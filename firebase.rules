@@ -1,0 +1,29 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 🔐 USERS collection
+    match /users/{uid} {
+      // Allow each authenticated user to read their own doc
+      allow read: if request.auth != null && request.auth.uid == uid;
+
+      // Block direct writes from clients.
+      // Only backend functions (with Admin SDK) can create/update/delete.
+      allow write: if false;
+    }
+
+    // 🔐 TOOLS collection
+    match /tools/{toolId} {
+      // Allow authenticated users to read the tools (for listing, search, dashboard)
+      allow read: if request.auth != null;
+
+      // Block writes, must go through Express API (which enforces perms)
+      allow write: if false;
+    }
+
+    // 🔒 Default: deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

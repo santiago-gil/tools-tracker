@@ -1,0 +1,21 @@
+# Node
+node_modules/
+npm-debug.log*
+
+# Local
+.env.local
+.env
+.env.*.local
+
+# TypeScript build output
+dist/
+*.tsbuildinfo
+
+# Logs
+logs
+*.log
+
+# OS files
+.DS_Store
+
+.eslintcache

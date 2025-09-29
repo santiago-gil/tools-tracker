@@ -1,0 +1,3083 @@
+[
+  {
+    "category": "Website Backends",
+    "platform": "BentoBox CMS",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "Y, we either receive access to the platform or send the GTM code to customer"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": ["https://help.getbento.com/en/articles/425473"],
+    "example_sites": ["https://help.getbento.com/en/articles/425473"],
+    "wcs_team_considerations": "https://ease.searchkings.ca/customers/SKC1002026181/accounts/ctm/379820/numbers(windows:windows;data=-O9BSFtwWJvqzsGxlsm0;type=viewTask)",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "Duda / Hibu",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "https://ease.searchkings.ca/tasks/-NXQheh3CJEViDEKmQ-t?noteId=-NXRLQljdxvidjU0RS2Z",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "FireSpring Site",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "Special",
+      "notes": "Requires the FireSpring Team to install codes"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "Google Site",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N | We can get GA added, but no GTM, CT or Ads Conversion.\nExample: https://ease.searchkings.ca/customers/SKC1002006700/dashboard(windows:windows;data=-NMaEiRHQVEfPA2ni_50;type=viewTask)"
+    },
+    "ga4_trackable": {
+      "status": "Partial",
+      "notes": "Y & N | We can get GA added, but no GTM or Ads Conversion.\nExample: https://ease.searchkings.ca/customers/SKC1002006700/dashboard(windows:windows;data=-NMaEiRHQVEfPA2ni_50;type=viewTask)\n        -Deleted user"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "GoDaddy Website Builder 8.0",
+    "gtm_ads_trackable": {
+      "status": "Partial",
+      "notes": "Y & N | GoDaddy Website Builder Version 8 only allows for GA tracking but no real conversion tracking or custom code installation. Further to this, GoDaddy seems to require a consent banner (pop-up) with an option to decline, in order for the Google Anayltics 4 Page view tracker to trigger\n\nGoDaddy 7.0 allows for tracking and custom code installation, weird why the newer version doesn't allow for more"
+    },
+    "ga4_trackable": {
+      "status": "Partial",
+      "notes": "Y & N | GoDaddy Website Builder Version 8 only allows for GA tracking but no real conversion tracking or custom code installation. Further to this,\u00a0GoDaddy seems to require a consent banner (pop-up) with an option to decline, in order for the Google Anayltics 4 Page view tracker to trigger\n\nGoDaddy 7.0 allows for tracking and custom code installation, weird why the newer version doesn't allow for more\n\t-Sajid Malgi"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [
+      "https://ca.godaddy.com/help/add-google-analytics-to-my-site-27179"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "Housecall Pro Site",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "GTM can be installed"
+    },
+    "ga4_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "Hubspot Landing Page",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y | When sharing the link, landing page might add a \"?hs_preview=\" automatically, which will interfere/block our codes from showing - need to check"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "Kartra",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [
+      "https://support.kartra.com/support/solutions/articles/153000175376-install-google-tag-manager-in-pages"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "https://seniorcare.idealcaregivers4u.com/ottawa",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "LeadPages",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "https://support.leadpages.com/hc/en-us/articles/203521880-Leadpages-and-Google"
+    ],
+    "example_sites": [
+      "https://support.leadpages.com/hc/en-us/articles/203521880-Leadpages-and-Google"
+    ],
+    "wcs_team_considerations": "https://ease.searchkings.ca/dashboards/-N42aeZAOWMI8sCLkIHY(windows:windows;data=-O2a-46BWpXx5aWDd7xj;type=viewTask)",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "LightSpeed",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "Y  - also has DFW Support"
+    },
+    "ga4_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "Luxury Presence Site (Real Estate)",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "Odoo",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "Y but Client Needs Developer Support  - no SK DFW/Product Feed Support for Ecomm"
+    },
+    "ga4_trackable": {
+      "status": "Unknown",
+      "notes": "?"
+    },
+    "msa_tracking": {
+      "status": "Special",
+      "notes": "Y but Client Needs Developer Support"
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "https://ease.searchkings.ca/customers/SKC1002023977/dashboard",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "Owner",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Special",
+      "notes": ""
+    },
+    "doc_links": [
+      "https://slack-files.com/T5M64QUQ4-F08T5B022T1-62378d54ed\n\nhttps://slack-files.com/T5M64QUQ4-F08TAHJ7JCT-d9c5a2d522"
+    ],
+    "example_sites": [
+      "https://slack-files.com/T5M64QUQ4-F08T5B022T1-62378d54ed\n\nhttps://slack-files.com/T5M64QUQ4-F08TAHJ7JCT-d9c5a2d522"
+    ],
+    "wcs_team_considerations": "https://chicagos-pizza.com/",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "PrestaShop",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "Client Needs Developer Support - Site requires GTM paid addon or the files on the hosting server need to be modified"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "ProSites",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y | send codes to service@prosites.com"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "https://ease.searchkings.ca/tasks/-NXGQDGF4jqfCXW_5iP8?noteId=-NY48sa9OYENn6oP9zxt",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "PriceGuide.ai",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "Y, GA4 conversion can be imported into Google Ads"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [
+      "https://priceguide.ai/how-to-add-your-google-analytics-tracking-code-to-your-priceguide-estimator/"
+    ],
+    "example_sites": ["-"],
+    "wcs_team_considerations": "https://ease.searchkings.ca/dashboards/-O1He3JYeJSONE_tg2tg(windows:windows;data=-OPCNVd81hGapgAWixHp;type=viewTask)",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "Salesforce Sites",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "Special",
+      "notes": "Requires special directives to be added to the webserver in order for tracking to work properly, basically we need to ask the salesforce site to whitelist GA, GTM, CTM etc."
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [
+      "https://developer.salesforce.com/blogs/2019/04/google-tag-manager-for-community-cloud"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "SalesForce LWR Forms",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "Y but requires having the form push an event to Google's Data Layer: dataLayer.push({ 'event': 'formSubmit' })"
+    },
+    "ga4_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "msa_tracking": {
+      "status": "Special",
+      "notes": "Y but requires having the form push an event to Google's Data Layer: dataLayer.push({ 'event': 'formSubmit' })"
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "Shopify Site",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "Shift4Shop",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "Squarespace Site",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "Squarespace Site"
+    },
+    "ga4_trackable": {
+      "status": "Partial",
+      "notes": "Y & N | Customer needs at least Business plan in order for us to add codes\n\t-Sajid Malgi"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [
+      "https://www.squarespace.com/pricing, https://www.loom.com/share/791e6c4ecbe041ffb15dc357893d7d15"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "https://ease.searchkings.ca/tasks/-Mv_aIRp1_1D9cTbTz1u?noteId=-Mvu9T8LS4kjSIo30e2h",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "Square Site",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [
+      "https://squareup.com/help/ca/en/article/6957-add-custom-tracking-code-to-your-website"
+    ],
+    "example_sites": [
+      "https://ease.searchkings.ca/tasks/-OUKw_tC8GoJriGL-rIb?noteId=-OWW5OZJ5EQ9K4m40Jrw"
+    ],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "Site123",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "Y - but need's an upgraded site plan"
+    },
+    "ga4_trackable": {
+      "status": "Special",
+      "notes": "Y - but need's an upgraded site plan"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "https://www.site123.com/support/7168957-add-plugins-and-custom-code"
+    ],
+    "example_sites": [
+      "https://www.site123.com/support/7168957-add-plugins-and-custom-code"
+    ],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "Tilda Site",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": ["https://help.tilda.cc/googletagmanager"],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "VistaPrint Site",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [
+      "https://www.vistaprint.sg/customer-care/help-centre/360030812971/"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "https://ease.searchkings.ca/customers/SKC1002025906/dashboard(windows:windows;data=-MxAVfMh_nscbAX_IRM9;type=viewTask)",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "Volusion",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "WebShop Manager",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "Weebly",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "https://ease.searchkings.ca/tasks/-NIcAkHlrgY5nG2honDW?noteId=-NIcxet8fhXP1vHdiJc8",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "Wix Site",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y | Wix sites allow for conversion tracking but it's best if the GA is installed directly through Wix's platform, not thru a GTM on the site\n\t-Sajid Malgi"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": ["https://www.wix.com/plans"],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Website Backends",
+    "platform": "WordPress Site",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "3CX Live Chat",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": ["it fires events automatically to ga but for version 9.4.0"],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "AnyChat",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N | Only able to track clicks at this time. No further event tracking possible\n\t-Ryan Drennan"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [
+      "https://docs.anychat.one/how-to/track-events-with-google-analytics-4"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "ApexChat (Blazeo)",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y | Reach out to apex rep to integrate with GA4 -\u00a0support@apexchat.com,\ntechsupport@apexchat.com\n\t-Joseph Cho"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y | Can integrate but the customer needs to contact the ApexChat rep themselves to get it set up. Pain in the ass.\n\t-Kim Glean"
+    },
+    "msa_tracking": {
+      "status": "Partial",
+      "notes": "Y & N | Trackable on a case by case basis"
+    },
+    "doc_links": [
+      "https://www.blazeo.com/blog/how-to-set-up-google-analytics-4/"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "https://valentlegal.ca/. https://diamondlaw.ca/, https://www.resteasypestcontrol.com/",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Artibot.ai",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": ["https://www.artibot.ai/js-api"],
+    "example_sites": ["https://www.artibot.ai/js-api"],
+    "wcs_team_considerations": "http://www.drtotherescue.com/",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Ascend by Wix (Wix Chat)",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [],
+    "example_sites": [
+      "https://support.wix.com/en/article/wix-chat-customizing-your-wix-chat-settings"
+    ],
+    "wcs_team_considerations": "https://www.lavedaboutique.com/",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Wix (AI Chat)",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Avoca AI",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N | We have access to the backend of the Chat. There's no way for us to add custom code/GTM inside the chat\n\t-Andy Chan"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "https://goproplumbinghvac.com/",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Bidclips",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Birdeye",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "https://support.birdeye.com/s/article/How-to-setup-advanced-Webchat-Analytics-within-Birdeye"
+    ],
+    "example_sites": [
+      "https://support.birdeye.com/s/article/How-to-setup-advanced-Webchat-Analytics-within-Birdeye"
+    ],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Birdseed Chat",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "Set up custom event (Form Submission) then datalayer variables for `eventModel.event_category` contains `BirdSeed` and `eventModel.event_label` contains `Live Chat Request Submission`"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "https://dondondoors.ca/",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "BoldChat (EngageToSell)",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "http://www.brettgm.ca",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Brevi Chat",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Brevo Chat",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "Special",
+      "notes": "Y, need login"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [],
+    "example_sites": [
+      "https://help.brevo.com/hc/en-us/articles/209580405-Integrate-Google-Analytics-with-your-Brevo-account"
+    ],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Broadly Web Chat",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "https://drtotherescue.com/",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Callrail Chat",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "Need to login and link Google Ads acct - not sure if worth it"
+    },
+    "ga4_trackable": {
+      "status": "Special",
+      "notes": "Y - need login to add GA4 measurement ID & API secret key"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [
+      "https://ease.searchkings.ca/tasks/-NSLsD6ldV1DWs-Danzn?noteId=-NSzwjcR7MmsB7yy03rm"
+    ],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Captivated Chat",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "Unsure"
+    },
+    "ga4_trackable": {
+      "status": "Special",
+      "notes": "Unsure"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [
+      "https://github.com/CaptivatedLLC/official-gtm-tag\nhttps://drive.google.com/file/d/1tksVerSWbVeibYXgbR1gQohtyUzbI-7p/view?usp=sharing"
+    ],
+    "example_sites": ["https://github.com/CaptivatedLLC/official-gtm-tag"],
+    "wcs_team_considerations": "https://tickmosquitocontrol.com/",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "ChaPort Chat",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": ["https://www.chaport.com/integrations/google-analytics"],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Chatra",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "https://chatra.io/help/analytics/ & https://chatra.com/help/cms/gtm/"
+    ],
+    "example_sites": [
+      "https://ease.searchkings.ca/users/tasks(windows:windows",
+      "data=-MmzVgfVkDUB5KxtJMj0",
+      "type=viewTask)"
+    ],
+    "wcs_team_considerations": "Pamela Lauz Jewellery",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "ChatArm",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "Y, can be imported from GA4"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "ChatSupport",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "Special",
+      "notes": "Y, need login"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": "?"
+    },
+    "doc_links": [
+      "Chat sends automated events via GA4. Will need to create goal in GA4 first then import into GAds"
+    ],
+    "example_sites": [
+      "https://ease.searchkings.ca/tasks/-NbtkNkJQGmvywyPeZ89?noteId=-NcO0-AVnRRKjqvec2Tm"
+    ],
+    "wcs_team_considerations": "https://livewiseinc.com/index.php",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "ChatSimple",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "Unknown",
+      "notes": "?"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [
+      "https://docs.chatsimple.ai/add-chatsimple-to-your-website/google-tag-manager\nChat doesn't trigger any event and doesn't provide global methods we can call or hook on to track chat user interactions"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Chatty",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": ["https://help.meetchatty.com/?ref=home"],
+    "example_sites": ["https://help.meetchatty.com"],
+    "wcs_team_considerations": "https://ww.candyclubcanada.ca/",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Chekkit",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": ["Pushes events to the data layer"],
+    "example_sites": [],
+    "wcs_team_considerations": "https://airdynastyac.com/",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Chiirp Chat",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [
+      "Loads within an iframe. Documentation suggests integrating with Zapier. Unable to track even using Google Ads code or GTM"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "https://thedvguys.com/",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Client ChatLive",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y | Reach local has used this chat as a white label. It can be tracked in Google"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": "?"
+    },
+    "doc_links": ["https://clientchatlive.com/features/"],
+    "example_sites": [],
+    "wcs_team_considerations": "https://www.barrowslevy.com/",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Crisp Chat",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "https://help.crisp.chat/en/article/how-to-push-a-conversion-to-google-ads-from-a-live-chat-via-google-tag-manager-1gxvjdq/"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "CustomGPT Chat",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Don't Go Chat",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": ["https://www.dontgo.com/features/ai-chatbot/"],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Drift",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "https://gethelp.drift.com/hc/en-us/articles/360019503134-How-to-Connect-Drift-to-Your-Google-Analytics-Account"
+    ],
+    "example_sites": [
+      "https://gethelp.drift.com/s/article/Install-Drift-with-Google-Tag-Manager"
+    ],
+    "wcs_team_considerations": "https://ease.searchkings.ca/customers/SKC1002019999/accounts(windows:windows;data=-Mjo4lCDnTe02EyKGvGc;type=viewTask)",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "eDesk",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Facebook Messenger Chat",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [
+      "Although customers may ask if they can use Zapier to set up chat tracking, Ops will not use Zapier to do this."
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "https://ease.searchkings.ca/tasks/-NTZYz0M1x8qKF8CRuW5?noteId=-NU2cD-1TL6ZWBaNHiR3",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "FreeChat",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "https://support.freshchat.com/support/solutions/articles/231987-integrate-google-analytics-event-tracking-with-freshdesk-messaging"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "Forterra Pest Control",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Freshchat (freshworks)",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "Does not seem like it (also loads within an iframe, and does not report any public events)"
+    },
+    "ga4_trackable": {
+      "status": "Unknown",
+      "notes": "?"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [
+      "https://www.freshworks.com/live-chat-software/integrations/"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "https://www.pumpernickels.ca/",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Genesys (Bold360)",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [
+      "https://dx.genesys.com/Web-Admin/Bold360Chat/Chat-Windows/2350036991/Google-Analytics-Integration-with-Bold360-Layered-Windows.htm"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Gorgias Chat",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "https://docs.gorgias.com/gorgias-chat/advanced-customization-new-chat"
+    ],
+    "example_sites": [
+      "https://docs.gorgias.com/gorgias-chat/advanced-customization-new-chat"
+    ],
+    "wcs_team_considerations": "https://ease.searchkings.ca/users/tasks(windows:windows;data=-MksHPAYxvyYo05qz1Zh;type=viewTask)",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Hatch API",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": ["https://www.usehatchapp.com/knowledge/hatch-api"],
+    "example_sites": [],
+    "wcs_team_considerations": "https://cleartheair-ac.com\n\nhttps://ease.searchkings.ca/tasks/-O5t6XMEWnewoEUTkDIl?noteId=-O6WhKfjkaCC-ObuJPDJ",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "HelpCrunch",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": ["https://docs.helpcrunch.com/developers/events"],
+    "example_sites": [],
+    "wcs_team_considerations": "https://totaltesting.com/     (GTM-NLJNN72)",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Help Scout Beacon Chat",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "https://developer.helpscout.com/beacon-2/web/javascript-api/"
+    ],
+    "example_sites": [
+      "https://developer.helpscout.com/beacon-2/web/javascript-api/"
+    ],
+    "wcs_team_considerations": "https://ease.searchkings.ca/dashboards/-N42aeZAOWMI8sCLkIHY(windows:windows;data=-NigBp9OXu4fSJFTQXqt;type=viewTask)",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Housecall Pro Chat",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "HomeServices Chat",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Hubspot Chat",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "Y (through GTM). Should sent event Automatically (if correctly setup)"
+    },
+    "ga4_trackable": {
+      "status": "Special",
+      "notes": "Y (through GTM). Should sent event Automatically (if correctly setup)"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "https://community.hubspot.com/t5/APIs-Integrations/Hubspot-Livechat-on-Google-Tag-Manager/td-p/240936"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "Happy Door\nhttps://hroptions.com/\n\nhttps://ease.searchkings.ca/tasks/-OOhJOKlf7NEnVIYhwH2?noteId=-OP6FKOKt8QMUsu5m3C5",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Instabot",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [
+      "https://instabothelp.zendesk.com/hc/en-us/articles/360029983791-Google-Analytics-Plugin"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Instabot.io",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": ["https://docs.instabot.io/docs/integrations"],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Intaker Chat",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [
+      "https://help.intaker.com/article/ga4-integration-for-intaker"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "diamondlaw.ca",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Intercom",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [],
+    "example_sites": [
+      "https://ease.searchkings.ca/tasks/-MjV6akA_J41qBbegLzl?noteId=-MjVD_7JBWT_HrtLtRWy\n\nhttps://www.intercom.com/help/en/articles/2454807-google-analytics-app"
+    ],
+    "wcs_team_considerations": "Motivated Maids - https://www.motivatedmaids.com",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "JivoChat",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": "?"
+    },
+    "doc_links": [
+      "https://www.jivochat.com/help/integrations/google-analytics-integration.html"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Juvo Leads Chat",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "https://juvoleads.com/google-analytics-4-juvo-leads-integration/"
+    ],
+    "example_sites": [
+      "https://ease.searchkings.ca/customers/SKC1002027306/accounts(windows:windows",
+      "data=-NY9rAvLEUBJkfmeJ8fq",
+      "type=viewTask)\n\nhttps://juvoleads.com/google-analytics-4-juvo-leads-integration/\n\nhttps://juvoleads.com/setting-up-google-analytics-and-google-ads-integration-with-juvo-leads/\n\nhttps://juvoleads.com/setting-up-offline-conversion-tracking-for-google-ads/"
+    ],
+    "wcs_team_considerations": "https://hilbernlaw.com/\nhttp://mcdivitt-law.com.dev.searchkings.ca/",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Kenect Chat",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [
+      "https://ease.searchkings.ca/customers/SKC1002028796/dashboard(windows:windows",
+      "data=-NGSFdtUz8t7nLoa-x8g",
+      "type=viewTask)"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "LaunchSMS",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "https://ease.searchkings.ca/customers/SKC1002034315/dashboard(windows:windows",
+      "data=-Nnjl3zb56NQQUNmpN9D",
+      "type=viewTask)"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "LeadConnector Chat",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": ["https://www.leadconnectorhq.com/support"],
+    "example_sites": [],
+    "wcs_team_considerations": "https://www.dbheatingcooling.com/ - https://ease.searchkings.ca/tasks/-NyvNfU01cymTUyFw-HK?noteId=-Nz3_vsNDPPWxeQ9--Oe",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "LiveChat",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "Y - but need paid integration"
+    },
+    "ga4_trackable": {
+      "status": "Special",
+      "notes": "Y - but they need the paid integration"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "https://www.livechat.com/help/log-live-chat-data-with-google-analytics/"
+    ],
+    "example_sites": ["https://developers.livechatinc.com/docs/js-api/"],
+    "wcs_team_considerations": "Comfort Aire",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Liveperson Automotive",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "Dealers United: https://www.lakeshoreford.net/",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "LivePerson Chat",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Unknown",
+      "notes": "?"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": "?"
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "https://ease.searchkings.ca/dashboards/-NYKF7fxwUEeho40Sony(windows:windows;data=-Ng4P3icMnjRPbztopVH;type=viewTask)",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Mindbody (Messenger.ai)",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "Special",
+      "notes": "N - No integration with Google Analytics and Google Ads"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [
+      "https://support.mindbodyonline.com/s/article/My-Analytics-screen-Bowtie?language=en_US.                                                         https://support.mindbodyonline.com/s/article/203260703-Google-Analytics?language=en_US"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Momence Chat",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "https://intercom.help/momence/en/articles/8114571-google-analytics-ga4-tracking-with-google-tag-manager"
+    ],
+    "example_sites": [
+      "https://intercom.help/momence/en/articles/8114571-google-analytics-ga4-tracking-with-google-tag-manager"
+    ],
+    "wcs_team_considerations": "https://ease.searchkings.ca/tasks/-O2a-46BWpXx5aWDd7xj?noteId=-O8D2HAITKPzZdIY3rF4",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Nexa Chat",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "Special",
+      "notes": "Y for GA3 and GA4, no for GTM"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [
+      "Kim can reach out to Allison Vavra - our Nexa rep to add GA UA to the customer's chat - no need to reach out to customer"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Ngage Live Chat",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "Y - need to have support team integrate GA4 tracking and track it as GA4 conversion by importing into Ads. Can only track chat requested."
+    },
+    "ga4_trackable": {
+      "status": "Special",
+      "notes": "Y - fires automatically but if firing to diff GA, need to have Ngage Live Chat team update setup"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [
+      "https://www.ngagelive.com/blog/difficulty-setting-up-google-analytics/"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "https://www.davidgordonlaw.com/",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Olark Chat",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Special",
+      "notes": "Y - only GA3 for now"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "https://productionclicks.com/tracking-olark-events-in-google-analytics-with-a-custom-script/"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Oncehub Chat",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "OneLocal",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "Y if the site is also using OneLocal"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [
+      "https://ease.searchkings.ca/tasks/-NV_VtSCNMRgRlGrb_e8?noteId=-NVoakoi3I-SEEseyNHb"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Optimy Chat",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "PagePilot",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "PipeDrive (Leadbooster)",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "Y - but needs to redirect to a thank you page"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "https://support.pipedrive.com/en/article/web-forms#after-submission-options"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Podium Text Widget",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Partial",
+      "notes": "Y & N | If event tracking for podium chat is set up from GTM, we should be able to track it\n\t-Sajid Malgi"
+    },
+    "doc_links": [
+      "https://help.podium.com/hc/en-us/articles/360050880114-Tracking-Webchat-Usage-with-Google-Tag-Manager\n\nhttps://help.podium.com/hc/en-us/articles/360041687113-Setting-up-Google-Analytics-for-Your-Website"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Provide Support Chat",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "ProntoChat",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": ["Need to get customer to reach out to ProntoChat"],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Pure Chat",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "Y - no need for login"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": ["https://purechat.com/support/integrations/google-analytics"],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "PulseM Chat",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y | Check to see if chat is in an iframe\n\t-Ryan Drennan"
+    },
+    "ga4_trackable": {
+      "status": "Unknown",
+      "notes": "?"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": ["https://support.pulsem.me/portal/en/home"],
+    "example_sites": [],
+    "wcs_team_considerations": "https://ease.searchkings.ca/tasks/-NVVENgVExp6iBw5odv3?noteId=-NVjDlobzEWpAG1XyrpF",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Ready Chat",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "RealTime Chat",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Recreate AI Chat",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "No documentation - we've actually touched base with their dev team and they have setup datalayer events"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "RichPanel",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Rossware Chat",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Ruby Chat",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "RP1 Chat",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "Using element visibility to track the initial \"Message Sent\" confirmation. Use ID: messageSentRP1"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "https://ease.searchkings.ca/dashboards/-O1ql8zwgfJlF1TphW9R(windows:windows;data=-OAYaTn-ssBNM6UDtTH-;type=viewTask)",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Roko Instabot chat",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": ["https://docs.instabot.io/docs/integrations"],
+    "example_sites": [],
+    "wcs_team_considerations": "https://www.libertysquaredentalgroup.com/, https://ease.searchkings.ca/tasks/-NDYjQ5k5a90iBM7-3Jp?noteId=-NECg3HNAhccE3B6_AWy",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Salesmsg Chat",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "Y - no need for login | Chat is not in an iframe. The platform does not have native GA4 / GTM configuration\n\t-Andy Chan"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": "?"
+    },
+    "doc_links": ["https://www.salesmessage.com/features/actionable-analytics"],
+    "example_sites": [],
+    "wcs_team_considerations": "https://www.ecotechpestcontrol.com/\n\nhttps://ease.searchkings.ca/tasks/-O1cPvUwEdpOGCdU68fY?noteId=-O332iGbCtCY03lPQ3PC",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Schedule Engine Chat",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": ["https://webchat.scheduleengine.net/setup.html"],
+    "example_sites": [],
+    "wcs_team_considerations": "callmurphys.com",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Scorpion Chat",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [
+      "Although it may appear as a non-iframe window, Mech has confirmed they load the chat via shadow root, which behaves similar to an iframe"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Service Fuison",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": ["https://www.servicefusion.com/partners-and-integrations"],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "ServiceTitan Chat (Text2Chat)",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Shopify Chat/Shopify Inbox",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": ["is within in iframe, and no GA integration"],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "SoTellUs Chat",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": ["iframe and zero documentation available online"],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Smartsupp",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": ["https://docs.smartsupp.com/chat-box/javascript-api/events/"],
+    "example_sites": [],
+    "wcs_team_considerations": "https://pprcoatings.com/   (GTM-M8ZCG4P)",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Smilesnap",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Smith AI",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "https://smith.ai/blog/how-to-track-smith-ai-live-chat-in-google-ads-google-analytics"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Support Board chat",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": ["Pushes events to the dataLayer., not in an iframe"],
+    "example_sites": [],
+    "wcs_team_considerations": "https://ease.searchkings.ca/customers/SKC1002030446/dashboard(windows:windows;data=-NpzqCqTTnqXk3mUtKwt;type=viewTask)",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Swell",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": ["Pushes events to the dataLayer."],
+    "example_sites": ["Pushes events to the dataLayer."],
+    "wcs_team_considerations": "https://www.mississaugadentistry.com/",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Steer CRM Forms",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "https://help.steercrm.com/knowledge/how-to-add-google-analytics-tracking-to-your-steer-scheduler"
+    ],
+    "example_sites": ["Pushes events to the dataLayer."],
+    "wcs_team_considerations": "https://ease.searchkings.ca/customers/SKC1002043209/accounts(windows:windows;data=-OOXjyZss700oFjTUnnn;type=viewTask)",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Tawk.to",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "Only if we can add the Tawk.to chat code via Google Tag Manager, since we need to modify it (add listeners to it)."
+    },
+    "ga4_trackable": {
+      "status": "Special",
+      "notes": "Y (pushes to datalayer, no need for login info) | Note: Chat must be loaded directly via GTM and must be removed either form Wordpress or in case directly installed"
+    },
+    "msa_tracking": {
+      "status": "Special",
+      "notes": "Y (See GAds notes)"
+    },
+    "doc_links": ["https://developer.tawk.to/jsapi/"],
+    "example_sites": ["https://developer.tawk.to/jsapi/"],
+    "wcs_team_considerations": "https://newcanadianjobs.ca/\n\nhttps://ease.searchkings.ca/tasks/-NmhO_s6_NGgPq3O36EO?noteId=-NoXYUU0LM5b_I1GhEpE",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "TextRequest",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "https://ease.searchkings.ca/tasks/-Nu4t8CDrALnbe6PxPfy?noteId=-NwKTjMUve7UpB86r7jB",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Thryvv Appt Scheduler",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "https://www.lowpricerichmond.com/",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Thryv WebChat",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Tidio Chat",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "Y(Login information now required)"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "https://help.tidio.com/hc/en-us/articles/5464775051292-Set-up-Tracking#automatic-tracking-for-nonshopify-websites"
+    ],
+    "example_sites": [
+      "Multi site: https://help.tidio.com/docs/install-the-same-tidio-chat-on-two-or-more-websites\nMulti Project: https://help.tidio.com/docs/manage-multiple-projects"
+    ],
+    "wcs_team_considerations": "https://ease.searchkings.ca/users/tasks(windows:windows;data=-Mkcw8_BfD69Xh_eXdsU;type=viewTask)\nhttps://ease.searchkings.ca/users/tasks(windows:windows;data=-MvyyrLn5eUC10deLU7H;type=viewTask)",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "therighut",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "TotalLiveChat",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "Special",
+      "notes": "Kinda (only able to track the Chat Window being opened), Need LocalIQ rep to put in measurement ID for us"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": "?"
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "https://www.hypro-drains.com/",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Warmly.ai Chat",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "https://www.intervoke.com/ https://ease.searchkings.ca/tasks/-N_obToKdABPi7zY34ZZ?noteId=-NaHehgIcexscMDdTUgY",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "WhatConverts",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "Y, if installed thru GTM we can accomodate for this extra CT script by configuring our tag for CTM to fire first - please refer to example for full logic"
+    },
+    "ga4_trackable": {
+      "status": "Special",
+      "notes": ""
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "WhatsApp",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Workiz Chat",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [
+      "The Workiz chat loads within an iframe, so even if it were pushing events to GA or GTM (didn't see any while testing), attribution would still be an issue\n\nwill need to be redireced to a thank you page"
+    ],
+    "example_sites": [
+      "https://help.workiz.com/en/articles/3135977-how-to-add-a-thank-you-web-page-to-workiz-online-booking"
+    ],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Zendesk (Zopim)",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y | Might be trackable via a 3rd party app that you would have to pay for but that may not even allow proper attribution with that setup\n\t-Sajid Malgi"
+    },
+    "doc_links": [
+      "https://www.analyticsmania.com/post/zopim-google-tag-manager/"
+    ],
+    "example_sites": [
+      "https://www.analyticsmania.com/post/zopim-google-tag-manager/"
+    ],
+    "wcs_team_considerations": "https://www.aqueductplumbing.com/",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Zendesk (Classic messenger) Web Widget",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "ga4_trackable": {
+      "status": "Special",
+      "notes": "Y- But Very Limited (basically only open and closes of the chat)"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [
+      "https://developer.zendesk.com/api-reference/widget/core/    https://developer.zendesk.com/api-reference/widget-messaging/web/core/"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Zidy Chat",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N | Ops reached out to Zidy Chat support but has no response. There are no existing documentations regarding GTM/GA4 integration support."
+    },
+    "ga4_trackable": {
+      "status": "No",
+      "notes": "N"
+    },
+    "msa_tracking": {
+      "status": "No",
+      "notes": "N"
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "https://www.baehrheatandair.com/\n\nhttps://ease.searchkings.ca/tasks/-Nj94_uhzdbnxVdc_2J6?noteId=-NjwiXriQa9WmYVs_yFc",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Zoho Sales IQ",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Y | Need Zoho Chat login to enable GTM integration"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "https://www.zoho.com/salesiq/help/integrations/integrating-google-analytics-with-zoho-salesiq.html Looks like we need the Customer to enable GTM settings on their Zoho Dashboard. Settings > Integrations > Google Tag Manager > Enabled. Might be best to ask for login info"
+    ],
+    "example_sites": [
+      "https://ease.searchkings.ca/customers/SKC1002024636/dashboard(windows:windows",
+      "data=-MoGsE36NOq4D7pf39VL",
+      "type=viewTask)"
+    ],
+    "wcs_team_considerations": "Refer to this task for a setup in both GAds and MSA https://ease.searchkings.ca/customers/SKC1002027010/tasks/open(windows:windows;data=-OVxdCRJcsp04Q5E6jR4;type=viewTask) Look at the GTM setup and use the Sales IQ template to get the necessary tags and triggers. PLESE NOTE: Sales IQ has two versions of chats, so please use (Chat Initiated|Offline Message Submitted|Zoho SalesIQ Chat Connected) to filter different chat events in the trigger. And Upate event triggers as needed as both chat versions use different events",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Zyratalk",
+    "gtm_ads_trackable": {
+      "status": "No",
+      "notes": "N | August 2024 update - Zyratalk chat is not trackable.\n\nTriggers fail to fire since the click is not visible to GTM."
+    },
+    "ga4_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [
+      "For Chat - Trigger is Click - All Elements. Click ID contains ChatStartID. For Click to Call - Click - All Elements, Click ID contains callusID."
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "https://ease.searchkings.ca/tasks/-NvHmmPgymaLN02ZwAj8?noteId=-NwoaCruhrCxBAAt9OfO",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Chat Tools",
+    "platform": "Re:amaze Chat",
+    "gtm_ads_trackable": {
+      "status": "Special",
+      "notes": "Y - Should be sending events through GTM automatically."
+    },
+    "ga4_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "msa_tracking": {
+      "status": "Yes",
+      "notes": "Y"
+    },
+    "doc_links": [],
+    "example_sites": [],
+    "wcs_team_considerations": "https://ease.searchkings.ca/customers/SKC1002031479/accounts/bing/176267131/settings(windows:windows;data=-NVGCEVinLprmbCxp2O7;type=viewTask)",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "User Consent Systems",
+    "platform": "usercentrics",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Yes"
+    },
+    "ga4_trackable": {
+      "status": "Yes",
+      "notes": "Yes"
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [
+      "https://usercentrics.atlassian.net/wiki/spaces/SKB/pages/605716518/How+do+I+configure+the+Google+Tag+Manager+script+and+Usercentrics+in+a+GDPR-compliant+manner+CMP+Version+1"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "User Consent Systems",
+    "platform": "usercentrics",
+    "gtm_ads_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "ga4_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": ["https://docs.usercentrics.com/#/consent-mode"],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  },
+  {
+    "category": "Google Ads Integrations",
+    "platform": "ActiveCampaign",
+    "gtm_ads_trackable": {
+      "status": "Yes",
+      "notes": "Yes"
+    },
+    "ga4_trackable": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "msa_tracking": {
+      "status": "Unknown",
+      "notes": ""
+    },
+    "doc_links": [
+      "https://help.activecampaign.com/hc/en-us/articles/10801783829404?_ga=2.80602834.438651583.1700169897-1287927878.1697813936#h_01HCNBH3X22CXGDD6EG76BCG2J"
+    ],
+    "example_sites": [],
+    "wcs_team_considerations": "",
+    "ops_notes": "",
+    "sk_recommended": false
+  }
+]
