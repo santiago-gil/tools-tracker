@@ -1,118 +1,60 @@
-// import { Outlet, NavLink } from 'react-router-dom';
-// import { useAuth } from './context/AuthProvider';
+import { useState } from 'react';
+import { useAuth } from './contexts/AuthContext';
+import { SignInPage } from './components/auth/SignInPage';
+import { Layout } from './components/layout/Layout';
+import { ToolList } from './components/tools/ToolList';
+import { UsersPage } from './components/users/UsersPage';
+import { LoadingSpinner } from './components/common/LoadingSpinner';
 
-// export default function App() {
-//   const { user, loading } = useAuth();
+type Page = 'tools' | 'users';
 
-//   if (loading) {
-//     return (
-//       <div className="flex items-center justify-center min-h-screen">
-//         <div className="h-6 w-6 animate-spin rounded-full border-2 border-sk-red border-t-transparent"></div>
-//         <span className="ml-2 text-gray-600 text-sm">Loading...</span>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="min-h-screen bg-[#F7F7F7]">
-//       <header className="bg-white border-b border-gray-200">
-//         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-//           <div className="flex items-center space-x-3">
-//             <div className="text-2xl">👑</div>
-//             <div>
-//               <h1 className="text-2xl font-bold text-gray-900">
-//                 Tool Tracker Lookup
-//               </h1>
-//               <p className="text-sm text-gray-500">
-//                 Resource for tracking integrations and capabilities.
-//               </p>
-//             </div>
-//           </div>
-//           <nav className="space-x-4">
-//             <NavLink
-//               to="/tools"
-//               className={({ isActive }) =>
-//                 `hover:underline ${isActive ? 'font-semibold text-sk-red' : ''}`
-//               }
-//             >
-//               Tools
-//             </NavLink>
-//             {user?.role === 'admin' && (
-//               <NavLink
-//                 to="/users"
-//                 className={({ isActive }) =>
-//                   `hover:underline ${isActive ? 'font-semibold text-sk-red' : ''}`
-//                 }
-//               >
-//                 Users
-//               </NavLink>
-//             )}
-//           </nav>
-//           <div className="text-sm text-gray-600">{user?.email ?? 'Not logged in'}</div>
-//         </div>
-//       </header>
-
-//       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-//         <Outlet />
-//       </main>
-//     </div>
-//   );
-// }
-import { Outlet, NavLink } from 'react-router-dom';
-import { useAuth } from './context/AuthProvider';
-
-export default function App() {
+export function App() {
   const { user, loading } = useAuth();
+  const [currentPage, setCurrentPage] = useState<Page>('tools');
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-sk-red border-t-transparent"></div>
-        <span className="ml-2 text-gray-600 text-sm">Loading...</span>
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner />
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-[#F7F7F7]">
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="text-2xl">👑</div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Tool Tracker Lookup</h1>
-              <p className="text-sm text-gray-500">
-                Resource for tracking integrations and capabilities.
-              </p>
-            </div>
-          </div>
-          <nav className="space-x-4">
-            <NavLink
-              to="/tools"
-              className={({ isActive }) =>
-                `hover:underline ${isActive ? 'font-semibold text-sk-red' : ''}`
-              }
-            >
-              Tools
-            </NavLink>
-            {user?.role === 'admin' && (
-              <NavLink
-                to="/users"
-                className={({ isActive }) =>
-                  `hover:underline ${isActive ? 'font-semibold text-sk-red' : ''}`
-                }
-              >
-                Users
-              </NavLink>
-            )}
-          </nav>
-          <div className="text-sm text-gray-600">{user?.email ?? 'Not logged in'}</div>
-        </div>
-      </header>
+  if (!user) {
+    return <SignInPage />;
+  }
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <Outlet />
-      </main>
-    </div>
+  return (
+    <Layout>
+      {/* Navigation Tabs */}
+      <div className="flex gap-4 mb-6 border-b border-gray-200">
+        <button
+          onClick={() => setCurrentPage('tools')}
+          className={`px-4 py-2 font-medium transition border-b-2 ${
+            currentPage === 'tools'
+              ? 'text-primary-600 border-primary-600'
+              : 'text-gray-600 border-transparent hover:text-gray-900'
+          }`}
+        >
+          Tools
+        </button>
+        {user.permissions.manageUsers && (
+          <button
+            onClick={() => setCurrentPage('users')}
+            className={`px-4 py-2 font-medium transition border-b-2 ${
+              currentPage === 'users'
+                ? 'text-primary-600 border-primary-600'
+                : 'text-gray-600 border-transparent hover:text-gray-900'
+            }`}
+          >
+            Users
+          </button>
+        )}
+      </div>
+
+      {/* Page Content */}
+      {currentPage === 'tools' && <ToolList />}
+      {currentPage === 'users' && user.permissions.manageUsers && <UsersPage />}
+    </Layout>
   );
 }
