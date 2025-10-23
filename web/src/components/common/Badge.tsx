@@ -1,24 +1,56 @@
 import type { TrackableStatus } from '../../types';
 
+const statusConfig: Record<
+  TrackableStatus,
+  { bg: string; text: string; border: string }
+> = {
+  Yes: {
+    bg: 'var(--badge-yes-bg)',
+    text: 'var(--badge-yes-text)',
+    border: 'var(--badge-yes-border)',
+  },
+  No: {
+    bg: 'var(--badge-no-bg)',
+    text: 'var(--badge-no-text)',
+    border: 'var(--badge-no-border)',
+  },
+  Partial: {
+    bg: 'var(--badge-partial-bg)',
+    text: 'var(--badge-partial-text)',
+    border: 'var(--badge-partial-border)',
+  },
+  Special: {
+    bg: 'var(--badge-special-bg)',
+    text: 'var(--badge-special-text)',
+    border: 'var(--badge-special-border)',
+  },
+  Unknown: {
+    bg: 'var(--badge-unknown-bg)',
+    text: 'var(--badge-unknown-text)',
+    border: 'var(--badge-unknown-border)',
+  },
+};
+
 interface BadgeProps {
   status: TrackableStatus;
-  children?: React.ReactNode;
+  compact?: boolean;
 }
 
-export function Badge({ status, children }: BadgeProps) {
-  const styles = {
-    Yes: 'bg-green-50 text-green-700 border-green-200',
-    No: 'bg-red-50 text-red-700 border-red-200',
-    Partial: 'bg-amber-50 text-amber-700 border-amber-200',
-    Special: 'bg-blue-50 text-blue-700 border-blue-200',
-    Unknown: 'bg-gray-50 text-gray-700 border-gray-200',
-  };
+export function Badge({ status, compact }: BadgeProps) {
+  const config = statusConfig[status];
 
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${styles[status]}`}
+      className={`inline-flex items-center rounded-full font-medium ring-1 ${
+        compact ? 'px-2 py-0.5 text-xs' : 'px-3 py-1 text-sm'
+      }`}
+      style={{
+        backgroundColor: config.bg,
+        color: config.text,
+        borderColor: config.border,
+      }}
     >
-      {children || status}
+      {status}
     </span>
   );
 }

@@ -2,28 +2,46 @@ import { z } from 'zod';
 
 /**
  * =========================
- * TOOL SCHEMA
+ * TOOL SCHEMA (v2)
  * =========================
  */
-const trackableFieldSchema = z.object({
+
+const trackableSchema = z.object({
   status: z.enum(["Yes", "No", "Partial", "Special", "Unknown"]),
-  notes: z.string().optional(),
+  notes: z.string().max(1000).optional(),
+  example_site: z.string().url().optional().or(z.literal("")),
+  documentation: z.string().url().optional().or(z.literal("")),
 });
 
-export const toolSchema = z.object({
-  platform: z.string().min(1, "Platform is required"),
-  category: z.string().min(1, "Category is required"),
-  gtm_ads_trackable: trackableFieldSchema.optional(),
-  ga4_trackable: trackableFieldSchema.optional(),
-  msa_tracking: trackableFieldSchema.optional(),
-  doc_links: z.array(z.string()).optional(),
-  example_sites: z.array(z.string()).optional(),
-  wcs_team_considerations: z.string().optional(),
-  ops_notes: z.string().optional(),
+const trackablesSchema = z.object({
+  gtm: trackableSchema.optional(),
+  ga4: trackableSchema.optional(),
+  google_ads: trackableSchema.optional(),
+  msa: trackableSchema.optional(),
+});
+
+const toolVersionSchema = z.object({
+  versionName: z.string().min(1).max(100),
+  trackables: trackablesSchema,
+  team_considerations: z.string().max(2000).optional(),
   sk_recommended: z.boolean().default(false),
 });
 
-// type of tool input from client (no id/timestamps set yet)
+const updatedBySchema = z.object({
+  uid: z.string().optional(),
+  email: z.string().optional(),
+  name: z.string().optional(),
+});
+
+export const toolSchema = z.object({
+  name: z.string().min(1, "Platform name is required").max(200),
+  category: z.string().min(1, "Category is required").max(100),
+  versions: z.array(toolVersionSchema).min(1),
+  updatedAt: z.string().optional(),
+  createdAt: z.string().optional(),
+  updatedBy: updatedBySchema.optional(),
+});
+
 export type ToolInput = z.infer<typeof toolSchema>;
 
 /**

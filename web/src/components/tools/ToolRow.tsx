@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Badge } from '../common/Badge';
 import type { Tool } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
@@ -10,105 +11,180 @@ interface ToolRowProps {
 
 export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
   const { user } = useAuth();
+  const [expanded, setExpanded] = useState(false);
+  const [selectedVersionIdx, setSelectedVersionIdx] = useState(0);
+
+  const currentVersion = tool.versions[selectedVersionIdx];
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <h3 className="text-lg font-semibold text-gray-900 truncate">
-              {tool.platform}
-            </h3>
-            {tool.sk_recommended && (
-              <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium">
-                SK Recommended
-              </span>
+    <div className="border rounded-xl overflow-hidden hover:shadow-md transition bg-white">
+      <div className="p-4 cursor-pointer" onClick={() => setExpanded(!expanded)}>
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3">
+          {/* Left side - Tool info and version tabs */}
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="text-lg font-semibold text-gray-900 flex-shrink-0">
+                {tool.name}
+              </h3>
+              {currentVersion?.sk_recommended && (
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700 flex-shrink-0">
+                  SK Recommended
+                </span>
+              )}
+              {/* Expand/Collapse indicator */}
+              <span className="text-lg text-gray-500 ml-2">{expanded ? '▲' : '▼'}</span>
+            </div>
+            <p className="text-xs text-gray-500 mt-0.5">{tool.category}</p>
+
+            {/* Version tabs - moved here for better organization */}
+            {tool.versions.length > 1 && (
+              <div className="flex gap-2 flex-wrap mt-3">
+                {tool.versions.map((version, idx) => (
+                  <button
+                    key={idx}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedVersionIdx(idx);
+                    }}
+                    className={`text-xs px-3 py-1.5 rounded-md transition font-medium ${
+                      selectedVersionIdx === idx
+                        ? 'bg-red-600 text-white shadow-sm'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-sm'
+                    }`}
+                  >
+                    {version.versionName}
+                  </button>
+                ))}
+              </div>
             )}
           </div>
-          <p className="text-xs text-gray-500 mt-0.5">{tool.category}</p>
-        </div>
 
-        <div className="flex items-center gap-4 text-sm shrink-0 flex-wrap">
-          <div className="flex items-center gap-2">
-            <span className="text-gray-500 text-xs">GTM/Ads:</span>
-            <Badge status={tool.gtm_ads_trackable?.status || 'Unknown'}>
-              {tool.gtm_ads_trackable?.status || '?'}
-            </Badge>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-gray-500 text-xs">GA4:</span>
-            <Badge status={tool.ga4_trackable?.status || 'Unknown'}>
-              {tool.ga4_trackable?.status || '?'}
-            </Badge>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-gray-500 text-xs">MSA:</span>
-            <Badge status={tool.msa_tracking?.status || 'Unknown'}>
-              {tool.msa_tracking?.status || '?'}
-            </Badge>
-          </div>
+          {/* Right side - Tracking badges and actions */}
+          <div className="flex flex-col gap-3 lg:items-end">
+            <div className="flex items-center gap-4 text-sm flex-wrap">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-gray-600">GTM:</span>
+                <Badge status={currentVersion?.trackables?.gtm?.status || 'Unknown'} />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-gray-600">Ads:</span>
+                <Badge
+                  status={currentVersion?.trackables?.google_ads?.status || 'Unknown'}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-gray-600">GA4:</span>
+                <Badge status={currentVersion?.trackables?.ga4?.status || 'Unknown'} />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-gray-600">MSA:</span>
+                <Badge status={currentVersion?.trackables?.msa?.status || 'Unknown'} />
+              </div>
+            </div>
 
-          <div className="hidden md:block w-px h-6 bg-gray-200" />
-
-          <div className="flex items-center gap-2">
-            {user?.permissions.edit && (
-              <button
-                onClick={onEdit}
-                className="text-sm text-gray-600 hover:text-gray-900 hover:underline"
-              >
-                Edit
-              </button>
-            )}
-            {user?.permissions.delete && (
-              <button
-                onClick={onDelete}
-                className="text-sm text-red-600 hover:text-red-700 hover:underline"
-              >
-                Delete
-              </button>
+            {(user?.permissions.edit || user?.permissions.delete) && (
+              <div className="flex items-center gap-2">
+                {user?.permissions.edit && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit();
+                    }}
+                    className="text-sm text-gray-600 hover:text-gray-900 hover:underline"
+                  >
+                    Edit
+                  </button>
+                )}
+                {user?.permissions.delete && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete();
+                    }}
+                    className="text-sm text-red-600 hover:text-red-700 hover:underline"
+                  >
+                    Delete
+                  </button>
+                )}
+              </div>
             )}
           </div>
         </div>
       </div>
 
-      {(tool.doc_links?.length || tool.example_sites?.length) && (
-        <div className="mt-3 space-y-1">
-          {tool.doc_links && tool.doc_links.length > 0 && (
-            <div className="text-sm truncate">
-              <span className="font-medium text-gray-700">Docs:</span>{' '}
-              {tool.doc_links.map((link, idx) => (
-                <span key={idx}>
-                  <a
-                    href={link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
-                  >
-                    {link}
-                  </a>
-                  {idx < tool.doc_links!.length - 1 && ', '}
-                </span>
-              ))}
+      {/* Expanded Details */}
+      {expanded && currentVersion && (
+        <div className="px-4 pb-4 pt-2 space-y-3 border-t bg-gray-50">
+          {currentVersion.team_considerations && (
+            <div>
+              <h4 className="text-sm font-semibold text-gray-900 mb-1">
+                Web Team Considerations
+              </h4>
+              <p className="text-sm text-gray-700">
+                {currentVersion.team_considerations}
+              </p>
             </div>
           )}
-          {tool.example_sites && tool.example_sites.length > 0 && (
-            <div className="text-sm truncate">
-              <span className="font-medium text-gray-700">Examples:</span>{' '}
-              {tool.example_sites.join(', ')}
-            </div>
-          )}
-        </div>
-      )}
 
-      {tool.wcs_team_considerations && (
-        <div className="mt-2 text-sm text-gray-700">
-          <span className="font-medium">WCS:</span> {tool.wcs_team_considerations}
-        </div>
-      )}
+          {Object.entries(currentVersion.trackables)
+            .filter(
+              ([, trackable]) =>
+                trackable?.notes || trackable?.example_site || trackable?.documentation,
+            )
+            .map(([key, trackable]) => {
+              const labels: Record<string, string> = {
+                gtm: 'Google Tag Manager',
+                ga4: 'Google Analytics 4',
+                google_ads: 'Google Ads',
+                msa: 'Microsoft Advertising',
+              };
+              return (
+                <div key={key} className="space-y-2">
+                  <h4 className="text-sm font-semibold text-gray-900">
+                    {labels[key] || key}
+                  </h4>
 
-      {tool.ops_notes && (
-        <div className="mt-2 text-sm text-gray-700">
-          <span className="font-medium">Notes:</span> {tool.ops_notes}
+                  {trackable?.notes && (
+                    <div>
+                      <h5 className="text-xs font-medium text-gray-600 mb-1">Notes</h5>
+                      <p className="text-sm text-gray-700">{trackable.notes}</p>
+                    </div>
+                  )}
+
+                  {trackable?.example_site && (
+                    <div>
+                      <h5 className="text-xs font-medium text-gray-600 mb-1">
+                        Example Site
+                      </h5>
+                      <a
+                        href={trackable.example_site}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-600 hover:text-blue-800 hover:underline break-all"
+                      >
+                        {trackable.example_site}
+                      </a>
+                    </div>
+                  )}
+
+                  {trackable?.documentation && (
+                    <div>
+                      <h5 className="text-xs font-medium text-gray-600 mb-1">
+                        Documentation
+                      </h5>
+                      <a
+                        href={trackable.documentation}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-600 hover:text-blue-800 hover:underline break-all"
+                      >
+                        {trackable.documentation}
+                      </a>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
         </div>
       )}
     </div>

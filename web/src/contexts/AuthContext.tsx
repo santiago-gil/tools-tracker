@@ -20,32 +20,6 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-// Helper to retry fetching user data (for race condition with Cloud Function)
-async function fetchUserWithRetry(
-  uid: string,
-  maxRetries = 5,
-  delayMs = 500,
-): Promise<User | null> {
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    try {
-      const { user } = await usersApi.getCurrent(uid);
-      return user;
-    } catch (error: any) {
-      // If 404, the document might not exist yet - retry
-      if (error.status === 404 && attempt < maxRetries - 1) {
-        console.log(
-          `User document not found (attempt ${attempt + 1}/${maxRetries}), retrying...`,
-        );
-        await new Promise((resolve) => setTimeout(resolve, delayMs));
-        continue;
-      }
-      // Other errors or max retries reached
-      throw error;
-    }
-  }
-  return null;
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -57,8 +31,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (fbUser) {
         try {
-          const firestoreUser = await fetchUserWithRetry(fbUser.uid);
-          setUser(firestoreUser);
+          const { user: firestoreUser } = await usersApi.getCurrent(fbUser.uid);
+          // Merge Firebase Auth data with Firestore user data
+          setUser({
+            ...firestoreUser,
+            displayName: fbUser.displayName || firestoreUser.displayName,
+            photoURL: fbUser.photoURL || firestoreUser.photoURL,
+          });
         } catch (error) {
           console.error('Failed to fetch user data:', error);
           setUser(null);

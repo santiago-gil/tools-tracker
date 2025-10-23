@@ -1,18 +1,25 @@
 import { useAuth } from '../../contexts/AuthContext';
+import { CrownLogo } from '../layout/CrownLogo';
 
 export function SignInPage() {
   const { signInWithGoogle, loading } = useAuth();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[var(--badge-unknown-bg)] flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         <div className="bg-white rounded-2xl shadow-xl p-8">
-          <div className="text-center mb-8">
-            <div className="text-6xl mb-4">👑</div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Tool Tracker</h1>
-            <p className="text-gray-600">Sign in to manage integrations and tools</p>
+          {/* Header */}
+          <div className="text-center mb-8 flex flex-col items-center">
+            <CrownLogo className="w-16 h-16 text-[var(--sk-gold)] mb-4" />
+            <h1 className="text-3xl font-bold text-[var(--sk-black)] mb-2">
+              <span className="text-[var(--sk-red)]">SearchKings</span> Tool Tracker
+            </h1>
+            <p className="text-sm text-[var(--sk-grey)]">
+              Sign in to manage integrations and tools
+            </p>
           </div>
 
+          {/* Google Sign in Button */}
           <button
             onClick={signInWithGoogle}
             disabled={loading}
@@ -39,8 +46,10 @@ export function SignInPage() {
             Sign in with Google
           </button>
 
-          <p className="text-xs text-gray-500 text-center mt-6">
-            By signing in, you agree to our terms and conditions
+          <p className="text-xs text-[var(--sk-grey)] text-center mt-6">
+            By signing in, you agree to our{' '}
+            <span className="text-[var(--sk-red)] font-medium">terms</span> and{' '}
+            <span className="text-[var(--sk-red)] font-medium">conditions</span>
           </p>
         </div>
       </div>

@@ -32,7 +32,7 @@ export function App() {
           onClick={() => setCurrentPage('tools')}
           className={`px-4 py-2 font-medium transition border-b-2 ${
             currentPage === 'tools'
-              ? 'text-primary-600 border-primary-600'
+              ? 'text-[var(--sk-red)] border-primary-600'
               : 'text-gray-600 border-transparent hover:text-gray-900'
           }`}
         >
@@ -43,7 +43,7 @@ export function App() {
             onClick={() => setCurrentPage('users')}
             className={`px-4 py-2 font-medium transition border-b-2 ${
               currentPage === 'users'
-                ? 'text-primary-600 border-primary-600'
+                ? 'text-[var(--sk-red)] border-primary-600'
                 : 'text-gray-600 border-transparent hover:text-gray-900'
             }`}
           >

@@ -1,3 +1,4 @@
+//common/ErrorBoundary
 import { Component, type ReactNode } from 'react';
 
 interface Props {
@@ -19,7 +20,7 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: any) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('ErrorBoundary caught:', error, errorInfo);
   }
 
@@ -38,7 +39,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </p>
               <button
                 onClick={() => window.location.reload()}
-                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"
+                className="px-4 py-2 bg-[var(--sk-red)] text-white rounded-lg hover:bg-[var(--sk-red-dark)] transition"
               >
                 Reload Page
               </button>

@@ -1,23 +1,23 @@
 import { useUsers, useUpdateUser, useDeleteUser } from '../../hooks/useUsers';
 import { LoadingSpinner } from '../common/LoadingSpinner';
-import type { User } from '../../types';
+import type { User, UserRole } from '../../types';
+import { ROLE_PERMISSIONS } from '../../types';
 
 export function UsersPage() {
   const { data: users, isLoading, error } = useUsers();
   const updateUser = useUpdateUser();
   const deleteUser = useDeleteUser();
 
-  const handleRoleChange = async (uid: string, role: User['role']) => {
-    const permissions = {
-      viewer: { add: false, edit: false, delete: false, manageUsers: false },
-      ops: { add: true, edit: true, delete: false, manageUsers: false },
-      admin: { add: true, edit: true, delete: true, manageUsers: true },
-    };
-
-    await updateUser.mutateAsync({
-      uid,
-      data: { role, permissions: permissions[role] },
-    });
+  const handleRoleChange = async (uid: string, role: UserRole) => {
+    try {
+      const newPermissions = ROLE_PERMISSIONS[role];
+      await updateUser.mutateAsync({
+        uid,
+        data: { role, permissions: newPermissions },
+      });
+    } catch (err) {
+      console.error('Failed to update user role', err);
+    }
   };
 
   const handleDelete = async (user: User) => {
@@ -25,9 +25,15 @@ export function UsersPage() {
       !confirm(
         `Are you sure you want to delete user "${user.email}"? This action cannot be undone.`,
       )
-    )
+    ) {
       return;
-    await deleteUser.mutateAsync(user.uid);
+    }
+
+    try {
+      await deleteUser.mutateAsync(user.uid);
+    } catch (err) {
+      console.error('Failed to delete user', err);
+    }
   };
 
   if (isLoading) {
@@ -45,11 +51,15 @@ export function UsersPage() {
     );
   }
 
+  if (!users?.length) {
+    return <div className="text-center py-12 text-gray-600">No users found.</div>;
+  }
+
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-gray-900">User Management</h2>
-        <p className="text-gray-600 mt-1">Manage user roles and permissions</p>
+        <p className="text-gray-600 mt-1">Manage user roles and permissions.</p>
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -72,7 +82,7 @@ export function UsersPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {users?.map((user: User) => (
+              {users.map((user) => (
                 <tr key={user.uid} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{user.email}</div>
@@ -81,9 +91,11 @@ export function UsersPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <select
                       value={user.role}
-                      onChange={(e) => handleRoleChange(user.uid, e.target.value as any)}
-                      disabled={updateUser.isPending}
-                      className="text-sm border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
+                      onChange={(e) =>
+                        handleRoleChange(user.uid, e.target.value as UserRole)
+                      }
+                      disabled={updateUser.isPending || user.role === 'admin'} // prevent demotion of self
+                      className="text-sm border-gray-300 rounded-lg focus:ring-[var(--primary)] focus:border-[var(--primary)]"
                     >
                       <option value="viewer">Viewer</option>
                       <option value="ops">Ops</option>
@@ -92,26 +104,16 @@ export function UsersPage() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-wrap gap-1">
-                      {user.permissions.add && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
-                          Add
-                        </span>
-                      )}
-                      {user.permissions.edit && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                          Edit
-                        </span>
-                      )}
-                      {user.permissions.delete && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
-                          Delete
-                        </span>
-                      )}
-                      {user.permissions.manageUsers && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
-                          Manage Users
-                        </span>
-                      )}
+                      {Object.entries(user.permissions)
+                        .filter(([, val]) => val)
+                        .map(([key]) => (
+                          <span
+                            key={key}
+                            className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 capitalize"
+                          >
+                            {key}
+                          </span>
+                        ))}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm">

@@ -9,13 +9,45 @@ npm-debug.log*
 
 # TypeScript build output
 dist/
+lib/
 *.tsbuildinfo
 
 # Logs
 logs
 *.log
+firestore-debug.log
+firebase-debug.log
 
 # OS files
 .DS_Store
+
+# Firebase
+firebase-debug.log
+firestore-debug.log
+.firebase/
+
+# Emulator data (contains sensitive data)
+emulator-data/
+saved-data/
+prod_data_export/
+
+# Scripts (contains sensitive data and files)
+scripts/
+
+# Build artifacts
+*.js.map
+*.d.ts.map
+
+# Migration files (may contain sensitive data)
+migrate.js
+migrate_to_v2.js
+
+# IDE files
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.temp
 
 .eslintcache

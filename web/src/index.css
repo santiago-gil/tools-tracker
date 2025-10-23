@@ -2,6 +2,59 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    /* Brand Colors */
+    --sk-red: #e41f1b;
+    --sk-red-light: #ee312f;
+    --sk-red-dark: #da1c1c;
+    --sk-gold: #ffa300;
+    --sk-gold-light: #ffbd00;
+    --sk-grey: #4a4a4a;
+    --sk-black: #000000;
+
+    /* UI Colors */
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+
+    /* Badge Colors (keep the nice ones) */
+    --badge-yes-bg: #ecfdf5;
+    --badge-yes-text: #059669;
+    --badge-yes-border: #a7f3d0;
+
+    --badge-no-bg: #fef2f2;
+    --badge-no-text: #dc2626;
+    --badge-no-border: #fecaca;
+
+    --badge-partial-bg: #fffbeb;
+    --badge-partial-text: #d97706;
+    --badge-partial-border: #fde68a;
+
+    --badge-special-bg: #eff6ff;
+    --badge-special-text: #2563eb;
+    --badge-special-border: #bfdbfe;
+
+    --badge-unknown-bg: #f9fafb;
+    --badge-unknown-text: #6b7280;
+    --badge-unknown-border: #e5e7eb;
+
+    --badge-recommended-bg: #faf5ff;
+    --badge-recommended-text: #9333ea;
+    --badge-recommended-border: #e9d5ff;
+  }
+}
+
+@layer components {
+  .input-base {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg transition-colors;
+  }
+
+  .input-base:focus {
+    @apply outline-none border-[var(--primary)];
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+  }
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -9,13 +62,33 @@
 }
 
 body {
-  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
-    Roboto, "Noto Sans", Ubuntu, Cantarell, "Helvetica Neue", Arial,
-    "Apple Color Emoji", "Segoe UI Emoji";
+  font-family: 'Satoshi', ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#root {
-  min-height: 100vh;
+/* Remove red focus rings, use blue */
+*:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+input,
+textarea,
+select {
+  @apply focus:outline-none;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Ensure modals have proper spacing for focus rings */
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+  margin: 1px; /* Prevents cutoff */
 }

@@ -28,6 +28,7 @@ import * as functions from 'firebase-functions';
 import express from 'express';
 import { attachRoutes } from './routes/index.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { securityHeaders, rateLimit, requestSizeLimit, corsConfig } from './middleware/security.js';
 import logger from './utils/logger/index.js';
 import { onUserCreated, onUserDeleted } from "./triggers/auth.js";
 
@@ -35,12 +36,12 @@ import { onUserCreated, onUserDeleted } from "./triggers/auth.js";
 
 const app = express();
 
-app.use(express.json());
-
-app.use((req, _res, next) => {
-    console.log("DEBUG Express sees request:", req.method, req.originalUrl, req.path);
-    next();
-});
+// Security middleware (order matters!)
+app.use(securityHeaders);
+app.use(corsConfig);
+app.use(rateLimit);
+app.use(requestSizeLimit);
+app.use(express.json({ limit: '1mb' }));
 
 // attach routes like normal
 attachRoutes(app);
