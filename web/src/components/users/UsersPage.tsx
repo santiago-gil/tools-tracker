@@ -93,10 +93,13 @@ export function UsersPage() {
               {users.map((user) => (
                 <tr key={user.uid} className="hover:elevation-1 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900 dark:text-white">
+                    <div
+                      className="text-sm font-medium"
+                      style={{ color: 'var(--text-primary)' }}
+                    >
                       {user.email}
                     </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                    <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
                       {user.uid}
                     </div>
                   </td>
@@ -121,7 +124,11 @@ export function UsersPage() {
                         .map(([key]) => (
                           <span
                             key={key}
-                            className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 capitalize"
+                            className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize"
+                            style={{
+                              backgroundColor: 'var(--surface-2)',
+                              color: 'var(--text-secondary)',
+                            }}
                           >
                             {key}
                           </span>

@@ -34,7 +34,10 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
           {/* Left side - Tool info and version tabs */}
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex-shrink-0">
+              <h3
+                className="text-lg font-semibold flex-shrink-0"
+                style={{ color: 'var(--text-primary)' }}
+              >
                 {tool.name}
               </h3>
               {currentVersion?.sk_recommended && (
@@ -50,11 +53,11 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
                 </span>
               )}
               {/* Expand/Collapse indicator */}
-              <span className="text-lg text-gray-500 dark:text-gray-400 ml-2">
+              <span className="text-lg ml-2" style={{ color: 'var(--text-tertiary)' }}>
                 {expanded ? '▲' : '▼'}
               </span>
             </div>
-            <p className="text-xs text-gray-600 dark:text-gray-300 mt-0.5">
+            <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>
               {tool.category}
             </p>
 

@@ -31,10 +31,21 @@ export function App() {
         <button
           onClick={() => setCurrentPage('tools')}
           className={`px-4 py-2 font-medium transition border-b-2 ${
-            currentPage === 'tools'
-              ? 'text-[var(--sk-red)] border-primary-600'
-              : 'text-gray-600 border-transparent hover:text-gray-900'
+            currentPage === 'tools' ? 'border-primary-600' : 'border-transparent'
           }`}
+          style={{
+            color: currentPage === 'tools' ? 'var(--sk-red)' : 'var(--text-secondary)',
+          }}
+          onMouseEnter={(e) => {
+            if (currentPage !== 'tools') {
+              e.currentTarget.style.color = 'var(--text-primary)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (currentPage !== 'tools') {
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }
+          }}
         >
           Tools
         </button>
@@ -42,10 +53,21 @@ export function App() {
           <button
             onClick={() => setCurrentPage('users')}
             className={`px-4 py-2 font-medium transition border-b-2 ${
-              currentPage === 'users'
-                ? 'text-[var(--sk-red)] border-primary-600'
-                : 'text-gray-600 border-transparent hover:text-gray-900'
+              currentPage === 'users' ? 'border-primary-600' : 'border-transparent'
             }`}
+            style={{
+              color: currentPage === 'users' ? 'var(--sk-red)' : 'var(--text-secondary)',
+            }}
+            onMouseEnter={(e) => {
+              if (currentPage !== 'users') {
+                e.currentTarget.style.color = 'var(--text-primary)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (currentPage !== 'users') {
+                e.currentTarget.style.color = 'var(--text-secondary)';
+              }
+            }}
           >
             Users
           </button>
