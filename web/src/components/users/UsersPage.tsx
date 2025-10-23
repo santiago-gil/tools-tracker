@@ -46,34 +46,42 @@ export function UsersPage() {
         <div className="text-red-600 text-lg font-semibold mb-2">
           Failed to load users
         </div>
-        <p className="text-gray-600">{(error as Error).message}</p>
+        <p className="text-gray-600 dark:text-gray-300">{(error as Error).message}</p>
       </div>
     );
   }
 
   if (!users?.length) {
-    return <div className="text-center py-12 text-gray-600">No users found.</div>;
+    return (
+      <div className="text-center py-12 text-gray-600 dark:text-gray-300">
+        No users found.
+      </div>
+    );
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">User Management</h2>
-        <p className="text-gray-600 mt-1">Manage user roles and permissions.</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          User Management
+        </h2>
+        <p className="text-gray-600 dark:text-gray-300 mt-1">
+          Manage user roles and permissions.
+        </p>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   User
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Role
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Permissions
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -81,12 +89,16 @@ export function UsersPage() {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {users.map((user) => (
-                <tr key={user.uid} className="hover:bg-gray-50">
+                <tr key={user.uid} className="hover:elevation-1 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{user.email}</div>
-                    <div className="text-xs text-gray-500">{user.uid}</div>
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">
+                      {user.email}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {user.uid}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <select

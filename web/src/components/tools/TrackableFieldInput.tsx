@@ -23,12 +23,12 @@ export function TrackableFieldInput({
     `versions.${versionIndex}.trackables.${trackableKey}.documentation` as const;
 
   return (
-    <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+    <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg space-y-3">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label
             htmlFor={`${trackableKey}-status-${versionIndex}`}
-            className="block text-sm font-medium text-gray-900 mb-1"
+            className="block text-sm font-medium text-gray-900 dark:text-white mb-1"
           >
             {label} <span className="text-red-600">*</span>
           </label>
@@ -48,7 +48,7 @@ export function TrackableFieldInput({
         <div>
           <label
             htmlFor={`${trackableKey}-notes-${versionIndex}`}
-            className="block text-sm font-medium text-gray-900 mb-1"
+            className="block text-sm font-medium text-gray-900 dark:text-white mb-1"
           >
             Notes
           </label>
@@ -66,7 +66,7 @@ export function TrackableFieldInput({
         <div>
           <label
             htmlFor={`${trackableKey}-example-${versionIndex}`}
-            className="block text-sm font-medium text-gray-900 mb-1"
+            className="block text-sm font-medium text-gray-900 dark:text-white mb-1"
           >
             Example Site
           </label>
@@ -82,7 +82,7 @@ export function TrackableFieldInput({
         <div>
           <label
             htmlFor={`${trackableKey}-docs-${versionIndex}`}
-            className="block text-sm font-medium text-gray-900 mb-1"
+            className="block text-sm font-medium text-gray-900 dark:text-white mb-1"
           >
             Documentation Link
           </label>

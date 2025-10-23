@@ -14,9 +14,7 @@ export function ToolFilters({
       <button
         onClick={() => onCategoryChange('')}
         className={`px-4 py-2 rounded-lg font-medium transition ${
-          selectedCategory === ''
-            ? 'bg-red-600 text-white'
-            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          selectedCategory === '' ? 'btn-primary' : 'btn-secondary'
         }`}
       >
         All
@@ -26,9 +24,7 @@ export function ToolFilters({
           key={category}
           onClick={() => onCategoryChange(category)}
           className={`px-4 py-2 rounded-lg font-medium transition ${
-            selectedCategory === category
-              ? 'bg-red-600 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            selectedCategory === category ? 'btn-primary' : 'btn-secondary'
           }`}
         >
           {category}

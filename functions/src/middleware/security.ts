@@ -70,6 +70,35 @@ export function rateLimit(req: Request, res: Response, next: NextFunction) {
 }
 
 /**
+ * Special rate limiting for refresh endpoint - prevents spam
+ */
+export function refreshRateLimit(req: Request, res: Response, next: NextFunction) {
+    const clientId = req.ip || req.connection.remoteAddress || 'unknown';
+    const key = `refresh_${clientId}`;
+    const now = Date.now();
+    const REFRESH_WINDOW_MS = 30 * 1000; // 30 seconds
+    const MAX_REFRESHES = 1; // 1 refresh per 30 seconds
+
+    const clientData = requestCounts.get(key);
+
+    if (!clientData || now > clientData.resetTime) {
+        // Reset or initialize
+        requestCounts.set(key, { count: 1, resetTime: now + REFRESH_WINDOW_MS });
+        return next();
+    }
+
+    if (clientData.count >= MAX_REFRESHES) {
+        return res.status(429).json({
+            error: 'Refresh rate limited. Please wait 30 seconds between refreshes.',
+            retryAfter: Math.ceil((clientData.resetTime - now) / 1000)
+        });
+    }
+
+    clientData.count++;
+    next();
+}
+
+/**
  * Request size limiting
  */
 export function requestSizeLimit(req: Request, res: Response, next: NextFunction) {

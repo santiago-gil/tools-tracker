@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { authMiddleware, requirePerm } from "../middleware/index.js";
 import { validateBody, validateParams } from "../middleware/validate.js";
+import { refreshRateLimit } from "../middleware/security.js";
 import { toolSchema, idParamSchema } from "../utils/validate.js";
 import {
-  getTools,
   getAllTools,
   addTool,
   updateTool,
@@ -26,7 +26,7 @@ router.get("/", async (req: AuthedRequest, res, next) => {
     "GET /tools called"
   );
   try {
-    const tools = await getTools();
+    const tools = await getAllTools();
     logger.info({ count: tools.length }, "GET /tools success");
 
     // Wrap in object
@@ -38,9 +38,9 @@ router.get("/", async (req: AuthedRequest, res, next) => {
 
 /**
  * GET /tools/refresh
- * Force refresh tools cache
+ * Force refresh tools cache (rate limited)
  */
-router.get("/refresh", async (req: AuthedRequest, res, next) => {
+router.get("/refresh", refreshRateLimit, async (req: AuthedRequest, res, next) => {
   logger.info(
     { uid: req.user?.uid, role: req.user?.role },
     "GET /tools/refresh called"

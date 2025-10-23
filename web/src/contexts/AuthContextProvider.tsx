@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import {
   signInWithPopup,
+  signInWithRedirect,
   getRedirectResult,
   GoogleAuthProvider,
   signOut as firebaseSignOut,
@@ -25,10 +26,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Check for redirect result first
         const result = await getRedirectResult(auth);
         if (result) {
-          console.log('Redirect result found:', result.user?.email);
+          // User signed in via redirect
         }
-      } catch (error) {
-        console.error('Error getting redirect result:', error);
+      } catch {
+        // Silently handle redirect errors
       }
 
       // Set up auth state listener
@@ -44,8 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               displayName: fbUser.displayName || firestoreUser.displayName,
               photoURL: fbUser.photoURL || firestoreUser.photoURL,
             });
-          } catch (error) {
-            console.error('Failed to fetch user data:', error);
+          } catch {
             setUser(null);
           }
         } else {
@@ -66,21 +66,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signInWithGoogle = async () => {
-    console.log('AuthProvider: signInWithGoogle called');
     const provider = new GoogleAuthProvider();
 
     try {
-      console.log('AuthProvider: Trying popup sign-in...');
-      const result = await signInWithPopup(auth, provider);
-      console.log('AuthProvider: Popup sign-in successful:', {
-        uid: result.user.uid,
-        email: result.user.email,
-        displayName: result.user.displayName,
-      });
-    } catch (error) {
-      console.error('AuthProvider: Popup sign-in failed:', error);
-      // Don't fall back to redirect for now, let's debug the popup issue first
-      throw error;
+      await signInWithPopup(auth, provider);
+    } catch (error: unknown) {
+      // Handle specific error cases
+      if (error && typeof error === 'object' && 'code' in error) {
+        const firebaseError = error as { code: string };
+        if (
+          firebaseError.code === 'auth/cancelled-popup-request' ||
+          firebaseError.code === 'auth/popup-blocked'
+        ) {
+          // Fall back to redirect flow
+          await signInWithRedirect(auth, provider);
+        } else {
+          // For other errors, just throw them
+          throw error;
+        }
+      } else {
+        // For other errors, just throw them
+        throw error;
+      }
     }
   };
 

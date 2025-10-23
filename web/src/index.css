@@ -4,14 +4,60 @@
 
 @layer base {
   :root {
-    /* Brand Colors */
-    --sk-red: #e41f1b;
-    --sk-red-light: #ee312f;
-    --sk-red-dark: #da1c1c;
-    --sk-gold: #ffa300;
-    --sk-gold-light: #ffbd00;
-    --sk-grey: #4a4a4a;
-    --sk-black: #000000;
+    /* ===== BRAND COLOR SYSTEM ===== */
+    /* Primary Brand - Red (SearchKings signature) */
+    --sk-red: #dc2626;
+    --sk-red-light: #ef4444;
+    --sk-red-dark: #b91c1c;
+    --sk-red-50: #fef2f2;
+    --sk-red-100: #fee2e2;
+    --sk-red-200: #fecaca;
+    --sk-red-300: #fca5a5;
+    --sk-red-400: #f87171;
+    --sk-red-500: #ef4444;
+    --sk-red-600: #dc2626;
+    --sk-red-700: #b91c1c;
+    --sk-red-800: #991b1b;
+    --sk-red-900: #7f1d1d;
+
+    /* Secondary Brand - Gold (Crown/royalty) */
+    --sk-gold: #f59e0b;
+    --sk-gold-light: #fbbf24;
+    --sk-gold-dark: #d97706;
+    --sk-gold-50: #fffbeb;
+    --sk-gold-100: #fef3c7;
+    --sk-gold-200: #fde68a;
+    --sk-gold-300: #fcd34d;
+    --sk-gold-400: #fbbf24;
+    --sk-gold-500: #f59e0b;
+    --sk-gold-600: #d97706;
+    --sk-gold-700: #b45309;
+    --sk-gold-800: #92400e;
+    --sk-gold-900: #78350f;
+
+    /* Neutral System */
+    --sk-grey: #6b7280;
+    --sk-black: #111827;
+    --sk-white: #ffffff;
+
+    /* ===== ELEVATION SYSTEM ===== */
+    /* Surface Colors - Light Mode */
+    --surface-0: #ffffff;      /* Base surface */
+    --surface-1: #f9fafb;     /* Elevated 1 */
+    --surface-2: #f3f4f6;     /* Elevated 2 */
+    --surface-3: #e5e7eb;     /* Elevated 3 */
+    --surface-4: #d1d5db;     /* Elevated 4 */
+
+    /* Text Colors - Light Mode */
+    --text-primary: #111827;
+    --text-secondary: #374151;
+    --text-tertiary: #6b7280;
+    --text-quaternary: #9ca3af;
+
+    /* Border Colors - Light Mode */
+    --border-light: #e5e7eb;
+    --border-medium: #d1d5db;
+    --border-strong: #9ca3af;
 
     /* UI Colors */
     --primary: #2563eb;
@@ -38,20 +84,274 @@
     --badge-unknown-text: #6b7280;
     --badge-unknown-border: #e5e7eb;
 
-    --badge-recommended-bg: #faf5ff;
-    --badge-recommended-text: #9333ea;
-    --badge-recommended-border: #e9d5ff;
+    --badge-recommended-bg: #f3e8ff;
+    --badge-recommended-text: #7c3aed;
+    --badge-recommended-border: #c4b5fd;
+  }
+
+  .dark {
+    /* ===== DARK MODE ELEVATION SYSTEM ===== */
+    /* Surface Colors - Dark Mode */
+    --surface-0: #111827;      /* Base surface */
+    --surface-1: #1f2937;      /* Elevated 1 */
+    --surface-2: #374151;      /* Elevated 2 */
+    --surface-3: #4b5563;      /* Elevated 3 */
+    --surface-4: #6b7280;      /* Elevated 4 */
+
+    /* Text Colors - Dark Mode */
+    --text-primary: #f9fafb;
+    --text-secondary: #e5e7eb;
+    --text-tertiary: #d1d5db;
+    --text-quaternary: #9ca3af;
+
+    /* Border Colors - Dark Mode */
+    --border-light: #374151;
+    --border-medium: #4b5563;
+    --border-strong: #6b7280;
+
+    /* Brand Colors - Dark Mode (enhanced for contrast) */
+    --sk-red: #f87171;
+    --sk-red-light: #fca5a5;
+    --sk-red-dark: #ef4444;
+    --sk-gold: #fbbf24;
+    --sk-gold-light: #fcd34d;
+    --sk-gold-dark: #f59e0b;
+    --sk-grey: #9ca3af;
+    --sk-black: #f9fafb;
+
+    /* UI Colors */
+    --primary: #60a5fa;
+    --primary-hover: #3b82f6;
+
+    /* Dark mode badge colors - better contrast for dark backgrounds */
+    /* Use bright colors with white text for better readability on dark cards */
+    --badge-yes-bg: #10b981;
+    --badge-yes-text: #ffffff;
+    --badge-yes-border: #059669;
+
+    --badge-no-bg: #ef4444;
+    --badge-no-text: #ffffff;
+    --badge-no-border: #dc2626;
+
+    --badge-partial-bg: #f59e0b;
+    --badge-partial-text: #ffffff;
+    --badge-partial-border: #d97706;
+
+    --badge-special-bg: #3b82f6;
+    --badge-special-text: #ffffff;
+    --badge-special-border: #2563eb;
+
+    --badge-unknown-bg: #6b7280;
+    --badge-unknown-text: #ffffff;
+    --badge-unknown-border: #4b5563;
+
+    --badge-recommended-bg: #a855f7;
+    --badge-recommended-text: #ffffff;
+    --badge-recommended-border: #9333ea;
   }
 }
 
 @layer components {
   .input-base {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg transition-colors;
+    @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg transition-colors;
   }
 
   .input-base:focus {
     @apply outline-none border-[var(--primary)];
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+  }
+
+  /* ===== ELEVATION SYSTEM ===== */
+  /* Level 0 - Base surface */
+  .elevation-0 {
+    background-color: var(--surface-0);
+    border: 1px solid var(--border-light);
+  }
+
+  /* Level 1 - Subtle elevation */
+  .elevation-1 {
+    background-color: var(--surface-1);
+    border: 1px solid var(--border-light);
+    box-shadow: 
+      0 1px 2px 0 rgba(0, 0, 0, 0.05),
+      0 1px 1px 0 rgba(0, 0, 0, 0.03);
+  }
+
+  .dark .elevation-1 {
+    box-shadow: 
+      0 1px 2px 0 rgba(0, 0, 0, 0.2),
+      0 1px 1px 0 rgba(0, 0, 0, 0.1);
+  }
+
+  /* Level 2 - Card elevation */
+  .elevation-2 {
+    background-color: var(--surface-1);
+    border: 1px solid var(--border-light);
+    box-shadow: 
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .dark .elevation-2 {
+    box-shadow: 
+      0 4px 6px -1px rgba(0, 0, 0, 0.3),
+      0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Level 3 - Modal/Dropdown elevation */
+  .elevation-3 {
+    background-color: var(--surface-1);
+    border: 1px solid var(--border-medium);
+    box-shadow: 
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  .dark .elevation-3 {
+    box-shadow: 
+      0 10px 15px -3px rgba(0, 0, 0, 0.4),
+      0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Level 4 - Floating elements */
+  .elevation-4 {
+    background-color: var(--surface-1);
+    border: 1px solid var(--border-medium);
+    box-shadow: 
+      0 20px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  .dark .elevation-4 {
+    box-shadow: 
+      0 20px 25px -5px rgba(0, 0, 0, 0.5),
+      0 10px 10px -5px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Interactive elevation changes */
+  .elevation-interactive {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .elevation-interactive:hover {
+    transform: translateY(-1px);
+  }
+
+  .elevation-interactive:active {
+    transform: translateY(0);
+  }
+
+  /* ===== COMPONENT STYLES ===== */
+  /* Button System */
+  .btn-primary {
+    background: linear-gradient(135deg, var(--sk-red) 0%, var(--sk-red-dark) 100%);
+    color: white;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    border: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+      0 4px 6px -1px rgba(220, 38, 38, 0.2),
+      0 2px 4px -1px rgba(220, 38, 38, 0.1);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 
+      0 8px 12px -2px rgba(220, 38, 38, 0.3),
+      0 4px 6px -1px rgba(220, 38, 38, 0.2);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  .btn-secondary {
+    background-color: var(--surface-1);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-light);
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .btn-secondary:hover {
+    background-color: var(--surface-2);
+    border-color: var(--border-medium);
+    transform: translateY(-1px);
+  }
+
+  /* Card System */
+  .card {
+    background-color: var(--surface-1);
+    border: 1px solid var(--border-light);
+    border-radius: 1rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  .dark .card:hover {
+    box-shadow: 
+      0 10px 15px -3px rgba(0, 0, 0, 0.4),
+      0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Input System */
+  .input-enhanced {
+    background-color: var(--surface-1);
+    border: 1px solid var(--border-light);
+    color: var(--text-primary);
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .input-enhanced:focus {
+    outline: none;
+    border-color: var(--sk-red);
+    box-shadow: 
+      0 0 0 3px rgba(220, 38, 38, 0.1),
+      0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Badge System */
+  .badge-enhanced {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    font-weight: 500;
+    border: 1px solid;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .badge-enhanced:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .dark .badge-enhanced:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Enhanced badge styles with proper contrast */
+  .badge-base {
+    @apply inline-flex items-center rounded-full font-medium ring-1;
+  }
+
+  .badge-sm {
+    @apply px-2 py-0.5 text-xs;
+  }
+
+  .badge-md {
+    @apply px-3 py-1 text-sm;
   }
 }
 

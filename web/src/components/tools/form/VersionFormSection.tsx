@@ -18,14 +18,14 @@ export function VersionFormSection({
 }: VersionFormSectionProps) {
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-900">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
         {isEditing ? `Version: ${version.versionName || 'Unnamed'}` : 'Version Details'}
       </h3>
 
       <div>
         <label
           htmlFor={`version-name-${versionIndex}`}
-          className="block text-sm font-medium text-gray-900 mb-1"
+          className="block text-sm font-medium text-gray-900 dark:text-white mb-1"
         >
           Version Name <span className="text-red-600">*</span>
         </label>
@@ -45,15 +45,23 @@ export function VersionFormSection({
       <div>
         <label
           htmlFor={`sk-recommended-${versionIndex}`}
-          className="inline-flex items-center gap-2 px-3 py-2 bg-purple-50 border border-purple-200 rounded-lg cursor-pointer w-fit"
+          className="inline-flex items-center gap-2 px-3 py-2 border rounded-lg cursor-pointer w-fit"
+          style={{
+            backgroundColor: 'var(--badge-recommended-bg)',
+            color: 'var(--badge-recommended-text)',
+            borderColor: 'var(--badge-recommended-border)',
+          }}
         >
           <input
             id={`sk-recommended-${versionIndex}`}
             type="checkbox"
             {...register(`versions.${versionIndex}.sk_recommended`)}
             className="h-5 w-5 rounded"
+            style={{
+              accentColor: 'var(--badge-recommended-text)',
+            }}
           />
-          <span className="text-sm font-medium text-purple-700">SK Recommended</span>
+          <span className="text-sm font-medium">SK Recommended</span>
         </label>
       </div>
 
@@ -61,7 +69,7 @@ export function VersionFormSection({
       <div className="border-t pt-4">
         <label
           htmlFor={`team-considerations-${versionIndex}`}
-          className="block text-sm font-medium text-gray-900 mb-1"
+          className="block text-sm font-medium text-gray-900 dark:text-white mb-1"
         >
           Web Team Considerations
         </label>

@@ -41,7 +41,7 @@ export function Badge({ status, compact }: BadgeProps) {
 
   return (
     <span
-      className={`inline-flex items-center rounded-full font-medium ring-1 ${
+      className={`badge-enhanced ${
         compact ? 'px-2 py-0.5 text-xs' : 'px-3 py-1 text-sm'
       }`}
       style={{

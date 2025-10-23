@@ -21,7 +21,9 @@ export function TrackableFieldsSection({
 }: TrackableFieldsSectionProps) {
   return (
     <div className="space-y-4 border-t pt-4">
-      <h4 className="text-base font-semibold text-gray-900">Tracking Capabilities</h4>
+      <h4 className="text-base font-semibold text-gray-900 dark:text-white">
+        Tracking Capabilities
+      </h4>
 
       {trackableKeys.map((key) => (
         <TrackableFieldInput

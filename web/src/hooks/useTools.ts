@@ -73,5 +73,10 @@ export function useRefreshTools() {
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to refresh tools');
     },
+    // Prevent multiple simultaneous refresh requests
+    onMutate: () => {
+      // Cancel any outgoing refetches
+      queryClient.cancelQueries({ queryKey: ['tools'] });
+    },
   });
 }

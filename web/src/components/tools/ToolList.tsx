@@ -113,7 +113,7 @@ export function ToolList() {
     <div className="space-y-6">
       {/* Controls */}
       <div className="flex flex-col lg:flex-row gap-4">
-        <div className="flex-1">
+        <div className="flex-1 relative">
           <label htmlFor="search-tools" className="sr-only">
             Search tools
           </label>
@@ -123,13 +123,42 @@ export function ToolList() {
             placeholder="Search tools..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="input-base"
+            className="input-base pr-12"
           />
+          <button
+            onClick={() => refreshTools.mutate()}
+            disabled={refreshTools.isPending}
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed z-10 elevation-interactive"
+            title="Refresh tools data"
+          >
+            {refreshTools.isPending ? (
+              <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+            )}
+          </button>
         </div>
         <div className="flex gap-3">
           <label
             htmlFor="sk-recommended-filter"
-            className="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-700 rounded-lg border border-purple-200 cursor-pointer hover:bg-purple-100 transition"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg border cursor-pointer transition"
+            style={{
+              backgroundColor: 'var(--badge-recommended-bg)',
+              color: 'var(--badge-recommended-text)',
+              borderColor: 'var(--badge-recommended-border)',
+            }}
           >
             <input
               id="sk-recommended-filter"
@@ -138,46 +167,11 @@ export function ToolList() {
               onChange={(e) => setShowSKRecommendedOnly(e.target.checked)}
               className="h-4 w-4 rounded"
             />
-            <span className="text-sm font-medium whitespace-nowrap">
-              SK Recommended Only
-            </span>
+            <span className="text-sm font-medium whitespace-nowrap">SK Recommended</span>
           </label>
 
-          <button
-            onClick={() => refreshTools.mutate()}
-            disabled={refreshTools.isPending}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-          >
-            {refreshTools.isPending ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Refreshing...
-              </>
-            ) : (
-              <>
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                  />
-                </svg>
-                Refresh
-              </>
-            )}
-          </button>
-
           {user?.permissions?.add && (
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
-            >
+            <button onClick={() => setShowAddModal(true)} className="btn-primary">
               + Add Tool
             </button>
           )}
@@ -192,7 +186,7 @@ export function ToolList() {
       />
 
       {!isLoading && (
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-gray-600 dark:text-gray-400">
           Showing {filteredTools.length} of {tools?.length ?? 0} tools
           {showSKRecommendedOnly && ' (SK Recommended)'}
         </div>
@@ -201,7 +195,9 @@ export function ToolList() {
       {isLoading ? (
         <LoadingSpinner className="py-12" />
       ) : filteredTools.length === 0 ? (
-        <p className="text-center py-12 text-gray-500">No tools found.</p>
+        <p className="text-center py-12 text-gray-500 dark:text-gray-400">
+          No tools found.
+        </p>
       ) : (
         <div className="space-y-3">
           {filteredTools.map((tool) => (

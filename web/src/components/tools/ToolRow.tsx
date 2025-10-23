@@ -17,8 +17,10 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
   // Safety check for versions array
   if (!tool.versions || tool.versions.length === 0) {
     return (
-      <div className="border rounded-xl overflow-hidden bg-white p-4">
-        <div className="text-gray-500">No versions available for {tool.name}</div>
+      <div className="border rounded-xl overflow-hidden bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 p-4">
+        <div className="text-gray-500 dark:text-gray-400">
+          No versions available for {tool.name}
+        </div>
       </div>
     );
   }
@@ -26,24 +28,35 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
   const currentVersion = tool.versions[selectedVersionIdx];
 
   return (
-    <div className="border rounded-xl overflow-hidden hover:shadow-md transition bg-white">
+    <div className="card elevation-2 elevation-interactive overflow-hidden">
       <div className="p-4 cursor-pointer" onClick={() => setExpanded(!expanded)}>
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3">
           {/* Left side - Tool info and version tabs */}
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-lg font-semibold text-gray-900 flex-shrink-0">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex-shrink-0">
                 {tool.name}
               </h3>
               {currentVersion?.sk_recommended && (
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700 flex-shrink-0">
+                <span
+                  className="px-2.5 py-0.5 rounded-full text-xs font-medium flex-shrink-0"
+                  style={{
+                    backgroundColor: 'var(--badge-recommended-bg)',
+                    color: 'var(--badge-recommended-text)',
+                    borderColor: 'var(--badge-recommended-border)',
+                  }}
+                >
                   SK Recommended
                 </span>
               )}
               {/* Expand/Collapse indicator */}
-              <span className="text-lg text-gray-500 ml-2">{expanded ? '▲' : '▼'}</span>
+              <span className="text-lg text-gray-500 dark:text-gray-400 ml-2">
+                {expanded ? '▲' : '▼'}
+              </span>
             </div>
-            <p className="text-xs text-gray-500 mt-0.5">{tool.category}</p>
+            <p className="text-xs text-gray-600 dark:text-gray-300 mt-0.5">
+              {tool.category}
+            </p>
 
             {/* Version tabs - moved here for better organization */}
             {tool.versions.length > 1 && (
@@ -57,8 +70,8 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
                     }}
                     className={`text-xs px-3 py-1.5 rounded-md transition font-medium ${
                       selectedVersionIdx === idx
-                        ? 'bg-red-600 text-white shadow-sm'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-sm'
+                        ? 'btn-primary text-xs'
+                        : 'btn-secondary text-xs'
                     }`}
                   >
                     {version.versionName}
@@ -72,21 +85,29 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
           <div className="flex flex-col gap-3 lg:items-end">
             <div className="flex items-center gap-4 text-sm flex-wrap">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-600">GTM:</span>
+                <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
+                  GTM:
+                </span>
                 <Badge status={currentVersion?.trackables?.gtm?.status || 'Unknown'} />
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-600">Ads:</span>
+                <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
+                  Ads:
+                </span>
                 <Badge
                   status={currentVersion?.trackables?.google_ads?.status || 'Unknown'}
                 />
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-600">GA4:</span>
+                <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
+                  GA4:
+                </span>
                 <Badge status={currentVersion?.trackables?.ga4?.status || 'Unknown'} />
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-600">MSA:</span>
+                <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
+                  MSA:
+                </span>
                 <Badge status={currentVersion?.trackables?.msa?.status || 'Unknown'} />
               </div>
             </div>
@@ -99,7 +120,7 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
                       e.stopPropagation();
                       onEdit();
                     }}
-                    className="text-sm text-gray-600 hover:text-gray-900 hover:underline"
+                    className="text-sm text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white hover:underline font-medium"
                   >
                     Edit
                   </button>
@@ -110,7 +131,7 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
                       e.stopPropagation();
                       onDelete();
                     }}
-                    className="text-sm text-red-600 hover:text-red-700 hover:underline"
+                    className="text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:underline font-medium"
                   >
                     Delete
                   </button>
@@ -123,13 +144,16 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
 
       {/* Expanded Details */}
       {expanded && currentVersion && (
-        <div className="px-4 pb-4 pt-2 space-y-3 border-t bg-gray-50">
+        <div
+          className="px-4 pb-4 pt-2 space-y-3 border-t elevation-1"
+          style={{ borderColor: 'var(--border-light)' }}
+        >
           {currentVersion.team_considerations && (
             <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-1">
+              <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
                 Web Team Considerations
               </h4>
-              <p className="text-sm text-gray-700">
+              <p className="text-sm text-gray-700 dark:text-gray-300">
                 {currentVersion.team_considerations}
               </p>
             </div>
@@ -149,27 +173,31 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
               };
               return (
                 <div key={key} className="space-y-2">
-                  <h4 className="text-sm font-semibold text-gray-900">
+                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
                     {labels[key] || key}
                   </h4>
 
                   {trackable?.notes && (
                     <div>
-                      <h5 className="text-xs font-medium text-gray-600 mb-1">Notes</h5>
-                      <p className="text-sm text-gray-700">{trackable.notes}</p>
+                      <h5 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Notes
+                      </h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">
+                        {trackable.notes}
+                      </p>
                     </div>
                   )}
 
                   {trackable?.example_site && (
                     <div>
-                      <h5 className="text-xs font-medium text-gray-600 mb-1">
+                      <h5 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                         Example Site
                       </h5>
                       <a
                         href={trackable.example_site}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-blue-600 hover:text-blue-800 hover:underline break-all"
+                        className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline break-all"
                       >
                         {trackable.example_site}
                       </a>
@@ -178,14 +206,14 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
 
                   {trackable?.documentation && (
                     <div>
-                      <h5 className="text-xs font-medium text-gray-600 mb-1">
+                      <h5 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                         Documentation
                       </h5>
                       <a
                         href={trackable.documentation}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-blue-600 hover:text-blue-800 hover:underline break-all"
+                        className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline break-all"
                       >
                         {trackable.documentation}
                       </a>

@@ -1,17 +1,22 @@
 import { useAuth } from '../../hooks/useAuth';
 import { CrownLogo } from '../layout/CrownLogo';
+import { DarkModeToggle } from '../common/DarkModeToggle';
 
 export function SignInPage() {
   const { signInWithGoogle, loading } = useAuth();
 
   return (
-    <div className="min-h-screen bg-[var(--badge-unknown-bg)] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[var(--badge-unknown-bg)] dark:bg-gray-900 flex items-center justify-center px-4">
       <div className="max-w-md w-full">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 relative">
+          {/* Dark mode toggle in top right */}
+          <div className="absolute top-4 right-4">
+            <DarkModeToggle />
+          </div>
           {/* Header */}
           <div className="text-center mb-8 flex flex-col items-center">
             <CrownLogo className="w-16 h-16 text-[var(--sk-gold)] mb-4" />
-            <h1 className="text-3xl font-bold text-[var(--sk-black)] mb-2">
+            <h1 className="text-3xl font-bold text-[var(--sk-black)] dark:text-white mb-2">
               <span className="text-[var(--sk-red)]">SearchKings</span> Tool Tracker
             </h1>
             <p className="text-sm text-[var(--sk-grey)]">
@@ -23,7 +28,7 @@ export function SignInPage() {
           <button
             onClick={signInWithGoogle}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-white border-2 border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-3 btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -45,12 +50,6 @@ export function SignInPage() {
             </svg>
             Sign in with Google
           </button>
-
-          <p className="text-xs text-[var(--sk-grey)] text-center mt-6">
-            By signing in, you agree to our{' '}
-            <span className="text-[var(--sk-red)] font-medium">terms</span> and{' '}
-            <span className="text-[var(--sk-red)] font-medium">conditions</span>
-          </p>
         </div>
       </div>
     </div>

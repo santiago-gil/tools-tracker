@@ -24,7 +24,7 @@ export function BasicInfoSection({
         <div>
           <label
             htmlFor="platform-name"
-            className="block text-sm font-medium text-gray-900 mb-1"
+            className="block text-sm font-medium text-gray-900 dark:text-white mb-1"
           >
             Platform Name <span className="text-red-600">*</span>
           </label>
@@ -42,7 +42,7 @@ export function BasicInfoSection({
         <div>
           <label
             htmlFor="category-select"
-            className="block text-sm font-medium text-gray-900 mb-1"
+            className="block text-sm font-medium text-gray-900 dark:text-white mb-1"
           >
             Category <span className="text-red-600">*</span>
           </label>
