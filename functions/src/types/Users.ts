@@ -10,4 +10,6 @@ export interface User {
   };
   createdAt: Date;
   updatedAt: Date;
+  photoURL?: string;
+  displayName?: string;
 }

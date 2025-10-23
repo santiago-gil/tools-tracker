@@ -116,7 +116,12 @@ export async function authMiddleware(
           logger.info({ uid: decoded.uid }, "Creating user document");
 
           // Use atomic operation to prevent race conditions
-          const newUser = await createUserDoc(decoded.uid, decoded.email);
+          const newUser = await createUserDoc(
+            decoded.uid,
+            decoded.email,
+            decoded.picture,
+            decoded.name
+          );
           userDoc = newUser;
 
           logger.info({ uid: decoded.uid, role: userDoc.role }, "User document successfully created");

@@ -38,8 +38,13 @@ const ROLE_DEFAULT_PERMISSIONS: Record<User["role"], User["permissions"]> = {
   },
 };
 
-export async function createUserDoc(uid: string, email: string): Promise<User> {
-  logger.info({ uid, email }, "Creating Firestore user document");
+export async function createUserDoc(
+  uid: string,
+  email: string,
+  photoURL?: string,
+  displayName?: string
+): Promise<User> {
+  logger.info({ uid, email, photoURL, displayName }, "Creating Firestore user document");
 
   const role: User["role"] = DEFAULT_ROLE;
   const permissions = ROLE_DEFAULT_PERMISSIONS[role];
@@ -50,12 +55,14 @@ export async function createUserDoc(uid: string, email: string): Promise<User> {
     permissions,
     createdAt: new Date(),
     updatedAt: new Date(),
+    ...(photoURL && { photoURL }),
+    ...(displayName && { displayName }),
   };
 
   await usersCol.doc(uid).set(userWithoutUid);
 
   logger.info(
-    { uid, role: userWithoutUid.role, permissions: userWithoutUid.permissions },
+    { uid, role: userWithoutUid.role, permissions: userWithoutUid.permissions, photoURL, displayName },
     "User document created"
   );
 
