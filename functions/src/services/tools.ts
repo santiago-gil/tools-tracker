@@ -7,7 +7,7 @@ import logger from "../utils/logger/index.js";
 import { toolsCache } from "./cache.js";
 import { sanitizeToolData } from "../utils/sanitize.js";
 
-const toolsCol = db.collection("tools");
+const toolsCol = db.collection(process.env.FIREBASE_COLLECTION || "tools");
 
 // Removed pagination - not needed for 300 tools
 // Users expect to see all tools at once
