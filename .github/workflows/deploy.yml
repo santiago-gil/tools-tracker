@@ -27,6 +27,14 @@ jobs:
       - name: Build functions
         run: cd functions && npm run build
       
+      - name: Clear TypeScript cache
+        run: |
+          cd web && rm -rf node_modules/.cache
+          cd web && rm -rf dist
+      
+      - name: Type check web
+        run: cd web && npx tsc --noEmit
+      
       - name: Build web
         run: cd web && npm run build
       
@@ -52,6 +60,14 @@ jobs:
         run: |
           cd functions && npm ci
           cd ../web && npm ci
+      
+      - name: Clear TypeScript cache
+        run: |
+          cd web && rm -rf node_modules/.cache
+          cd web && rm -rf dist
+      
+      - name: Type check web
+        run: cd web && npx tsc --noEmit
       
       - name: Build functions
         run: cd functions && npm run build
