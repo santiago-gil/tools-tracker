@@ -46,7 +46,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             });
           } catch (error) {
             console.error('Failed to fetch user data:', error);
-            setUser(null);
+            console.error('Error details:', {
+              uid: fbUser.uid,
+              email: fbUser.email,
+              error: error instanceof Error ? error.message : error,
+            });
+
+            // If it's a 404 error, the user document doesn't exist yet
+            // The backend should create it automatically, so let's retry after a short delay
+            if (error instanceof Error && error.message.includes('404')) {
+              console.log('User document not found, retrying in 2 seconds...');
+              setTimeout(async () => {
+                try {
+                  const { user: firestoreUser } = await usersApi.getCurrent(fbUser.uid);
+                  setUser({
+                    ...firestoreUser,
+                    displayName: fbUser.displayName || firestoreUser.displayName,
+                    photoURL: fbUser.photoURL || firestoreUser.photoURL,
+                  });
+                } catch (retryError) {
+                  console.error('Retry failed:', retryError);
+                  setUser(null);
+                }
+              }, 2000);
+            } else {
+              setUser(null);
+            }
           }
         } else {
           setUser(null);

@@ -14,7 +14,7 @@ export const onUserCreated = auth.user().onCreate(async (user) => {
     return;
   }
 
-  const allowedDomains = ["@yourcompany.com"];
+  const allowedDomains = ["@searchkings.ca"];
 
   // relax auth in emulator
   if (
