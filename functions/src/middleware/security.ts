@@ -89,7 +89,8 @@ export function requestSizeLimit(req: Request, res: Response, next: NextFunction
 export function corsConfig(req: Request, res: Response, next: NextFunction) {
     const origin = req.headers.origin;
     const allowedOrigins = [
-        'https://your-domain.com', // Replace with your actual domain
+        process.env.ALLOWED_ORIGIN || `https://${process.env.GCLOUD_PROJECT}.web.app`,
+        `https://${process.env.GCLOUD_PROJECT}.firebaseapp.com`,
         'http://localhost:3000',    // Development
         'http://localhost:5002'     // Firebase emulator
     ];
