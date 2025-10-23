@@ -1,33 +1,3 @@
-// export interface TrackableField {
-//   status: "Yes" | "No" | "Partial" | "Special" | "Unknown";
-//   notes?: string;
-// }
-
-// export interface DocumentationLink {
-//   url: string;
-//   label: string;
-// }
-
-// export interface Tool {
-//   id?: string;
-//   platform: string;
-//   category: string;
-
-
-//   gtm_trackable?: TrackableField;
-//   google_ads_trackable?: TrackableField;
-//   ga4_trackable?: TrackableField;
-//   msa_tracking?: TrackableField;
-
-//   doc_links?: DocumentationLink[]; 
-//   example_sites?: string[];
-//   wcs_team_considerations?: string;
-//   ops_notes?: string;
-//   sk_recommended?: boolean;
-
-//   createdAt?: string;
-//   updatedAt?: string;
-// }
 export type TrackableStatus =
   | "Yes"
   | "No"

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAuth } from './contexts/AuthContext';
+import { useAuth } from './hooks/useAuth';
 import { SignInPage } from './components/auth/SignInPage';
 import { Layout } from './components/layout/Layout';
 import { ToolList } from './components/tools/ToolList';

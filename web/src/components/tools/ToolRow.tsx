@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Badge } from '../common/Badge';
 import type { Tool } from '../../types';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 
 interface ToolRowProps {
   tool: Tool;

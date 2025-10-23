@@ -10,7 +10,7 @@ import {
   useDeleteTool,
   useRefreshTools,
 } from '../../hooks/useTools';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import type { Tool } from '../../types';
 
 export function ToolList() {

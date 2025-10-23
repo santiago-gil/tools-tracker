@@ -1,6 +1,7 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useEffect, useState, type ReactNode } from 'react';
 import {
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   GoogleAuthProvider,
   signOut as firebaseSignOut,
   onAuthStateChanged,
@@ -18,7 +19,7 @@ interface AuthContextValue {
   signOut: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+export const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
@@ -26,35 +27,56 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
-      setFirebaseUser(fbUser);
+    let unsubscribe: (() => void) | undefined;
 
-      if (fbUser) {
-        try {
-          const { user: firestoreUser } = await usersApi.getCurrent(fbUser.uid);
-          // Merge Firebase Auth data with Firestore user data
-          setUser({
-            ...firestoreUser,
-            displayName: fbUser.displayName || firestoreUser.displayName,
-            photoURL: fbUser.photoURL || firestoreUser.photoURL,
-          });
-        } catch (error) {
-          console.error('Failed to fetch user data:', error);
-          setUser(null);
+    const handleAuth = async () => {
+      try {
+        // Check for redirect result first
+        const result = await getRedirectResult(auth);
+        if (result) {
+          console.log('Redirect result:', result);
         }
-      } else {
-        setUser(null);
+      } catch (error) {
+        console.error('Error getting redirect result:', error);
       }
 
-      setLoading(false);
-    });
+      // Set up auth state listener
+      unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+        setFirebaseUser(fbUser);
 
-    return unsubscribe;
+        if (fbUser) {
+          try {
+            const { user: firestoreUser } = await usersApi.getCurrent(fbUser.uid);
+            // Merge Firebase Auth data with Firestore user data
+            setUser({
+              ...firestoreUser,
+              displayName: fbUser.displayName || firestoreUser.displayName,
+              photoURL: fbUser.photoURL || firestoreUser.photoURL,
+            });
+          } catch (error) {
+            console.error('Failed to fetch user data:', error);
+            setUser(null);
+          }
+        } else {
+          setUser(null);
+        }
+
+        setLoading(false);
+      });
+    };
+
+    handleAuth();
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, []);
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    await signInWithRedirect(auth, provider);
   };
 
   const signOut = async () => {
@@ -68,12 +90,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
-  }
-  return context;
 }
