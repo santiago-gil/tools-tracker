@@ -24,7 +24,10 @@ attachRoutes(app);
 app.use(errorHandler);
 
 // instead of app.listen, export an https function
-export const api = functions.https.onRequest(app);
+export const api = functions.https.onRequest({
+  memory: '1GiB',
+  timeoutSeconds: 60
+}, app);
 
 export { onUserCreated, onUserDeleted };
 

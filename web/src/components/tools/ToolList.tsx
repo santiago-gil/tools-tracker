@@ -64,7 +64,7 @@ export function ToolList() {
       );
     }
 
-    return filtered.sort((a, b) => a.name.localeCompare(b.name));
+    return filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
   }, [tools, selectedCategory, debouncedSearchQuery, showSKRecommendedOnly]);
 
   const handleSubmit = async (toolData: Partial<Tool>) => {

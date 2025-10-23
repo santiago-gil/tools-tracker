@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import {
-  signInWithRedirect,
+  signInWithPopup,
   getRedirectResult,
   GoogleAuthProvider,
   signOut as firebaseSignOut,
@@ -25,7 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Check for redirect result first
         const result = await getRedirectResult(auth);
         if (result) {
-          console.log('Redirect result:', result);
+          console.log('Redirect result found:', result.user?.email);
         }
       } catch (error) {
         console.error('Error getting redirect result:', error);
@@ -46,32 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             });
           } catch (error) {
             console.error('Failed to fetch user data:', error);
-            console.error('Error details:', {
-              uid: fbUser.uid,
-              email: fbUser.email,
-              error: error instanceof Error ? error.message : error,
-            });
-
-            // If it's a 404 error, the user document doesn't exist yet
-            // The backend should create it automatically, so let's retry after a short delay
-            if (error instanceof Error && error.message.includes('404')) {
-              console.log('User document not found, retrying in 2 seconds...');
-              setTimeout(async () => {
-                try {
-                  const { user: firestoreUser } = await usersApi.getCurrent(fbUser.uid);
-                  setUser({
-                    ...firestoreUser,
-                    displayName: fbUser.displayName || firestoreUser.displayName,
-                    photoURL: fbUser.photoURL || firestoreUser.photoURL,
-                  });
-                } catch (retryError) {
-                  console.error('Retry failed:', retryError);
-                  setUser(null);
-                }
-              }, 2000);
-            } else {
-              setUser(null);
-            }
+            setUser(null);
           }
         } else {
           setUser(null);
@@ -91,8 +66,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signInWithGoogle = async () => {
+    console.log('AuthProvider: signInWithGoogle called');
     const provider = new GoogleAuthProvider();
-    await signInWithRedirect(auth, provider);
+
+    try {
+      console.log('AuthProvider: Trying popup sign-in...');
+      const result = await signInWithPopup(auth, provider);
+      console.log('AuthProvider: Popup sign-in successful:', {
+        uid: result.user.uid,
+        email: result.user.email,
+        displayName: result.user.displayName,
+      });
+    } catch (error) {
+      console.error('AuthProvider: Popup sign-in failed:', error);
+      // Don't fall back to redirect for now, let's debug the popup issue first
+      throw error;
+    }
   };
 
   const signOut = async () => {

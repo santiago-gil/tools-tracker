@@ -7,7 +7,8 @@ import { toolsCache } from "./cache.js";
 import { sanitizeToolData } from "../utils/sanitize.js";
 import dayjs from 'dayjs';
 
-const toolsCol = db.collection(process.env.FIREBASE_COLLECTION || "tools");
+// Use tools_v2 collection directly
+const toolsCol = db.collection("tools_v2");
 
 /**
  * Convert various date formats to ISO string using dayjs

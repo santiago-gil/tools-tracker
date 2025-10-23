@@ -14,6 +14,15 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
   const [expanded, setExpanded] = useState(false);
   const [selectedVersionIdx, setSelectedVersionIdx] = useState(0);
 
+  // Safety check for versions array
+  if (!tool.versions || tool.versions.length === 0) {
+    return (
+      <div className="border rounded-xl overflow-hidden bg-white p-4">
+        <div className="text-gray-500">No versions available for {tool.name}</div>
+      </div>
+    );
+  }
+
   const currentVersion = tool.versions[selectedVersionIdx];
 
   return (
