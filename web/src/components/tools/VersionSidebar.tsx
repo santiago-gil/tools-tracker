@@ -49,7 +49,7 @@ export function VersionSidebar({
                   </p>
                   <div className="flex gap-1 mt-2 flex-wrap min-h-[20px]">
                     {Object.entries(version.trackables)
-                      .filter(([, value]) => value)
+                      .filter(([, value]: [string, unknown]) => value)
                       .map(([key, trackable]) => (
                         <Badge
                           key={key}

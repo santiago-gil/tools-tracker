@@ -5,8 +5,39 @@ import type { QueryDocumentSnapshot } from "firebase-admin/firestore";
 import logger from "../utils/logger/index.js";
 import { toolsCache } from "./cache.js";
 import { sanitizeToolData } from "../utils/sanitize.js";
+import dayjs from 'dayjs';
 
 const toolsCol = db.collection(process.env.FIREBASE_COLLECTION || "tools");
+
+/**
+ * Convert various date formats to ISO string using dayjs
+ */
+function convertToDateString(dateValue: unknown): string {
+  if (!dateValue) return '';
+
+  try {
+    // Handle Firestore Timestamp objects
+    if (dateValue && typeof dateValue === 'object') {
+      const obj = dateValue as Record<string, unknown>;
+
+      // Check if it's a Firestore Timestamp
+      if (obj.toDate && typeof obj.toDate === 'function') {
+        return dayjs((obj.toDate as () => Date)()).toISOString();
+      }
+
+      // Check if it has a seconds property (Firestore Timestamp)
+      if (typeof obj.seconds === 'number') {
+        return dayjs.unix(obj.seconds).toISOString();
+      }
+    }
+
+    // Use dayjs to parse and convert
+    return dayjs(dateValue as any).toISOString();
+  } catch (error) {
+    console.warn('Could not convert date value:', dateValue);
+    return String(dateValue || '');
+  }
+}
 
 /**
  * Get all tools with smart caching
@@ -21,10 +52,16 @@ export async function getAllTools(forceRefresh = false): Promise<Tool[]> {
       logger.info("Cache miss - fetching from Firestore");
       const snap = await toolsCol.get();
       logger.info({ count: snap.size }, "Fetched tools collection");
-      return snap.docs.map((d: QueryDocumentSnapshot) => ({
-        id: d.id,
-        ...(d.data() as Omit<Tool, "id">),
-      }));
+      return snap.docs.map((d: QueryDocumentSnapshot) => {
+        const data = d.data() as Omit<Tool, "id">;
+        return {
+          id: d.id,
+          ...data,
+          // Convert Firestore Timestamps to ISO strings
+          createdAt: data.createdAt ? convertToDateString(data.createdAt) : undefined,
+          updatedAt: data.updatedAt ? convertToDateString(data.updatedAt) : undefined,
+        };
+      });
     },
     forceRefresh
   );
@@ -97,9 +134,13 @@ export async function getToolById(id: string): Promise<Tool | null> {
     return null;
   }
 
+  const data = doc.data() as Omit<Tool, "id">;
   const tool = {
     id: doc.id,
-    ...(doc.data() as Omit<Tool, "id">),
+    ...data,
+    // Convert Firestore Timestamps to ISO strings
+    createdAt: data.createdAt ? convertToDateString(data.createdAt) : undefined,
+    updatedAt: data.updatedAt ? convertToDateString(data.updatedAt) : undefined,
   };
 
   logger.info({ id }, "Tool fetched successfully");

@@ -9,7 +9,7 @@ export function LoadingSpinner({ className = '' }: { className?: string }) {
 export function LoadingSkeleton() {
   return (
     <div className="space-y-3">
-      {[...Array(5)].map((_, i) => (
+      {[...Array(5)].map((_: unknown, i: number) => (
         <div
           key={i}
           className="bg-white border border-gray-200 rounded-xl p-4 animate-pulse"

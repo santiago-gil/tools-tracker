@@ -11,6 +11,7 @@ import {
   useRefreshTools,
 } from '../../hooks/useTools';
 import { useAuth } from '../../hooks/useAuth';
+import { useDebounce } from '../../hooks/useDebounce';
 import type { Tool } from '../../types';
 
 export function ToolList() {
@@ -26,6 +27,9 @@ export function ToolList() {
   const [showSKRecommendedOnly, setShowSKRecommendedOnly] = useState(false);
   const [editingTool, setEditingTool] = useState<Tool | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+
+  // Debounce search query to improve performance
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   const categories = useMemo(() => {
     if (!tools) return [];
@@ -44,8 +48,8 @@ export function ToolList() {
       filtered = filtered.filter((t) => t.category === selectedCategory);
     }
 
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
+    if (debouncedSearchQuery) {
+      const query = debouncedSearchQuery.toLowerCase();
       filtered = filtered.filter(
         (t) =>
           t.name.toLowerCase().includes(query) ||
@@ -61,7 +65,7 @@ export function ToolList() {
     }
 
     return filtered.sort((a, b) => a.name.localeCompare(b.name));
-  }, [tools, selectedCategory, searchQuery, showSKRecommendedOnly]);
+  }, [tools, selectedCategory, debouncedSearchQuery, showSKRecommendedOnly]);
 
   const handleSubmit = async (toolData: Partial<Tool>) => {
     // Backend will handle sanitization and validation

@@ -105,7 +105,7 @@ export function UsersPage() {
                   <td className="px-6 py-4">
                     <div className="flex flex-wrap gap-1">
                       {Object.entries(user.permissions || {})
-                        .filter(([, val]) => val)
+                        .filter(([, val]: [string, unknown]) => val)
                         .map(([key]) => (
                           <span
                             key={key}

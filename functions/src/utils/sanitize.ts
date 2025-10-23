@@ -54,6 +54,38 @@ export function sanitizeUrl(url: string): string | null {
     }
 }
 
+import dayjs from 'dayjs';
+
+/**
+ * Convert various date formats to ISO string using dayjs
+ */
+function convertToDateString(dateValue: unknown): string {
+    if (!dateValue) return '';
+
+    try {
+        // Handle Firestore Timestamp objects
+        if (dateValue && typeof dateValue === 'object') {
+            const obj = dateValue as Record<string, unknown>;
+
+            // Check if it's a Firestore Timestamp
+            if (obj.toDate && typeof obj.toDate === 'function') {
+                return dayjs((obj.toDate as () => Date)()).toISOString();
+            }
+
+            // Check if it has a seconds property (Firestore Timestamp)
+            if (typeof obj.seconds === 'number') {
+                return dayjs.unix(obj.seconds).toISOString();
+            }
+        }
+
+        // Use dayjs to parse and convert
+        return dayjs(dateValue as any).toISOString();
+    } catch (error) {
+        console.warn('Could not convert date value:', dateValue);
+        return String(dateValue || '');
+    }
+}
+
 /**
  * Sanitize tool data before saving to database
  */
@@ -69,6 +101,15 @@ export function sanitizeToolData(data: any) {
 
     if (sanitized.category) {
         sanitized.category = sanitizeText(sanitized.category, 100);
+    }
+
+    // Handle date fields - convert to ISO strings
+    if (sanitized.createdAt) {
+        sanitized.createdAt = convertToDateString(sanitized.createdAt);
+    }
+
+    if (sanitized.updatedAt) {
+        sanitized.updatedAt = convertToDateString(sanitized.updatedAt);
     }
 
     // Sanitize versions array
