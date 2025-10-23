@@ -82,9 +82,9 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
               </div>
             </div>
 
-            {(user?.permissions.edit || user?.permissions.delete) && (
+            {(user?.permissions?.edit || user?.permissions?.delete) && (
               <div className="flex items-center gap-2">
-                {user?.permissions.edit && (
+                {user?.permissions?.edit && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -95,7 +95,7 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
                     Edit
                   </button>
                 )}
-                {user?.permissions.delete && (
+                {user?.permissions?.delete && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();

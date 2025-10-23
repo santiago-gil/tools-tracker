@@ -38,7 +38,7 @@ export function App() {
         >
           Tools
         </button>
-        {user.permissions.manageUsers && (
+        {user.permissions?.manageUsers && (
           <button
             onClick={() => setCurrentPage('users')}
             className={`px-4 py-2 font-medium transition border-b-2 ${
@@ -54,7 +54,7 @@ export function App() {
 
       {/* Page Content */}
       {currentPage === 'tools' && <ToolList />}
-      {currentPage === 'users' && user.permissions.manageUsers && <UsersPage />}
+      {currentPage === 'users' && user.permissions?.manageUsers && <UsersPage />}
     </Layout>
   );
 }

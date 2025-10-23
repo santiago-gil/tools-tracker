@@ -169,7 +169,7 @@ export function ToolList() {
             )}
           </button>
 
-          {user?.permissions.add && (
+          {user?.permissions?.add && (
             <button
               onClick={() => setShowAddModal(true)}
               className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"

@@ -1,4 +1,3 @@
-// functions/src/services/tools.ts
 import type { Tool } from "../types/Tool.js";
 import type { ToolInput } from "../utils/validate.js";
 import { db } from "../utils/firebase.js";
@@ -8,9 +7,6 @@ import { toolsCache } from "./cache.js";
 import { sanitizeToolData } from "../utils/sanitize.js";
 
 const toolsCol = db.collection(process.env.FIREBASE_COLLECTION || "tools");
-
-// Removed pagination - not needed for 300 tools
-// Users expect to see all tools at once
 
 /**
  * Get all tools with smart caching
@@ -167,6 +163,3 @@ export async function deleteTool(id: string): Promise<void> {
   toolsCache.invalidate('all-tools');
   logger.info({ id }, "Tool deleted successfully, cache invalidated");
 }
-
-// Removed getToolStats - not being used anywhere
-// If you need stats in the future, implement with caching

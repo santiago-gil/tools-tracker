@@ -1,29 +1,3 @@
-// import express from 'express';
-// import dotenv from 'dotenv';
-// import logger from './logger';
-// import routes from './routes';
-// import { errorHandler } from './middleware/errorHandler';
-// dotenv.config({ path: '.env.local' });
-
-// const port = process.env.PORT || 3000;
-
-// const app = express();
-
-// app.use(express.json());
-// app.use(
-//   express.urlencoded({
-//     extended: true,
-//   }),
-// );
-
-// routes(app);
-
-// app.use(errorHandler);
-
-// app.listen(port, () => {
-//   logger.info(`Running at ${port}`);
-// });
-
 import * as functions from 'firebase-functions';
 import express from 'express';
 import { attachRoutes } from './routes/index.js';
