@@ -1,5 +1,5 @@
 import type { UseFormRegister } from 'react-hook-form';
-import type { ToolFormData } from '../../lib/validation';
+import type { ToolFormData } from '../../lib/validation.js';
 import { TRACKABLE_STATUSES } from '../../types';
 
 interface TrackableFieldInputProps {
@@ -26,12 +26,15 @@ export function TrackableFieldInput({
     <div className="bg-gray-50 p-4 rounded-lg space-y-3">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor={`${trackableKey}-status-${versionIndex}`} className="block text-sm font-medium text-gray-900 mb-1">
+          <label
+            htmlFor={`${trackableKey}-status-${versionIndex}`}
+            className="block text-sm font-medium text-gray-900 mb-1"
+          >
             {label} <span className="text-red-600">*</span>
           </label>
-          <select 
+          <select
             id={`${trackableKey}-status-${versionIndex}`}
-            {...register(statusKey)} 
+            {...register(statusKey)}
             className="input-base"
           >
             {TRACKABLE_STATUSES.map((status) => (
@@ -43,7 +46,12 @@ export function TrackableFieldInput({
         </div>
 
         <div>
-          <label htmlFor={`${trackableKey}-notes-${versionIndex}`} className="block text-sm font-medium text-gray-900 mb-1">Notes</label>
+          <label
+            htmlFor={`${trackableKey}-notes-${versionIndex}`}
+            className="block text-sm font-medium text-gray-900 mb-1"
+          >
+            Notes
+          </label>
           <input
             id={`${trackableKey}-notes-${versionIndex}`}
             type="text"
@@ -56,7 +64,10 @@ export function TrackableFieldInput({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor={`${trackableKey}-example-${versionIndex}`} className="block text-sm font-medium text-gray-900 mb-1">
+          <label
+            htmlFor={`${trackableKey}-example-${versionIndex}`}
+            className="block text-sm font-medium text-gray-900 mb-1"
+          >
             Example Site
           </label>
           <input
@@ -69,7 +80,10 @@ export function TrackableFieldInput({
         </div>
 
         <div>
-          <label htmlFor={`${trackableKey}-docs-${versionIndex}`} className="block text-sm font-medium text-gray-900 mb-1">
+          <label
+            htmlFor={`${trackableKey}-docs-${versionIndex}`}
+            className="block text-sm font-medium text-gray-900 mb-1"
+          >
             Documentation Link
           </label>
           <input

@@ -9,7 +9,7 @@ npm-debug.log*
 
 # TypeScript build output
 dist/
-lib/
+functions/lib/
 *.tsbuildinfo
 
 # Logs

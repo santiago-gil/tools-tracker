@@ -1,5 +1,5 @@
 import type { UseFormRegister, FieldErrors } from 'react-hook-form';
-import type { ToolFormData } from '../../../lib/validation';
+import type { ToolFormData } from '../../../lib/validation.js';
 
 interface BasicInfoSectionProps {
   register: UseFormRegister<ToolFormData>;

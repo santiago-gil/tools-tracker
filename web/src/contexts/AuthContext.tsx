@@ -7,8 +7,8 @@ import {
   onAuthStateChanged,
   type User as FirebaseUser,
 } from 'firebase/auth';
-import { auth } from '../lib/firebase';
-import { usersApi } from '../lib/api';
+import { auth } from '../lib/firebase.js';
+import { usersApi } from '../lib/api.js';
 import type { User } from '../types';
 
 interface AuthContextValue {

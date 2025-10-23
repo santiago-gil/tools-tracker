@@ -1,5 +1,5 @@
 import type { UseFormRegister, FieldErrors } from 'react-hook-form';
-import type { ToolFormData, VersionFormData } from '../../../lib/validation';
+import type { ToolFormData, VersionFormData } from '../../../lib/validation.js';
 
 interface VersionFormSectionProps {
   version: VersionFormData;

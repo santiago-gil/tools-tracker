@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm, type FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toolFormSchema, type ToolFormData } from '../lib/validation';
+import { toolFormSchema, type ToolFormData } from '../lib/validation.js';
 import type { Tool, ToolVersion } from '../types';
 
 const DEFAULT_VERSION: ToolVersion = {

@@ -1,5 +1,5 @@
 import type { UseFormRegister } from 'react-hook-form';
-import type { ToolFormData } from '../../../lib/validation';
+import type { ToolFormData } from '../../../lib/validation.js';
 import { TrackableFieldInput } from '../TrackableFieldInput';
 
 interface TrackableFieldsSectionProps {
