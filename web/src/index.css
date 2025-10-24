@@ -522,7 +522,6 @@
     transform: translateZ(0);
   }
 
-
   @keyframes holographic-shift {
     0%, 100% {
       background-position: 0% 50%;
@@ -622,36 +621,10 @@
   box-sizing: border-box;
 }
 
-html {
-  background-color: #ffffff;
-  height: 100%;
-}
-
-.dark html {
-  background-color: #111827;
-}
-
 body {
   font-family: 'Satoshi', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #ffffff;
-  min-height: 100vh;
-  height: 100%;
-}
-
-.dark body {
-  background-color: #111827;
-}
-
-/* Ensure no white shows through on dark mode */
-#root {
-  background-color: #ffffff;
-  min-height: 100vh;
-}
-
-.dark #root {
-  background-color: #111827;
 }
 
 /* Remove red focus rings, use blue */

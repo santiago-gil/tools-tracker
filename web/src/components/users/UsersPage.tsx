@@ -124,6 +124,9 @@ export const UsersPage = memo(function UsersPage() {
                     >
                       {user.email}
                     </div>
+                    <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                      {user.uid}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <select

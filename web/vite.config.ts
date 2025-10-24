@@ -20,14 +20,5 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: process.env.NODE_ENV === 'development',
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          query: ['@tanstack/react-query'],
-          virtual: ['@tanstack/react-virtual'],
-        },
-      },
-    },
   },
 });
