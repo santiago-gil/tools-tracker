@@ -203,7 +203,7 @@ export const ToolList = memo(function ToolList() {
             )}
           </button>
         </div>
-        <div className="flex gap-3 items-center justify-center lg:justify-start">
+        <div className="flex gap-3">
           <SKRecommendedBadge
             isRecommended={showSKRecommendedOnly}
             className="active:scale-95"

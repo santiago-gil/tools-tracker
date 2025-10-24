@@ -69,7 +69,7 @@ export function ToolRowHeader({
 
   return (
     <div
-      className="p-4 cursor-pointer hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
+      className="p-4 cursor-pointer hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-inset"
       onClick={onToggleExpanded}
       onKeyDown={handleKeyDown}
       tabIndex={0}
