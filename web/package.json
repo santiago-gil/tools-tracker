@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:clean": "rm -rf dist && pnpm run build",
+    "deploy": "pnpm run build:clean && cd .. && firebase deploy --only hosting",
     "preview": "vite preview",
     "lint": "eslint .",
     "type-check": "tsc -b --noEmit"

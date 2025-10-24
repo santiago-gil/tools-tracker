@@ -4,7 +4,9 @@
   "scripts": {
     "test:robustness": "node scripts/test-robustness.js",
     "test:stress": "node scripts/stress-test.js",
-    "test:all": "npm run test:robustness && npm run test:stress"
+    "test:all": "pnpm run test:robustness && pnpm run test:stress",
+    "build:web": "cd web && pnpm run build:clean",
+    "deploy:web": "cd web && pnpm run deploy"
   },
   "dependencies": {
     "csv-parse": "^6.1.0",

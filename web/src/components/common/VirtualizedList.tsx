@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 interface VirtualizedListProps<T> {
   items: T[];
   itemHeight: number;
-  containerHeight: number;
+  containerHeight: number | string;
   renderItem: ({ item, index }: { item: T; index: number }) => ReactNode;
   className?: string;
   overscan?: number;
@@ -32,7 +32,10 @@ export const VirtualizedList = memo(function VirtualizedList<T>({
     <div
       ref={parentRef}
       className={`overflow-auto ${className}`}
-      style={{ height: containerHeight }}
+      style={{
+        height: typeof containerHeight === 'string' ? containerHeight : containerHeight,
+        minHeight: typeof containerHeight === 'number' ? containerHeight : undefined,
+      }}
     >
       <div
         style={{

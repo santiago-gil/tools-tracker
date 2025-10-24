@@ -1,13 +1,13 @@
-name: Deploy to Firebase
+name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
   pull_request:
     branches: [ main ]
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
     
     steps:
@@ -30,16 +30,17 @@ jobs:
         cd web
         pnpm install --frozen-lockfile
         
-    - name: Build web app (clean)
+    - name: Type check
+      run: |
+        cd web
+        pnpm run type-check
+        
+    - name: Lint
+      run: |
+        cd web
+        pnpm run lint
+        
+    - name: Build (clean)
       run: |
         cd web
         pnpm run build:clean
-        
-    - name: Deploy to Firebase
-      uses: FirebaseExtended/action-hosting-deploy@v0
-      with:
-        repoToken: '${{ secrets.GITHUB_TOKEN }}'
-        firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
-        projectId: tool-tracker-c8180
-        channelId: live
-        entryPoint: web/dist

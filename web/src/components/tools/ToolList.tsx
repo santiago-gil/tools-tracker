@@ -14,7 +14,6 @@ import {
 import { useAuth } from '../../hooks/useAuth';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useToolFiltering } from '../../hooks/useToolFiltering';
-import { useWindowSize } from '../../hooks/useWindowSize';
 import type { Tool } from '../../types';
 
 export const ToolList = memo(function ToolList() {
@@ -67,8 +66,8 @@ export const ToolList = memo(function ToolList() {
     showSKRecommendedOnly,
   });
 
-  // Get window size for responsive virtual scrolling
-  const { height: windowHeight } = useWindowSize();
+  // Get window size for responsive virtual scrolling (removed as we now use full height)
+  // const { height: windowHeight } = useWindowSize();
 
   const handleSubmit = useCallback(
     async (toolData: Partial<Tool>) => {
@@ -152,7 +151,11 @@ export const ToolList = memo(function ToolList() {
   }
 
   return (
-    <div className="space-y-6">
+    <div
+      className={`space-y-6 ${
+        filteredTools.length <= 3 ? 'h-auto' : 'h-full flex flex-col'
+      }`}
+    >
       {/* Controls */}
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="flex-1 relative">
@@ -180,11 +183,11 @@ export const ToolList = memo(function ToolList() {
           <button
             onClick={handleRefresh}
             disabled={refreshTools.isPending}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed z-10 transition-colors duration-200"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed z-10 transition-colors duration-200 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
             title="Refresh tools data"
           >
             {refreshTools.isPending ? (
-              <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-4 h-4 border-2 border-gray-400 dark:border-gray-300 border-t-transparent rounded-full animate-spin"></div>
             ) : (
               <svg
                 className="w-4 h-4"
@@ -205,9 +208,9 @@ export const ToolList = memo(function ToolList() {
         <div className="flex gap-3">
           <label
             htmlFor="sk-recommended-filter"
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all duration-200 active:scale-95 ${
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all duration-200 active:scale-95 badge-holographic ${
               showSKRecommendedOnly
-                ? 'badge-holographic'
+                ? ''
                 : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500'
             }`}
           >
@@ -270,26 +273,49 @@ export const ToolList = memo(function ToolList() {
           No tools found.
         </p>
       ) : (
-        <div className="relative">
-          <VirtualizedList
-            items={filteredTools}
-            itemHeight={120} // Approximate height of each ToolRow
-            containerHeight={Math.min(600, windowHeight * 0.6)} // Responsive height
-            renderItem={({ item: tool, index }) => (
-              <div
-                key={tool.id}
-                className={`${index === 0 ? 'virtual-first-item' : ''} mb-3`}
-              >
-                <ToolRow
-                  tool={tool}
-                  onEdit={() => handleEditTool(tool)}
-                  onDelete={() => handleDelete(tool)}
-                />
-              </div>
-            )}
-            className="custom-scrollbar"
-            overscan={5} // Render 5 extra items above/below for smooth scrolling
-          />
+        <div
+          className={`relative ${
+            filteredTools.length <= 3 ? 'flex-none w-full' : 'flex-1 min-h-0'
+          }`}
+        >
+          {filteredTools.length <= 3 ? (
+            // For few items, show them naturally without virtualization
+            <div className="space-y-3 w-full">
+              {filteredTools.map((tool, index) => (
+                <div
+                  key={tool.id}
+                  className={`w-full ${index === 0 ? 'virtual-first-item' : ''}`}
+                >
+                  <ToolRow
+                    tool={tool}
+                    onEdit={() => handleEditTool(tool)}
+                    onDelete={() => handleDelete(tool)}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            // For many items, use virtualization
+            <VirtualizedList
+              items={filteredTools}
+              itemHeight={120} // Approximate height of each ToolRow
+              containerHeight="100%" // Take full available height
+              renderItem={({ item: tool, index }) => (
+                <div
+                  key={tool.id}
+                  className={`${index === 0 ? 'virtual-first-item' : ''} mb-3`}
+                >
+                  <ToolRow
+                    tool={tool}
+                    onEdit={() => handleEditTool(tool)}
+                    onDelete={() => handleDelete(tool)}
+                  />
+                </div>
+              )}
+              className="custom-scrollbar"
+              overscan={5} // Render 5 extra items above/below for smooth scrolling
+            />
+          )}
         </div>
       )}
 
