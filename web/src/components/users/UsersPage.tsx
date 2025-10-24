@@ -101,7 +101,7 @@ export function UsersPage() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y" style={{ divideColor: 'var(--border-light)' }}>
+            <tbody className="divide-y divide-[var(--border-light)]">
               {users.map((user) => (
                 <tr
                   key={user.uid}
