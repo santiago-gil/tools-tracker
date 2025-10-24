@@ -8,18 +8,19 @@ export function SignInPage() {
   return (
     <div className="min-h-screen bg-[var(--badge-unknown-bg)] dark:bg-gray-900 flex items-center justify-center px-4">
       <div className="max-w-md w-full">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 relative">
+        <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow-xl p-10 relative">
           {/* Dark mode toggle in top right */}
-          <div className="absolute top-4 right-4">
+          <div className="absolute top-5 right-5">
             <DarkModeToggle />
           </div>
+
           {/* Header */}
           <div className="text-center mb-8 flex flex-col items-center">
-            <CrownLogo className="w-16 h-16 text-[var(--sk-gold)] mb-4" />
-            <h1 className="text-3xl font-bold text-[var(--sk-black)] dark:text-white mb-2">
+            <CrownLogo className="w-28 h-28 text-[var(--sk-gold)] mb-4" />
+            <h1 className="text-3xl font-bold text-[var(--sk-black)] dark:text-white mb-3">
               <span className="text-[var(--sk-red)]">SearchKings</span> Tool Tracker
             </h1>
-            <p className="text-sm text-[var(--sk-grey)]">
+            <p className="text-sm text-[var(--sk-grey)] dark:text-gray-300 leading-relaxed">
               Sign in to manage integrations and tools
             </p>
           </div>
@@ -28,7 +29,7 @@ export function SignInPage() {
           <button
             onClick={signInWithGoogle}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 btn-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:transform hover:scale-105 active:scale-95"
+            className="w-full flex items-center justify-center gap-3 btn-google-glass disabled:opacity-50 disabled:cursor-not-allowed py-4"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
