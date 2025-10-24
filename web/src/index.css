@@ -473,8 +473,11 @@
     transition: all 0.3s ease;
   }
 
-  /* Holographic effect only on hover */
-  .badge-holographic:hover {
+  /* Holographic effect on hover and focus */
+  .badge-holographic:hover,
+  .badge-holographic:focus-within,
+  .hover\:badge-holographic:hover,
+  .hover\:badge-holographic:focus-within {
     background: linear-gradient(135deg, 
       rgba(168, 85, 247, 0.12) 0%, 
       rgba(236, 72, 153, 0.12) 25%, 
@@ -504,8 +507,11 @@
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
   }
 
-  /* Dark mode holographic effect on hover */
-  .dark .badge-holographic:hover {
+  /* Dark mode holographic effect on hover and focus */
+  .dark .badge-holographic:hover,
+  .dark .badge-holographic:focus-within,
+  .dark .hover\:badge-holographic:hover,
+  .dark .hover\:badge-holographic:focus-within {
     background: linear-gradient(135deg, 
       rgba(168, 85, 247, 0.2) 0%, 
       rgba(236, 72, 153, 0.2) 25%, 
@@ -530,6 +536,7 @@
       background-position: 100% 50%;
     }
   }
+
 
   /* Enhanced badge styles with proper contrast */
   .badge-base {

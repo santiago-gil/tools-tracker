@@ -45,15 +45,31 @@ export function VersionFormSection({
       <div>
         <label
           htmlFor={`sk-recommended-${versionIndex}`}
-          className="inline-flex items-center gap-2 px-3 py-2 border rounded-lg cursor-pointer w-fit badge-holographic"
+          onClick={() => {
+            const currentValue = version.sk_recommended;
+            // This will trigger the form's onChange handler
+            const event = new Event('change', { bubbles: true });
+            const input = document.getElementById(
+              `sk-recommended-${versionIndex}`,
+            ) as HTMLInputElement;
+            if (input) {
+              input.checked = !currentValue;
+              input.dispatchEvent(event);
+            }
+          }}
+          className={`inline-flex items-center gap-2 px-3 py-2 border rounded-lg cursor-pointer w-fit transition-all duration-200 ${
+            version.sk_recommended
+              ? 'badge-holographic'
+              : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:badge-holographic'
+          }`}
         >
           <input
             id={`sk-recommended-${versionIndex}`}
             type="checkbox"
             {...register(`versions.${versionIndex}.sk_recommended`)}
-            className="h-5 w-5 rounded"
+            className="h-5 w-5 rounded cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             style={{
-              accentColor: '#ffffff',
+              accentColor: version.sk_recommended ? '#8b5cf6' : undefined,
             }}
           />
           <span className="text-sm font-medium">SK Recommended</span>
