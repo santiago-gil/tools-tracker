@@ -3,8 +3,6 @@ name: Deploy to Firebase
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   deploy:
@@ -54,4 +52,4 @@ jobs:
         firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
         projectId: tool-tracker-c8180
         channelId: live
-        entryPoint: web/dist
+        entryPoint: .
