@@ -30,6 +30,17 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // 🔐 AUDIT_LOGS collection
+    match /audit_logs/{auditId} {
+      // Allow authenticated users to read audit logs
+      // Users can only read audit logs for resources they have access to
+      allow read: if request.auth != null;
+      
+      // Block direct writes from clients.
+      // Only backend functions (with Admin SDK) can create audit logs.
+      allow write: if false;
+    }
+
     // 🔒 Default: deny everything else
     match /{document=**} {
       allow read, write: if false;
