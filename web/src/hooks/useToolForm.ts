@@ -3,66 +3,17 @@ import { useForm, type FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toolFormSchema, type ToolFormData } from '../lib/validation.js';
 import type { Tool, ToolVersion } from '../types';
+import { createEmptyTrackables } from '../utils/trackableFields';
 
 const DEFAULT_VERSION: ToolVersion = {
     versionName: 'v1',
-    trackables: {
-        gtm: {
-            status: 'Unknown',
-            notes: '',
-            example_site: '',
-            documentation: '',
-        },
-        ga4: {
-            status: 'Unknown',
-            notes: '',
-            example_site: '',
-            documentation: '',
-        },
-        google_ads: {
-            status: 'Unknown',
-            notes: '',
-            example_site: '',
-            documentation: '',
-        },
-        msa: {
-            status: 'Unknown',
-            notes: '',
-            example_site: '',
-            documentation: '',
-        },
-    },
+    trackables: createEmptyTrackables(),
     sk_recommended: false,
 };
 
 const createEmptyVersion = (): ToolVersion => ({
     versionName: '',
-    trackables: {
-        gtm: {
-            status: 'Unknown',
-            notes: '',
-            example_site: '',
-            documentation: '',
-        },
-        ga4: {
-            status: 'Unknown',
-            notes: '',
-            example_site: '',
-            documentation: '',
-        },
-        google_ads: {
-            status: 'Unknown',
-            notes: '',
-            example_site: '',
-            documentation: '',
-        },
-        msa: {
-            status: 'Unknown',
-            notes: '',
-            example_site: '',
-            documentation: '',
-        },
-    },
+    trackables: createEmptyTrackables(),
     sk_recommended: false,
     team_considerations: '',
 });

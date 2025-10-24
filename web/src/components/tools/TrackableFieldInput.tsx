@@ -1,6 +1,7 @@
 import type { UseFormRegister } from 'react-hook-form';
 import type { ToolFormData } from '../../lib/validation.js';
 import { TRACKABLE_STATUSES } from '../../types';
+import { FormField } from '../common/FormField';
 
 interface TrackableFieldInputProps {
   trackableKey: 'gtm' | 'ga4' | 'google_ads' | 'msa';
@@ -25,75 +26,44 @@ export function TrackableFieldInput({
   return (
     <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg space-y-3">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label
-            htmlFor={`${trackableKey}-status-${versionIndex}`}
-            className="block text-sm font-medium text-gray-900 dark:text-white mb-1"
-          >
-            {label} <span className="text-red-600">*</span>
-          </label>
-          <select
-            id={`${trackableKey}-status-${versionIndex}`}
-            {...register(statusKey)}
-            className="input-base"
-          >
+        <FormField label={label} required id={`${trackableKey}-status-${versionIndex}`}>
+          <select {...register(statusKey)} className="input-base">
             {TRACKABLE_STATUSES.map((status) => (
               <option key={status} value={status}>
                 {status}
               </option>
             ))}
           </select>
-        </div>
+        </FormField>
 
-        <div>
-          <label
-            htmlFor={`${trackableKey}-notes-${versionIndex}`}
-            className="block text-sm font-medium text-gray-900 dark:text-white mb-1"
-          >
-            Notes
-          </label>
+        <FormField label="Notes" id={`${trackableKey}-notes-${versionIndex}`}>
           <input
-            id={`${trackableKey}-notes-${versionIndex}`}
             type="text"
             {...register(notesKey)}
             className="input-base"
             placeholder="Optional implementation notes"
           />
-        </div>
+        </FormField>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label
-            htmlFor={`${trackableKey}-example-${versionIndex}`}
-            className="block text-sm font-medium text-gray-900 dark:text-white mb-1"
-          >
-            Example Site
-          </label>
+        <FormField label="Example Site" id={`${trackableKey}-example-${versionIndex}`}>
           <input
-            id={`${trackableKey}-example-${versionIndex}`}
-            type="text"
+            type="url"
             {...register(exampleSiteKey)}
             className="input-base"
             placeholder="https://example.com"
           />
-        </div>
+        </FormField>
 
-        <div>
-          <label
-            htmlFor={`${trackableKey}-docs-${versionIndex}`}
-            className="block text-sm font-medium text-gray-900 dark:text-white mb-1"
-          >
-            Documentation Link
-          </label>
+        <FormField label="Documentation Link" id={`${trackableKey}-docs-${versionIndex}`}>
           <input
-            id={`${trackableKey}-docs-${versionIndex}`}
-            type="text"
+            type="url"
             {...register(docKey)}
             className="input-base"
             placeholder="https://docs.example.com"
           />
-        </div>
+        </FormField>
       </div>
     </div>
   );

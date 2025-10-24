@@ -1,5 +1,6 @@
 import type { UseFormRegister, FieldErrors } from 'react-hook-form';
 import type { ToolFormData } from '../../../lib/validation.js';
+import { FormField } from '../../common/FormField';
 
 interface BasicInfoSectionProps {
   register: UseFormRegister<ToolFormData>;
@@ -21,34 +22,27 @@ export function BasicInfoSection({
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label
-            htmlFor="platform-name"
-            className="block text-sm font-medium text-gray-900 dark:text-white mb-1"
-          >
-            Platform Name <span className="text-red-600">*</span>
-          </label>
+        <FormField
+          label="Platform Name"
+          required
+          error={errors.name?.message}
+          id="platform-name"
+        >
           <input
-            id="platform-name"
             {...register('name')}
             className="input-base"
             placeholder="e.g., HubSpot Chat"
           />
-          {errors.name && (
-            <p className="text-xs text-red-600 mt-1">{errors.name.message}</p>
-          )}
-        </div>
+        </FormField>
 
-        <div>
-          <label
-            htmlFor="category-select"
-            className="block text-sm font-medium text-gray-900 dark:text-white mb-1"
-          >
-            Category <span className="text-red-600">*</span>
-          </label>
+        <FormField
+          label="Category"
+          required
+          error={errors.category?.message}
+          id={showCustomCategory ? 'category-custom' : 'category-select'}
+        >
           {!showCustomCategory ? (
             <select
-              id="category-select"
               {...register('category')}
               onChange={(e) => onCategoryChange(e.target.value)}
               className="input-base"
@@ -64,7 +58,6 @@ export function BasicInfoSection({
           ) : (
             <div className="space-y-2">
               <input
-                id="category-custom"
                 {...register('category')}
                 className="input-base"
                 placeholder="Enter new category name..."
@@ -79,10 +72,7 @@ export function BasicInfoSection({
               </button>
             </div>
           )}
-          {errors.category && (
-            <p className="text-xs text-red-600 mt-1">{errors.category.message}</p>
-          )}
-        </div>
+        </FormField>
       </div>
 
       <div className="border-t pt-4" />

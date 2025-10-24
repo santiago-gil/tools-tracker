@@ -1,4 +1,5 @@
 import type { ToolVersion } from '../../types';
+import { SKRecommendedBadge } from '../common/SKRecommendedBadge';
 
 interface VersionMetaSectionProps {
   version: ToolVersion;
@@ -27,13 +28,9 @@ export function VersionMetaSection({ version, onChange }: VersionMetaSectionProp
         />
       </div>
 
-      <div
+      <SKRecommendedBadge
+        isRecommended={version.sk_recommended}
         onClick={() => handleChange('sk_recommended', !version.sk_recommended)}
-        className={`flex items-center p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
-          version.sk_recommended
-            ? 'badge-holographic'
-            : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:badge-holographic'
-        }`}
       >
         <input
           type="checkbox"
@@ -51,7 +48,7 @@ export function VersionMetaSection({ version, onChange }: VersionMetaSectionProp
         >
           SK Recommended
         </label>
-      </div>
+      </SKRecommendedBadge>
     </div>
   );
 }

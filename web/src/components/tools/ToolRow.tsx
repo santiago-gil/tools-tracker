@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Badge } from '../common/Badge';
 import type { Tool } from '../../types';
-import { useAuth } from '../../hooks/useAuth';
+import { ToolRowHeader } from './ToolRowHeader';
+import { ToolRowExpanded } from './ToolRowExpanded';
 
 interface ToolRowProps {
   tool: Tool;
@@ -10,7 +10,6 @@ interface ToolRowProps {
 }
 
 export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
-  const { user } = useAuth();
   const [expanded, setExpanded] = useState(false);
   const [selectedVersionIdx, setSelectedVersionIdx] = useState(0);
 
@@ -18,9 +17,7 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
   if (!tool.versions || tool.versions.length === 0) {
     return (
       <div className="border rounded-xl overflow-hidden bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 p-4">
-        <div style={{ color: 'var(--text-tertiary)' }}>
-          No versions available for {tool.name}
-        </div>
+        <div className="text-tertiary">No versions available for {tool.name}</div>
       </div>
     );
   }
@@ -32,264 +29,28 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
       className={`card elevation-2 elevation-interactive transition-all duration-200 ${
         expanded ? 'expanded' : 'overflow-hidden'
       }`}
+      role="article"
+      aria-label={`Tool: ${tool.name}`}
     >
-      <div
-        className="p-4 cursor-pointer hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors duration-150"
-        onClick={() => setExpanded(!expanded)}
-      >
-        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3">
-          {/* Left side - Tool info and version tabs */}
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h2
-                className="text-lg font-semibold flex-shrink-0"
-                style={{ color: 'var(--text-primary)' }}
-              >
-                {tool.name}
-              </h2>
-              {currentVersion?.sk_recommended && (
-                <span className="px-2 py-1 rounded-md text-xs font-medium flex-shrink-0 border badge-holographic">
-                  SK Recommended
-                </span>
-              )}
-              {/* Expand/Collapse indicator */}
-              <div
-                className="ml-2 transition-transform duration-200"
-                style={{
-                  transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
-                  color: 'var(--text-tertiary)',
-                }}
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <polyline points="6,9 12,15 18,9"></polyline>
-                </svg>
-              </div>
-            </div>
-            <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>
-              {tool.category}
-            </p>
-
-            {/* Version tabs - moved here for better organization */}
-            {tool.versions.length > 1 && (
-              <div className="flex gap-2 flex-wrap mt-3">
-                {tool.versions.map((version, idx) => (
-                  <button
-                    key={idx}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedVersionIdx(idx);
-                    }}
-                    className={`filter-btn text-xs ${
-                      selectedVersionIdx === idx
-                        ? 'filter-btn-active'
-                        : 'filter-btn-inactive'
-                    }`}
-                  >
-                    {version.versionName}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Right side - Tracking badges and actions */}
-          <div className="flex flex-col gap-3 lg:items-end">
-            <div className="flex items-center gap-4 text-sm flex-wrap">
-              <div className="flex items-center gap-2">
-                <span
-                  className="text-xs font-medium"
-                  style={{ color: 'var(--text-secondary)' }}
-                >
-                  GTM:
-                </span>
-                <Badge status={currentVersion?.trackables?.gtm?.status || 'Unknown'} />
-              </div>
-              <div className="flex items-center gap-2">
-                <span
-                  className="text-xs font-medium"
-                  style={{ color: 'var(--text-secondary)' }}
-                >
-                  Ads:
-                </span>
-                <Badge
-                  status={currentVersion?.trackables?.google_ads?.status || 'Unknown'}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <span
-                  className="text-xs font-medium"
-                  style={{ color: 'var(--text-secondary)' }}
-                >
-                  GA4:
-                </span>
-                <Badge status={currentVersion?.trackables?.ga4?.status || 'Unknown'} />
-              </div>
-              <div className="flex items-center gap-2">
-                <span
-                  className="text-xs font-medium"
-                  style={{ color: 'var(--text-secondary)' }}
-                >
-                  MSA:
-                </span>
-                <Badge status={currentVersion?.trackables?.msa?.status || 'Unknown'} />
-              </div>
-            </div>
-
-            {(user?.permissions?.edit || user?.permissions?.delete) && (
-              <div className="flex items-center gap-2">
-                {user?.permissions?.edit && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onEdit();
-                    }}
-                    className="btn-secondary text-sm px-3 py-1 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 active:scale-95"
-                  >
-                    Edit
-                  </button>
-                )}
-                {user?.permissions?.delete && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDelete();
-                    }}
-                    className="btn-secondary text-sm px-3 py-1 text-red-700 dark:text-red-300 border-red-300 dark:border-red-700 transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-400 dark:hover:border-red-600 active:scale-95"
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+      <ToolRowHeader
+        tool={tool}
+        currentVersion={currentVersion}
+        selectedVersionIdx={selectedVersionIdx}
+        expanded={expanded}
+        onToggleExpanded={() => setExpanded(!expanded)}
+        onVersionSelect={setSelectedVersionIdx}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
 
       {/* Expanded Details */}
-      {expanded &&
-        currentVersion &&
-        (() => {
-          // Check if there's any content to show
-          const hasTeamConsiderations = currentVersion.team_considerations;
-          const hasTrackableContent = Object.entries(currentVersion.trackables).some(
-            ([, trackable]) =>
-              trackable?.notes || trackable?.example_site || trackable?.documentation,
-          );
-
-          // Only render if there's actual content
-          if (!hasTeamConsiderations && !hasTrackableContent) {
-            return (
-              <div className="px-4 pb-4 pt-2 text-center">
-                <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>
-                  No additional details available for this tool
-                </p>
-              </div>
-            );
-          }
-
-          return (
-            <div
-              className="px-4 pb-4 pt-2 space-y-3 border-t rounded-b-xl"
-              style={{
-                borderColor: 'var(--border-light)',
-                backgroundColor: 'var(--surface-1)',
-              }}
-            >
-              {currentVersion.team_considerations && (
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
-                    Web Team Considerations
-                  </h3>
-                  <p className="text-sm text-gray-700 dark:text-gray-300">
-                    {currentVersion.team_considerations}
-                  </p>
-                </div>
-              )}
-
-              {Object.entries(currentVersion.trackables)
-                .filter(
-                  ([, trackable]) =>
-                    trackable?.notes ||
-                    trackable?.example_site ||
-                    trackable?.documentation,
-                )
-                .map(([key, trackable]) => {
-                  const labels: Record<string, string> = {
-                    gtm: 'Google Tag Manager',
-                    ga4: 'Google Analytics 4',
-                    google_ads: 'Google Ads',
-                    msa: 'Microsoft Advertising',
-                  };
-                  return (
-                    <div key={key} className="space-y-2">
-                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                        {labels[key] || key}
-                      </h3>
-
-                      {trackable?.notes && (
-                        <div>
-                          <h5
-                            className="text-xs font-medium mb-1"
-                            style={{ color: 'var(--text-tertiary)' }}
-                          >
-                            Notes
-                          </h5>
-                          <p className="text-sm text-gray-700 dark:text-gray-300">
-                            {trackable.notes}
-                          </p>
-                        </div>
-                      )}
-
-                      {trackable?.example_site && (
-                        <div>
-                          <h5
-                            className="text-xs font-medium mb-1"
-                            style={{ color: 'var(--text-tertiary)' }}
-                          >
-                            Example Site
-                          </h5>
-                          <a
-                            href={trackable.example_site}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline break-all"
-                          >
-                            {trackable.example_site}
-                          </a>
-                        </div>
-                      )}
-
-                      {trackable?.documentation && (
-                        <div>
-                          <h5
-                            className="text-xs font-medium mb-1"
-                            style={{ color: 'var(--text-tertiary)' }}
-                          >
-                            Documentation
-                          </h5>
-                          <a
-                            href={trackable.documentation}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline break-all"
-                          >
-                            {trackable.documentation}
-                          </a>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-            </div>
-          );
-        })()}
+      {expanded && currentVersion && (
+        <ToolRowExpanded
+          currentVersion={currentVersion}
+          toolId={tool.id || ''}
+          versionIdx={selectedVersionIdx}
+        />
+      )}
     </div>
   );
 }

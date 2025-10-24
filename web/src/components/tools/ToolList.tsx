@@ -4,6 +4,7 @@ import { ToolFormModal } from './ToolFormModal';
 import { ToolFilters } from './ToolFilters';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { DynamicVirtualizedList } from '../common/DynamicVirtualizedList';
+import { SKRecommendedBadge } from '../common/SKRecommendedBadge';
 import {
   useTools,
   useCreateTool,
@@ -203,13 +204,9 @@ export const ToolList = memo(function ToolList() {
           </button>
         </div>
         <div className="flex gap-3">
-          <label
-            htmlFor="sk-recommended-filter"
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all duration-200 active:scale-95 ${
-              showSKRecommendedOnly
-                ? 'badge-holographic'
-                : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:badge-holographic'
-            }`}
+          <SKRecommendedBadge
+            isRecommended={showSKRecommendedOnly}
+            className="active:scale-95"
           >
             <input
               id="sk-recommended-filter"
@@ -222,7 +219,7 @@ export const ToolList = memo(function ToolList() {
               }}
             />
             <span className="text-sm font-medium whitespace-nowrap">SK Recommended</span>
-          </label>
+          </SKRecommendedBadge>
 
           {user?.permissions?.add && (
             <button onClick={handleAddTool} className="btn-primary text-sm px-3 py-2">

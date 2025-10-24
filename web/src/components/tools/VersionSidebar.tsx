@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Badge } from '../common/Badge';
 import type { ToolVersion } from '../../types';
 
@@ -16,6 +17,14 @@ export function VersionSidebar({
   onAddVersion,
   onRemoveVersion,
 }: VersionSidebarProps) {
+  // Create stable keys for versions based on versionName and index
+  const versionKeys = useMemo(() => {
+    return versions.map(
+      (version, idx) =>
+        `version-${idx}-${version.versionName.replace(/[^a-zA-Z0-9]/g, '-')}`,
+    );
+  }, [versions]);
+
   return (
     <div className="w-full md:w-64 bg-gray-50 dark:bg-gray-800 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700 p-4">
       <div className="space-y-3">
@@ -35,7 +44,7 @@ export function VersionSidebar({
         <div className="space-y-2">
           {versions.map((version, idx) => (
             <button
-              key={idx}
+              key={versionKeys[idx]}
               onClick={() => onSelectVersion(idx)}
               type="button"
               className={`w-full text-left p-3 rounded-lg transition-all duration-200 min-h-[80px] elevation-1 ${

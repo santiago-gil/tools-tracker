@@ -620,6 +620,23 @@
   .virtual-first-item {
     padding-top: 0.5rem;
   }
+
+  /* Text utility classes */
+  .text-primary {
+    color: var(--text-primary);
+  }
+
+  .text-secondary {
+    color: var(--text-secondary);
+  }
+
+  .text-tertiary {
+    color: var(--text-tertiary);
+  }
+
+  .text-muted {
+    color: var(--text-quaternary);
+  }
 }
 
 * {

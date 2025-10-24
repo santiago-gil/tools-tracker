@@ -3,6 +3,7 @@ import { useUsers, useUpdateUser, useDeleteUser } from '../../hooks/useUsers';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import type { User, UserRole } from '../../types';
 import { ROLE_PERMISSIONS } from '../../types';
+import { getButtonClasses } from '../../utils/buttonVariants';
 
 export const UsersPage = memo(function UsersPage() {
   const { data: users, isLoading, error } = useUsers();
@@ -170,7 +171,7 @@ export const UsersPage = memo(function UsersPage() {
                     <button
                       onClick={() => handleDelete(user)}
                       disabled={deleteUser.isPending}
-                      className="btn-secondary text-sm px-3 py-1 text-red-700 dark:text-red-300 border-red-300 dark:border-red-700 transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-400 dark:hover:border-red-600 active:scale-95 disabled:opacity-50"
+                      className={getButtonClasses('danger', deleteUser.isPending)}
                     >
                       Delete
                     </button>
