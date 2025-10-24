@@ -7,17 +7,17 @@ import { describe, it, expect, vi } from 'vitest';
 describe('Robustness Tests', () => {
   describe('Optimistic Locking Logic', () => {
     it('should detect version conflicts', () => {
-      const currentVersion = 5;
-      const expectedVersion = 3;
-      
+      const currentVersion: number = 5;
+      const expectedVersion: number = 3;
+
       const hasConflict = currentVersion !== expectedVersion;
       expect(hasConflict).toBe(true);
     });
 
     it('should allow updates with matching versions', () => {
-      const currentVersion = 5;
-      const expectedVersion = 5;
-      
+      const currentVersion: number = 5;
+      const expectedVersion: number = 5;
+
       const hasConflict = currentVersion !== expectedVersion;
       expect(hasConflict).toBe(false);
     });
@@ -59,7 +59,7 @@ describe('Robustness Tests', () => {
     it('should generate unique request IDs', () => {
       const requestId1 = Math.random().toString(36).substring(2, 15);
       const requestId2 = Math.random().toString(36).substring(2, 15);
-      
+
       expect(requestId1).toBeDefined();
       expect(requestId2).toBeDefined();
       expect(requestId1).not.toBe(requestId2);
@@ -67,7 +67,7 @@ describe('Robustness Tests', () => {
 
     it('should track request duration', () => {
       const startTime = Date.now();
-      
+
       // Simulate some work
       const workTime = 100;
       setTimeout(() => {
@@ -79,12 +79,12 @@ describe('Robustness Tests', () => {
 
   describe('Concurrent Editing Protection', () => {
     it('should handle multiple concurrent operations', async () => {
-      const operations = Array.from({ length: 5 }, (_, i) => 
+      const operations = Array.from({ length: 5 }, (_, i) =>
         Promise.resolve({ success: true, version: i + 1 })
       );
 
       const results = await Promise.all(operations);
-      
+
       expect(results).toHaveLength(5);
       expect(results.every(r => r.success)).toBe(true);
     });
@@ -126,7 +126,7 @@ describe('Robustness Tests', () => {
 
       const networkError = new Error('Connection timeout');
       const result = handleNetworkError(networkError);
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBe('Network error');
     });
@@ -135,10 +135,10 @@ describe('Robustness Tests', () => {
   describe('Performance', () => {
     it('should complete operations within reasonable time', async () => {
       const startTime = Date.now();
-      
+
       // Simulate fast operation
       await new Promise(resolve => setTimeout(resolve, 10));
-      
+
       const duration = Date.now() - startTime;
       expect(duration).toBeLessThan(100); // Should complete in < 100ms
     });
@@ -146,9 +146,9 @@ describe('Robustness Tests', () => {
     it('should handle batch operations efficiently', () => {
       const batchSize = 100;
       const operations = Array.from({ length: batchSize }, (_, i) => i);
-      
+
       const processed = operations.map(op => op * 2);
-      
+
       expect(processed).toHaveLength(batchSize);
       expect(processed[0]).toBe(0);
       expect(processed[99]).toBe(198);
