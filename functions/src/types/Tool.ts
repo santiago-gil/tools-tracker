@@ -40,4 +40,5 @@ export interface Tool {
   updatedAt?: string;
   updatedBy?: UserInfo;
   createdAt?: string;
+  _optimisticVersion?: number;
 }

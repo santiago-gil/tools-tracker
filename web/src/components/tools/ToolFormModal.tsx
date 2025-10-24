@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useToolForm } from '../../hooks/useToolForm';
 import { FormHeader } from './form/FormHeader';
 import { FormFooter } from './form/FormFooter';
@@ -44,9 +45,17 @@ export function ToolFormModal({
     onSubmit(data);
   };
 
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    document.body.classList.add('modal-open');
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, []);
+
   return (
     <div
-      className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 overflow-y-auto"
+      className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50"
       onClick={onClose}
     >
       <div
@@ -71,9 +80,9 @@ export function ToolFormModal({
           {/* Main Form Area */}
           <form
             onSubmit={handleSubmit(onFormSubmit, onFormError)}
-            className="flex-1 flex flex-col overflow-y-auto"
+            className="flex-1 flex flex-col overflow-y-auto custom-scrollbar"
           >
-            <div className="p-8 space-y-6 overflow-y-auto flex-1">
+            <div className="p-8 space-y-6 flex-1">
               {/* Basic Info Section */}
               <BasicInfoSection
                 register={register}

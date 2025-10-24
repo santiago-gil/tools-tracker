@@ -1,8 +1,9 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, memo, useCallback } from 'react';
 import { ToolRow } from './ToolRow';
 import { ToolFormModal } from './ToolFormModal';
 import { ToolFilters } from './ToolFilters';
 import { LoadingSpinner } from '../common/LoadingSpinner';
+import { VirtualizedList } from '../common/VirtualizedList';
 import {
   useTools,
   useCreateTool,
@@ -12,9 +13,11 @@ import {
 } from '../../hooks/useTools';
 import { useAuth } from '../../hooks/useAuth';
 import { useDebounce } from '../../hooks/useDebounce';
+import { useToolFiltering } from '../../hooks/useToolFiltering';
+import { useWindowSize } from '../../hooks/useWindowSize';
 import type { Tool } from '../../types';
 
-export function ToolList() {
+export const ToolList = memo(function ToolList() {
   const { user } = useAuth();
   const { data: tools, isLoading, error } = useTools();
   const createTool = useCreateTool();
@@ -28,10 +31,13 @@ export function ToolList() {
   const [editingTool, setEditingTool] = useState<Tool | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
 
-  // Detect platform for keyboard shortcut display
-  const isMac =
-    typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
-  const modifierKey = isMac ? '⌘' : 'Ctrl';
+  // Detect platform for keyboard shortcut display (memoized)
+  const isMac = useMemo(
+    () =>
+      typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform),
+    [],
+  );
+  const modifierKey = useMemo(() => (isMac ? '⌘' : 'Ctrl'), [isMac]);
 
   // Add keyboard shortcut for search (Ctrl+K / Cmd+K)
   useEffect(() => {
@@ -53,72 +59,86 @@ export function ToolList() {
   // Debounce search query to improve performance
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
-  const categories = useMemo(() => {
-    if (!tools) return [];
-    return Array.from(new Set(tools.map((t) => t.category))).sort();
-  }, [tools]);
+  // Extract filtering logic into custom hook
+  const { categories, filteredTools } = useToolFiltering({
+    tools,
+    searchQuery: debouncedSearchQuery,
+    selectedCategory,
+    showSKRecommendedOnly,
+  });
 
-  const filteredTools = useMemo(() => {
-    if (!tools) return [];
-    let filtered = [...tools];
+  // Get window size for responsive virtual scrolling
+  const { height: windowHeight } = useWindowSize();
 
-    if (showSKRecommendedOnly) {
-      filtered = filtered.filter((t) => t.versions.some((v) => v.sk_recommended));
-    }
-
-    if (selectedCategory) {
-      filtered = filtered.filter((t) => t.category === selectedCategory);
-    }
-
-    if (debouncedSearchQuery) {
-      const query = debouncedSearchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (t) =>
-          t.name.toLowerCase().includes(query) ||
-          t.category.toLowerCase().includes(query) ||
-          t.versions.some(
-            (v) =>
-              v.team_considerations?.toLowerCase().includes(query) ||
-              Object.values(v.trackables).some((trackable) =>
-                trackable?.notes?.toLowerCase().includes(query),
-              ),
-          ),
-      );
-    }
-
-    return filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-  }, [tools, selectedCategory, debouncedSearchQuery, showSKRecommendedOnly]);
-
-  const handleSubmit = async (toolData: Partial<Tool>) => {
-    // Backend will handle sanitization and validation
-    try {
-      if (editingTool?.id) {
-        await updateTool.mutateAsync({
-          id: editingTool.id,
-          tool: toolData,
-        });
-        setEditingTool(null);
-      } else {
-        await createTool.mutateAsync(toolData as Omit<Tool, 'id'>);
-        setShowAddModal(false);
+  const handleSubmit = useCallback(
+    async (toolData: Partial<Tool>) => {
+      // Backend will handle sanitization and validation
+      try {
+        if (editingTool?.id) {
+          await updateTool.mutateAsync({
+            id: editingTool.id,
+            tool: toolData,
+            expectedVersion: editingTool._optimisticVersion || 0,
+          });
+          setEditingTool(null);
+        } else {
+          await createTool.mutateAsync(toolData as Omit<Tool, 'id'>);
+          setShowAddModal(false);
+        }
+      } catch (error) {
+        console.error('Error in handleSubmit:', error);
       }
-    } catch (error) {
-      console.error('Error in handleSubmit:', error);
-    }
-  };
+    },
+    [editingTool?.id, editingTool?._optimisticVersion, updateTool, createTool],
+  );
 
-  const handleDelete = async (tool: Tool) => {
-    if (
-      !confirm(
-        `Are you sure you want to delete "${tool.name}"? This action cannot be undone.`,
-      )
-    ) {
-      return;
-    }
-    if (tool.id) {
-      await deleteTool.mutateAsync(tool.id);
-    }
-  };
+  const handleDelete = useCallback(
+    async (tool: Tool) => {
+      if (
+        !confirm(
+          `Are you sure you want to delete "${tool.name}"? This action cannot be undone.`,
+        )
+      ) {
+        return;
+      }
+      if (tool.id) {
+        await deleteTool.mutateAsync(tool.id);
+      }
+    },
+    [deleteTool],
+  );
+
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  }, []);
+
+  const handleCategoryChange = useCallback((category: string) => {
+    setSelectedCategory(category);
+  }, []);
+
+  const handleSKRecommendedChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setShowSKRecommendedOnly(e.target.checked);
+    },
+    [],
+  );
+
+  const handleRefresh = useCallback(() => {
+    refreshTools.mutate();
+  }, [refreshTools]);
+
+  const handleAddTool = useCallback(() => {
+    setShowAddModal(true);
+  }, []);
+
+  const handleEditTool = useCallback((tool: Tool) => {
+    setEditingTool(tool);
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setShowAddModal(false);
+    setEditingTool(null);
+  }, []);
 
   if (error) {
     return (
@@ -144,7 +164,7 @@ export function ToolList() {
             type="search"
             placeholder="Search tools..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={handleSearchChange}
             className="input-base pr-20"
           />
           {/* Keyboard shortcut indicator */}
@@ -158,7 +178,7 @@ export function ToolList() {
             </kbd>
           </div>
           <button
-            onClick={() => refreshTools.mutate()}
+            onClick={handleRefresh}
             disabled={refreshTools.isPending}
             className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed z-10 transition-colors duration-200"
             title="Refresh tools data"
@@ -195,7 +215,7 @@ export function ToolList() {
               id="sk-recommended-filter"
               type="checkbox"
               checked={showSKRecommendedOnly}
-              onChange={(e) => setShowSKRecommendedOnly(e.target.checked)}
+              onChange={handleSKRecommendedChange}
               className="h-5 w-5 rounded"
               style={{
                 accentColor: showSKRecommendedOnly ? '#ffffff' : undefined,
@@ -205,10 +225,7 @@ export function ToolList() {
           </label>
 
           {user?.permissions?.add && (
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="btn-primary text-sm px-3 py-2"
-            >
+            <button onClick={handleAddTool} className="btn-primary text-sm px-3 py-2">
               + Add Tool
             </button>
           )}
@@ -219,13 +236,30 @@ export function ToolList() {
       <ToolFilters
         categories={categories}
         selectedCategory={selectedCategory}
-        onCategoryChange={setSelectedCategory}
+        onCategoryChange={handleCategoryChange}
       />
 
+      {/* Loading and status indicators */}
+      {isLoading && (
+        <div className="flex items-center justify-center py-8">
+          <LoadingSpinner />
+          <span className="ml-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+            Loading tools...
+          </span>
+        </div>
+      )}
+
       {!isLoading && (
-        <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-          Showing {filteredTools.length} of {tools?.length ?? 0} tools
-          {showSKRecommendedOnly && ' (SK Recommended)'}
+        <div className="flex items-center justify-between">
+          <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+            Showing {filteredTools.length} of {tools?.length ?? 0} tools
+            {showSKRecommendedOnly && ' (SK Recommended)'}
+          </div>
+          {refreshTools.isPending && (
+            <div className="text-sm" style={{ color: 'var(--text-tertiary)' }}>
+              Refreshing...
+            </div>
+          )}
         </div>
       )}
 
@@ -236,15 +270,26 @@ export function ToolList() {
           No tools found.
         </p>
       ) : (
-        <div className="space-y-3">
-          {filteredTools.map((tool) => (
-            <ToolRow
-              key={tool.id}
-              tool={tool}
-              onEdit={() => setEditingTool(tool)}
-              onDelete={() => handleDelete(tool)}
-            />
-          ))}
+        <div className="relative">
+          <VirtualizedList
+            items={filteredTools}
+            itemHeight={120} // Approximate height of each ToolRow
+            containerHeight={Math.min(600, windowHeight * 0.6)} // Responsive height
+            renderItem={({ item: tool, index }) => (
+              <div
+                key={tool.id}
+                className={`${index === 0 ? 'virtual-first-item' : ''} mb-3`}
+              >
+                <ToolRow
+                  tool={tool}
+                  onEdit={() => handleEditTool(tool)}
+                  onDelete={() => handleDelete(tool)}
+                />
+              </div>
+            )}
+            className="custom-scrollbar"
+            overscan={5} // Render 5 extra items above/below for smooth scrolling
+          />
         </div>
       )}
 
@@ -252,14 +297,11 @@ export function ToolList() {
         <ToolFormModal
           tool={editingTool}
           categories={categories}
-          onClose={() => {
-            setShowAddModal(false);
-            setEditingTool(null);
-          }}
+          onClose={handleCloseModal}
           onSubmit={handleSubmit}
           isSubmitting={createTool.isPending || updateTool.isPending}
         />
       )}
     </div>
   );
-}
+});

@@ -112,6 +112,11 @@
     --surface-3: #4b5563;      /* Elevated 3 */
     --surface-4: #6b7280;      /* Elevated 4 */
 
+    /* Glass Effect Colors - Dark Mode */
+    --glass-bg: rgba(31, 41, 55, 0.4);
+    --glass-border: rgba(75, 85, 99, 0.3);
+    --glass-backdrop: blur(12px);
+
     /* Text Colors - Dark Mode */
     --text-primary: #f9fafb;
     --text-secondary: #e5e7eb;
@@ -209,6 +214,7 @@
     box-shadow: 
       0 4px 6px -1px rgba(0, 0, 0, 0.1),
       0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border-radius: 1rem; /* Consistent rounded corners */
   }
 
   /* Light mode: subtle off-white for cards */
@@ -217,10 +223,13 @@
   }
 
   .dark .elevation-2 {
-    background-color: var(--surface-2);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: var(--glass-backdrop);
+    -webkit-backdrop-filter: var(--glass-backdrop);
     box-shadow: 
-      0 4px 6px -1px rgba(0, 0, 0, 0.3),
-      0 2px 4px -1px rgba(0, 0, 0, 0.2);
+      0 4px 6px -1px var(--glass-shadow),
+      0 2px 4px -1px var(--glass-shadow);
   }
 
   /* Level 3 - Modal/Dropdown elevation */
@@ -262,6 +271,17 @@
 
   .elevation-interactive:hover {
     transform: translateY(-1px);
+    box-shadow: 
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05),
+      0 0 0 1px rgba(0, 0, 0, 0.05);
+  }
+
+  .dark .elevation-interactive:hover {
+    box-shadow: 
+      0 10px 15px -3px rgba(0, 0, 0, 0.3),
+      0 4px 6px -2px rgba(0, 0, 0, 0.2),
+      0 0 0 1px rgba(255, 255, 255, 0.1);
   }
 
   .elevation-interactive:active {
@@ -318,17 +338,37 @@
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  /* Glass Effect Cards - Dark Mode */
+  .dark .card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: var(--glass-backdrop);
+    -webkit-backdrop-filter: var(--glass-backdrop);
+    box-shadow: 
+      0 4px 6px -1px var(--glass-shadow),
+      0 2px 4px -1px var(--glass-shadow);
+  }
+
   .card:hover {
     transform: translateY(-2px);
     box-shadow: 
       0 10px 15px -3px rgba(0, 0, 0, 0.1),
       0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-light); /* Ensure border stays on hover */
   }
 
   .dark .card:hover {
     box-shadow: 
-      0 10px 15px -3px rgba(0, 0, 0, 0.4),
-      0 4px 6px -2px rgba(0, 0, 0, 0.3);
+      0 10px 15px -3px rgba(0, 0, 0, 0.3),
+      0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--glass-border);
+  }
+
+  /* Expanded state styling - seamless */
+  .card.expanded {
+    border-radius: 1rem;
+    margin-bottom: 0;
+    transition: all 0.2s ease-in-out;
   }
 
   /* Input System */
@@ -456,6 +496,76 @@
 
   .badge-md {
     @apply px-3 py-1 text-sm;
+  }
+
+  /* Category Filter Buttons */
+  .filter-btn {
+    @apply px-3 py-2 rounded-md font-medium transition-all duration-200 active:scale-95 border;
+  }
+
+  .filter-btn-active {
+    @apply bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300;
+  }
+
+  .filter-btn-active:hover {
+    @apply bg-red-100 dark:hover:bg-red-900/30 border-red-300 dark:hover:border-red-700;
+  }
+
+  .filter-btn-inactive {
+    @apply bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200;
+  }
+
+  .filter-btn-inactive:hover {
+    @apply bg-gray-100 dark:hover:bg-gray-700 border-gray-300 dark:hover:border-gray-500;
+  }
+
+  /* Custom Scrollbar Styling */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(156, 163, 175, 0.5);
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(107, 114, 128, 0.7);
+    background-clip: content-box;
+  }
+
+  .dark .custom-scrollbar {
+    scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(75, 85, 99, 0.5);
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(107, 114, 128, 0.7);
+  }
+
+  /* Modal body scroll lock */
+  .modal-open {
+    overflow: hidden;
+  }
+
+  /* Virtual scrolling first item spacing */
+  .virtual-first-item {
+    padding-top: 0.5rem;
   }
 }
 

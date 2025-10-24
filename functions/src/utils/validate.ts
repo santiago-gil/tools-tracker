@@ -40,6 +40,7 @@ export const toolSchema = z.object({
   updatedAt: z.string().optional(),
   createdAt: z.string().optional(),
   updatedBy: updatedBySchema.optional(),
+  _optimisticVersion: z.number().int().min(0).optional(),
 });
 
 export type ToolInput = z.infer<typeof toolSchema>;

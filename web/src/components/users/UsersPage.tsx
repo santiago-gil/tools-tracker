@@ -1,9 +1,10 @@
+import { memo } from 'react';
 import { useUsers, useUpdateUser, useDeleteUser } from '../../hooks/useUsers';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import type { User, UserRole } from '../../types';
 import { ROLE_PERMISSIONS } from '../../types';
 
-export function UsersPage() {
+export const UsersPage = memo(function UsersPage() {
   const { data: users, isLoading, error } = useUsers();
   const updateUser = useUpdateUser();
   const deleteUser = useDeleteUser();
@@ -182,4 +183,4 @@ export function UsersPage() {
       </div>
     </div>
   );
-}
+});

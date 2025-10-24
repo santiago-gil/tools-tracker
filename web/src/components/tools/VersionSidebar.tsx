@@ -26,7 +26,7 @@ export function VersionSidebar({
           <button
             type="button"
             onClick={onAddVersion}
-            className="text-xs btn-secondary px-2 py-1 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 active:scale-95"
+            className="filter-btn filter-btn-inactive text-xs px-2 py-1"
           >
             + Add
           </button>

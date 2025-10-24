@@ -33,8 +33,8 @@ export function useUpdateTool() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, tool }: { id: string; tool: Partial<Tool> }) =>
-      toolsApi.update(id, tool),
+    mutationFn: ({ id, tool, expectedVersion }: { id: string; tool: Partial<Tool>; expectedVersion?: number }) =>
+      toolsApi.update(id, tool, expectedVersion),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['tools'] });
       toast.success(response.message || 'Tool updated successfully');

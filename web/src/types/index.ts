@@ -31,6 +31,7 @@ export interface Tool {
   updatedAt?: string;
   createdAt?: string;
   updatedBy?: UserInfo;
+  _optimisticVersion?: number;
 }
 
 export interface ToolVersion {

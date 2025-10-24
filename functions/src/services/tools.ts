@@ -58,6 +58,17 @@ export async function getAllTools(forceRefresh = false): Promise<Tool[]> {
       logger.info({ count: snap.size }, "Fetched tools collection");
       return snap.docs.map((d: QueryDocumentSnapshot) => {
         const data = d.data() as Omit<Tool, "id">;
+
+        // Auto-initialize _optimisticVersion if missing
+        if (data._optimisticVersion === undefined) {
+          logger.info({ toolId: d.id }, 'Tool missing _optimisticVersion, initializing to 0');
+          // Update the document in the background (don't wait for it)
+          d.ref.update({ _optimisticVersion: 0 }).catch(error => {
+            logger.error({ error, toolId: d.id }, 'Failed to initialize _optimisticVersion');
+          });
+          data._optimisticVersion = 0;
+        }
+
         return {
           id: d.id,
           ...data,
@@ -164,6 +175,7 @@ export async function addTool(data: ToolInput): Promise<string> {
     ...sanitizedData,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    _optimisticVersion: 0, // Initialize version for new tools
   };
 
   const docRef = await toolsCol.add(toolData);

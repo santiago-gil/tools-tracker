@@ -73,7 +73,7 @@ export function BasicInfoSection({
               <button
                 type="button"
                 onClick={onBackToCategoryList}
-                className="text-sm text-gray-600 hover:text-gray-800"
+                className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
               >
                 ← Back to category list
               </button>

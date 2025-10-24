@@ -1,10 +1,18 @@
-import { useState } from 'react';
+import { useState, Suspense, lazy } from 'react';
 import { useAuth } from './hooks/useAuth';
 import { SignInPage } from './components/auth/SignInPage';
 import { Layout } from './components/layout/Layout';
-import { ToolList } from './components/tools/ToolList';
-import { UsersPage } from './components/users/UsersPage';
 import { LoadingSpinner } from './components/common/LoadingSpinner';
+
+// Lazy load components for better performance
+const ToolList = lazy(() =>
+  import('./components/tools/ToolList').then((module) => ({ default: module.ToolList })),
+);
+const UsersPage = lazy(() =>
+  import('./components/users/UsersPage').then((module) => ({
+    default: module.UsersPage,
+  })),
+);
 
 type Page = 'tools' | 'users';
 
@@ -53,8 +61,10 @@ export function App() {
       </div>
 
       {/* Page Content */}
-      {currentPage === 'tools' && <ToolList />}
-      {currentPage === 'users' && user.permissions?.manageUsers && <UsersPage />}
+      <Suspense fallback={<LoadingSpinner />}>
+        {currentPage === 'tools' && <ToolList />}
+        {currentPage === 'users' && user.permissions?.manageUsers && <UsersPage />}
+      </Suspense>
     </Layout>
   );
 }

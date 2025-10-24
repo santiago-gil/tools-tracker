@@ -56,7 +56,14 @@ export async function verifyOptimisticLock(
         }
 
         const toolData = toolDoc.data();
-        const currentVersion = toolData?._optimisticVersion || 0;
+        let currentVersion = toolData?._optimisticVersion;
+
+        // If tool doesn't have _optimisticVersion, initialize it to 0
+        if (currentVersion === undefined) {
+            logger.info({ toolId }, 'Tool missing _optimisticVersion, initializing to 0');
+            await toolDoc.ref.update({ _optimisticVersion: 0 });
+            currentVersion = 0;
+        }
 
         if (currentVersion !== expectedVersion) {
             logger.warn({

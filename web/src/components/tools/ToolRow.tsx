@@ -28,8 +28,15 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
   const currentVersion = tool.versions[selectedVersionIdx];
 
   return (
-    <div className="card elevation-2 elevation-interactive overflow-hidden">
-      <div className="p-4 cursor-pointer" onClick={() => setExpanded(!expanded)}>
+    <div
+      className={`card elevation-2 elevation-interactive transition-all duration-200 ${
+        expanded ? 'expanded' : 'overflow-hidden'
+      }`}
+    >
+      <div
+        className="p-4 cursor-pointer hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors duration-150"
+        onClick={() => setExpanded(!expanded)}
+      >
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3">
           {/* Left side - Tool info and version tabs */}
           <div className="min-w-0 flex-1">
@@ -46,9 +53,24 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
                 </span>
               )}
               {/* Expand/Collapse indicator */}
-              <span className="text-lg ml-2" style={{ color: 'var(--text-tertiary)' }}>
-                {expanded ? '▲' : '▼'}
-              </span>
+              <div
+                className="ml-2 transition-transform duration-200"
+                style={{
+                  transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                  color: 'var(--text-tertiary)',
+                }}
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <polyline points="6,9 12,15 18,9"></polyline>
+                </svg>
+              </div>
             </div>
             <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>
               {tool.category}
@@ -64,10 +86,10 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
                       e.stopPropagation();
                       setSelectedVersionIdx(idx);
                     }}
-                    className={`text-xs px-3 py-1.5 rounded-md transition font-medium ${
+                    className={`filter-btn text-xs ${
                       selectedVersionIdx === idx
-                        ? 'btn-primary text-xs'
-                        : 'btn-secondary text-xs'
+                        ? 'filter-btn-active'
+                        : 'filter-btn-inactive'
                     }`}
                   >
                     {version.versionName}
@@ -151,96 +173,123 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
       </div>
 
       {/* Expanded Details */}
-      {expanded && currentVersion && (
-        <div
-          className="px-4 pb-4 pt-2 space-y-3 border-t elevation-1"
-          style={{ borderColor: 'var(--border-light)' }}
-        >
-          {currentVersion.team_considerations && (
-            <div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
-                Web Team Considerations
-              </h3>
-              <p className="text-sm text-gray-700 dark:text-gray-300">
-                {currentVersion.team_considerations}
-              </p>
-            </div>
-          )}
+      {expanded &&
+        currentVersion &&
+        (() => {
+          // Check if there's any content to show
+          const hasTeamConsiderations = currentVersion.team_considerations;
+          const hasTrackableContent = Object.entries(currentVersion.trackables).some(
+            ([, trackable]) =>
+              trackable?.notes || trackable?.example_site || trackable?.documentation,
+          );
 
-          {Object.entries(currentVersion.trackables)
-            .filter(
-              ([, trackable]) =>
-                trackable?.notes || trackable?.example_site || trackable?.documentation,
-            )
-            .map(([key, trackable]) => {
-              const labels: Record<string, string> = {
-                gtm: 'Google Tag Manager',
-                ga4: 'Google Analytics 4',
-                google_ads: 'Google Ads',
-                msa: 'Microsoft Advertising',
-              };
-              return (
-                <div key={key} className="space-y-2">
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                    {labels[key] || key}
+          // Only render if there's actual content
+          if (!hasTeamConsiderations && !hasTrackableContent) {
+            return (
+              <div className="px-4 pb-4 pt-2 text-center">
+                <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>
+                  No additional details available for this tool
+                </p>
+              </div>
+            );
+          }
+
+          return (
+            <div
+              className="px-4 pb-4 pt-2 space-y-3 border-t rounded-b-xl"
+              style={{
+                borderColor: 'var(--border-light)',
+                backgroundColor: 'var(--surface-1)',
+              }}
+            >
+              {currentVersion.team_considerations && (
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+                    Web Team Considerations
                   </h3>
-
-                  {trackable?.notes && (
-                    <div>
-                      <h5
-                        className="text-xs font-medium mb-1"
-                        style={{ color: 'var(--text-tertiary)' }}
-                      >
-                        Notes
-                      </h5>
-                      <p className="text-sm text-gray-700 dark:text-gray-300">
-                        {trackable.notes}
-                      </p>
-                    </div>
-                  )}
-
-                  {trackable?.example_site && (
-                    <div>
-                      <h5
-                        className="text-xs font-medium mb-1"
-                        style={{ color: 'var(--text-tertiary)' }}
-                      >
-                        Example Site
-                      </h5>
-                      <a
-                        href={trackable.example_site}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline break-all"
-                      >
-                        {trackable.example_site}
-                      </a>
-                    </div>
-                  )}
-
-                  {trackable?.documentation && (
-                    <div>
-                      <h5
-                        className="text-xs font-medium mb-1"
-                        style={{ color: 'var(--text-tertiary)' }}
-                      >
-                        Documentation
-                      </h5>
-                      <a
-                        href={trackable.documentation}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline break-all"
-                      >
-                        {trackable.documentation}
-                      </a>
-                    </div>
-                  )}
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
+                    {currentVersion.team_considerations}
+                  </p>
                 </div>
-              );
-            })}
-        </div>
-      )}
+              )}
+
+              {Object.entries(currentVersion.trackables)
+                .filter(
+                  ([, trackable]) =>
+                    trackable?.notes ||
+                    trackable?.example_site ||
+                    trackable?.documentation,
+                )
+                .map(([key, trackable]) => {
+                  const labels: Record<string, string> = {
+                    gtm: 'Google Tag Manager',
+                    ga4: 'Google Analytics 4',
+                    google_ads: 'Google Ads',
+                    msa: 'Microsoft Advertising',
+                  };
+                  return (
+                    <div key={key} className="space-y-2">
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                        {labels[key] || key}
+                      </h3>
+
+                      {trackable?.notes && (
+                        <div>
+                          <h5
+                            className="text-xs font-medium mb-1"
+                            style={{ color: 'var(--text-tertiary)' }}
+                          >
+                            Notes
+                          </h5>
+                          <p className="text-sm text-gray-700 dark:text-gray-300">
+                            {trackable.notes}
+                          </p>
+                        </div>
+                      )}
+
+                      {trackable?.example_site && (
+                        <div>
+                          <h5
+                            className="text-xs font-medium mb-1"
+                            style={{ color: 'var(--text-tertiary)' }}
+                          >
+                            Example Site
+                          </h5>
+                          <a
+                            href={trackable.example_site}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline break-all"
+                          >
+                            {trackable.example_site}
+                          </a>
+                        </div>
+                      )}
+
+                      {trackable?.documentation && (
+                        <div>
+                          <h5
+                            className="text-xs font-medium mb-1"
+                            style={{ color: 'var(--text-tertiary)' }}
+                          >
+                            Documentation
+                          </h5>
+                          <a
+                            href={trackable.documentation}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline break-all"
+                          >
+                            {trackable.documentation}
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
+          );
+        })()}
     </div>
   );
 }

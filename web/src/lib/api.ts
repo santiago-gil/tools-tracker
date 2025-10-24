@@ -69,10 +69,11 @@ export const toolsApi = {
       method: 'POST',
       body: JSON.stringify(tool),
     }),
-  update: (id: string, tool: Partial<Tool>) =>
+  update: (id: string, tool: Partial<Tool>, expectedVersion?: number) =>
     fetchApi<UpdateToolResponse>(`/tools/${id}`, {
       method: 'PUT',
       body: JSON.stringify(tool),
+      headers: expectedVersion !== undefined ? { 'x-expected-version': expectedVersion.toString() } : {},
     }),
   delete: (id: string) =>
     fetchApi<DeleteToolResponse>(`/tools/${id}`, { method: 'DELETE' }),
