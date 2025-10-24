@@ -47,7 +47,7 @@ export function VersionFormSection({
             accentColor: version.sk_recommended ? '#8b5cf6' : undefined,
           }}
         />
-        <span className="text-sm font-medium">SK Recommended</span>
+        <span className="ml-3 text-sm font-medium">SK Recommended</span>
       </SKRecommendedBadge>
 
       {/* Web Team Considerations */}

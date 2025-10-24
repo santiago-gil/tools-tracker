@@ -203,7 +203,7 @@ export const ToolList = memo(function ToolList() {
             )}
           </button>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 items-center justify-center lg:justify-start">
           <SKRecommendedBadge
             isRecommended={showSKRecommendedOnly}
             className="active:scale-95"
@@ -218,7 +218,9 @@ export const ToolList = memo(function ToolList() {
                 accentColor: showSKRecommendedOnly ? '#8b5cf6' : undefined,
               }}
             />
-            <span className="text-sm font-medium whitespace-nowrap">SK Recommended</span>
+            <span className="ml-3 text-sm font-medium whitespace-nowrap">
+              SK Recommended
+            </span>
           </SKRecommendedBadge>
 
           {user?.permissions?.add && (

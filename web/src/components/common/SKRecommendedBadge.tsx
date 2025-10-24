@@ -12,7 +12,7 @@ export function SKRecommendedBadge({
   onClick,
 }: SKRecommendedBadgeProps) {
   const baseClasses =
-    'flex items-center p-4 border rounded-lg transition-all duration-200';
+    'flex items-center p-4 border rounded-lg transition-all duration-200 w-fit';
   const recommendedClasses = 'badge-holographic';
   const defaultClasses =
     'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:badge-holographic';
