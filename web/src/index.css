@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Font loading optimization */
+@font-face {
+  font-family: 'Satoshi';
+  src: url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap');
+  font-display: swap;
+  font-weight: 400 500 700;
+}
+
 @layer base {
   :root {
     /* ===== BRAND COLOR SYSTEM ===== */
@@ -69,30 +77,30 @@
     --primary: #2563eb;
     --primary-hover: #1d4ed8;
 
-    /* Badge Colors (keep the nice ones) */
-    --badge-yes-bg: #ecfdf5;
-    --badge-yes-text: #059669;
-    --badge-yes-border: #a7f3d0;
+    /* Badge Colors - Improved contrast ratios */
+    --badge-yes-bg: rgba(34, 197, 94, 0.15);
+    --badge-yes-text: #15803d;
+    --badge-yes-border: rgba(34, 197, 94, 0.4);
 
-    --badge-no-bg: #fef2f2;
+    --badge-no-bg: rgba(239, 68, 68, 0.15);
     --badge-no-text: #dc2626;
-    --badge-no-border: #fecaca;
+    --badge-no-border: rgba(239, 68, 68, 0.4);
 
-    --badge-partial-bg: #fffbeb;
+    --badge-partial-bg: rgba(245, 158, 11, 0.15);
     --badge-partial-text: #d97706;
-    --badge-partial-border: #fde68a;
+    --badge-partial-border: rgba(245, 158, 11, 0.4);
 
-    --badge-special-bg: #eff6ff;
+    --badge-special-bg: rgba(59, 130, 246, 0.15);
     --badge-special-text: #2563eb;
-    --badge-special-border: #bfdbfe;
+    --badge-special-border: rgba(59, 130, 246, 0.4);
 
-    --badge-unknown-bg: #f9fafb;
-    --badge-unknown-text: #6b7280;
-    --badge-unknown-border: #e5e7eb;
+    --badge-unknown-bg: rgba(107, 114, 128, 0.15);
+    --badge-unknown-text: #374151;
+    --badge-unknown-border: rgba(107, 114, 128, 0.4);
 
-    --badge-recommended-bg: #f3e8ff;
+    --badge-recommended-bg: rgba(168, 85, 247, 0.15);
     --badge-recommended-text: #7c3aed;
-    --badge-recommended-border: #c4b5fd;
+    --badge-recommended-border: rgba(168, 85, 247, 0.4);
   }
 
   .dark {
@@ -116,9 +124,9 @@
     --border-strong: #6b7280;
 
     /* Brand Colors - Dark Mode (enhanced for contrast) */
-    --sk-red: #f87171;
-    --sk-red-light: #fca5a5;
-    --sk-red-dark: #ef4444;
+    --sk-red: #ef4444;
+    --sk-red-light: #f87171;
+    --sk-red-dark: #dc2626;
     --sk-gold: #fbbf24;
     --sk-gold-light: #fcd34d;
     --sk-gold-dark: #f59e0b;
@@ -129,31 +137,35 @@
     --primary: #60a5fa;
     --primary-hover: #3b82f6;
 
-    /* Dark mode badge colors - better contrast for dark backgrounds */
-    /* Use bright colors with white text for better readability on dark cards */
-    --badge-yes-bg: #10b981;
-    --badge-yes-text: #ffffff;
-    --badge-yes-border: #059669;
+    /* Dark mode badge colors - transparent with high contrast text */
+    --badge-yes-bg: rgba(16, 185, 129, 0.15);
+    --badge-yes-text: #4ade80;
+    --badge-yes-border: rgba(16, 185, 129, 0.4);
 
-    --badge-no-bg: #ef4444;
-    --badge-no-text: #ffffff;
-    --badge-no-border: #dc2626;
+    --badge-no-bg: rgba(239, 68, 68, 0.15);
+    --badge-no-text: #f87171;
+    --badge-no-border: rgba(239, 68, 68, 0.4);
 
-    --badge-partial-bg: #f59e0b;
-    --badge-partial-text: #ffffff;
-    --badge-partial-border: #d97706;
+    --badge-partial-bg: rgba(245, 158, 11, 0.15);
+    --badge-partial-text: #fbbf24;
+    --badge-partial-border: rgba(245, 158, 11, 0.4);
 
-    --badge-special-bg: #3b82f6;
-    --badge-special-text: #ffffff;
-    --badge-special-border: #2563eb;
+    --badge-special-bg: rgba(59, 130, 246, 0.15);
+    --badge-special-text: #60a5fa;
+    --badge-special-border: rgba(59, 130, 246, 0.4);
 
-    --badge-unknown-bg: #6b7280;
-    --badge-unknown-text: #ffffff;
-    --badge-unknown-border: #4b5563;
+    --badge-unknown-bg: rgba(107, 114, 128, 0.15);
+    --badge-unknown-text: #e5e7eb;
+    --badge-unknown-border: rgba(107, 114, 128, 0.4);
 
-    --badge-recommended-bg: #a855f7;
+    --badge-recommended-bg: linear-gradient(135deg, 
+      rgba(168, 85, 247, 0.2) 0%, 
+      rgba(236, 72, 153, 0.2) 25%, 
+      rgba(59, 130, 246, 0.2) 50%, 
+      rgba(16, 185, 129, 0.2) 75%, 
+      rgba(168, 85, 247, 0.2) 100%);
     --badge-recommended-text: #ffffff;
-    --badge-recommended-border: #9333ea;
+    --badge-recommended-border: rgba(168, 85, 247, 0.6);
   }
 }
 
@@ -197,6 +209,11 @@
     box-shadow: 
       0 4px 6px -1px rgba(0, 0, 0, 0.1),
       0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Light mode: subtle off-white for cards */
+  .elevation-2 {
+    background-color: #fefefe;
   }
 
   .dark .elevation-2 {
@@ -262,15 +279,15 @@
     border: none;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 
-      0 4px 6px -1px rgba(220, 38, 38, 0.2),
-      0 2px 4px -1px rgba(220, 38, 38, 0.1);
+      0 2px 4px -1px rgba(220, 38, 38, 0.15),
+      0 1px 2px -1px rgba(220, 38, 38, 0.1);
   }
 
   .btn-primary:hover {
     transform: translateY(-1px);
     box-shadow: 
-      0 8px 12px -2px rgba(220, 38, 38, 0.3),
-      0 4px 6px -1px rgba(220, 38, 38, 0.2);
+      0 4px 6px -1px rgba(220, 38, 38, 0.2),
+      0 2px 4px -1px rgba(220, 38, 38, 0.15);
   }
 
   .btn-primary:active {
@@ -332,23 +349,100 @@
       0 4px 6px -1px rgba(0, 0, 0, 0.1);
   }
 
-  /* Badge System */
+  /* Badge System - Transparent, modern approach */
   .badge-enhanced {
     display: inline-flex;
     align-items: center;
-    border-radius: 9999px;
+    border-radius: 6px;
     font-weight: 500;
+    font-size: 0.75rem;
     border: 1px solid;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
   .badge-enhanced:hover {
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
 
   .dark .badge-enhanced:hover {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Simple SK Recommended badge by default */
+  .badge-holographic {
+    background: linear-gradient(135deg, 
+      rgba(168, 85, 247, 0.08) 0%, 
+      rgba(236, 72, 153, 0.08) 25%, 
+      rgba(59, 130, 246, 0.08) 50%, 
+      rgba(16, 185, 129, 0.08) 75%, 
+      rgba(168, 85, 247, 0.08) 100%);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    color: #1f2937;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  /* Holographic effect only on hover */
+  .badge-holographic:hover {
+    background: linear-gradient(135deg, 
+      rgba(168, 85, 247, 0.12) 0%, 
+      rgba(236, 72, 153, 0.12) 25%, 
+      rgba(59, 130, 246, 0.12) 50%, 
+      rgba(16, 185, 129, 0.12) 75%, 
+      rgba(168, 85, 247, 0.12) 100%);
+    background-size: 400% 400%;
+    animation: holographic-shift 6s ease-in-out infinite;
+    border-color: rgba(168, 85, 247, 0.5);
+    box-shadow: 
+      0 0 6px rgba(168, 85, 247, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    will-change: background-position;
+    transform: translateZ(0);
+  }
+
+  /* Dark mode - simple by default */
+  .dark .badge-holographic {
+    background: linear-gradient(135deg, 
+      rgba(168, 85, 247, 0.15) 0%, 
+      rgba(236, 72, 153, 0.15) 25%, 
+      rgba(59, 130, 246, 0.15) 50%, 
+      rgba(16, 185, 129, 0.15) 75%, 
+      rgba(168, 85, 247, 0.15) 100%);
+    border-color: rgba(168, 85, 247, 0.5);
+    color: #f9fafb;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
+
+  /* Dark mode holographic effect on hover */
+  .dark .badge-holographic:hover {
+    background: linear-gradient(135deg, 
+      rgba(168, 85, 247, 0.2) 0%, 
+      rgba(236, 72, 153, 0.2) 25%, 
+      rgba(59, 130, 246, 0.2) 50%, 
+      rgba(16, 185, 129, 0.2) 75%, 
+      rgba(168, 85, 247, 0.2) 100%);
+    background-size: 400% 400%;
+    animation: holographic-shift 6s ease-in-out infinite;
+    border-color: rgba(168, 85, 247, 0.7);
+    box-shadow: 
+      0 0 8px rgba(168, 85, 247, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    will-change: background-position;
+    transform: translateZ(0);
+  }
+
+  @keyframes holographic-shift {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
   }
 
   /* Enhanced badge styles with proper contrast */

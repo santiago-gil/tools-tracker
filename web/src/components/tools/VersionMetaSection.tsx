@@ -27,17 +27,17 @@ export function VersionMetaSection({ version, onChange }: VersionMetaSectionProp
         />
       </div>
 
-      <div className="flex items-center p-4 bg-[var(--badge-recommended-bg)] border border-[var(--badge-recommended-border)] rounded-lg">
+      <div className="flex items-center p-4 border rounded-lg badge-holographic">
         <input
           type="checkbox"
           id="sk_recommended"
           checked={version.sk_recommended ?? false}
           onChange={(e) => handleChange('sk_recommended', e.target.checked)}
-          className="h-5 w-5 text-[var(--badge-recommended-text)] focus:ring-[var(--badge-recommended-text)] border-[var(--badge-recommended-border)] rounded cursor-pointer"
+          className="h-5 w-5 text-white focus:ring-white border-white/50 rounded cursor-pointer"
         />
         <label
           htmlFor="sk_recommended"
-          className="ml-3 text-sm font-medium text-[var(--badge-recommended-text)] cursor-pointer"
+          className="ml-3 text-sm font-medium cursor-pointer"
         >
           SK Recommended
         </label>

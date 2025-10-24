@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions';
 import express from 'express';
 import { attachRoutes } from './routes/index.js';
 import { errorHandler } from './middleware/errorHandler.js';
-import { securityHeaders, rateLimit, requestSizeLimit, corsConfig } from './middleware/security.js';
+import { securityHeaders, rateLimit, requestSizeLimit, corsConfig, requestLogger } from './middleware/security.js';
 import logger from './utils/logger/index.js';
 import { onUserCreated, onUserDeleted } from "./triggers/auth.js";
 
@@ -13,6 +13,7 @@ const app = express();
 // Security middleware (order matters!)
 app.use(securityHeaders);
 app.use(corsConfig);
+app.use(requestLogger);
 app.use(rateLimit);
 app.use(requestSizeLimit);
 app.use(express.json({ limit: '1mb' }));

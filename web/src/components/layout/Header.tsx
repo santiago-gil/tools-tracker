@@ -6,7 +6,10 @@ export function Header() {
   const { user, signOut } = useAuth();
 
   return (
-    <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40 shadow-sm">
+    <header
+      className="elevation-1 sticky top-0 z-40 backdrop-blur-sm bg-white/95 dark:bg-gray-900/95 border-b transition-colors duration-200"
+      style={{ borderColor: 'var(--border-light)' }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <CrownLogo className="w-20 h-20 text-[var(--sk-gold)]" />
@@ -15,7 +18,7 @@ export function Header() {
               <span className="text-[var(--sk-red)]">SearchKings</span>{' '}
               <span className="text-[var(--sk-black)] dark:text-white">Tool Tracker</span>
             </h1>
-            <p className="text-sm text-[var(--sk-grey)]">
+            <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>
               Integration & Capability Resource
             </p>
           </div>
@@ -32,12 +35,30 @@ export function Header() {
               />
             )}
             <div className="text-right hidden sm:block">
-              <div className="text-sm font-medium text-gray-900 dark:text-white">
+              <div
+                className="text-sm font-medium"
+                style={{ color: 'var(--text-primary)' }}
+              >
                 {user.displayName || user.email}
               </div>
-              <div className="text-xs text-[var(--sk-grey)] capitalize">{user.role}</div>
+              <div
+                className="text-xs capitalize"
+                style={{ color: 'var(--text-tertiary)' }}
+              >
+                {user.role}
+              </div>
             </div>
-            <button onClick={signOut} className="btn-primary text-sm">
+            <button
+              onClick={signOut}
+              className="text-sm transition-colors duration-200 hover:underline"
+              style={{
+                color: 'var(--text-secondary)',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.color = 'var(--text-secondary)')
+              }
+            >
               Sign Out
             </button>
           </div>

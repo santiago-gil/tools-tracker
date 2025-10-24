@@ -1,4 +1,3 @@
-//common/ErrorBoundary
 import { Component, type ReactNode } from 'react';
 
 interface Props {

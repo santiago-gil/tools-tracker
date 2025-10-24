@@ -45,12 +45,7 @@ export function VersionFormSection({
       <div>
         <label
           htmlFor={`sk-recommended-${versionIndex}`}
-          className="inline-flex items-center gap-2 px-3 py-2 border rounded-lg cursor-pointer w-fit"
-          style={{
-            backgroundColor: 'var(--badge-recommended-bg)',
-            color: 'var(--badge-recommended-text)',
-            borderColor: 'var(--badge-recommended-border)',
-          }}
+          className="inline-flex items-center gap-2 px-3 py-2 border rounded-lg cursor-pointer w-fit badge-holographic"
         >
           <input
             id={`sk-recommended-${versionIndex}`}
@@ -58,7 +53,7 @@ export function VersionFormSection({
             {...register(`versions.${versionIndex}.sk_recommended`)}
             className="h-5 w-5 rounded"
             style={{
-              accentColor: 'var(--badge-recommended-text)',
+              accentColor: '#ffffff',
             }}
           />
           <span className="text-sm font-medium">SK Recommended</span>

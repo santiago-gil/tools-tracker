@@ -28,7 +28,7 @@ export function SignInPage() {
           <button
             onClick={signInWithGoogle}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-3 btn-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:transform hover:scale-105 active:scale-95"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path

@@ -5,6 +5,9 @@ import type { QueryDocumentSnapshot } from "firebase-admin/firestore";
 import logger from "../utils/logger/index.js";
 import { toolsCache } from "./cache.js";
 import { sanitizeToolData } from "../utils/sanitize.js";
+import { logAuditEvent } from "./audit.js";
+import { verifyOptimisticLock, incrementVersion } from "../middleware/optimisticLocking.js";
+import type { AuthedRequest } from "../types/http.js";
 import dayjs from 'dayjs';
 
 // Use tools_v2 collection directly
@@ -173,24 +176,66 @@ export async function addTool(data: ToolInput): Promise<string> {
 }
 
 /**
- * Update an existing tool
+ * Update an existing tool with optimistic locking and audit logging
  */
-export async function updateTool(id: string, data: Partial<ToolInput>): Promise<void> {
-  logger.info({ id, data }, "Updating tool");
+export async function updateTool(
+  id: string,
+  data: Partial<ToolInput>,
+  req?: AuthedRequest,
+  expectedVersion?: number
+): Promise<{ success: boolean; newVersion?: number; error?: string }> {
+  logger.info({ id, data, expectedVersion }, "Updating tool");
 
-  // Sanitize data on backend for security
-  const sanitizedData = sanitizeToolData(data);
+  try {
+    // Check optimistic lock if version provided
+    if (expectedVersion !== undefined) {
+      const lockResult = await verifyOptimisticLock(id, expectedVersion);
+      if (!lockResult.success) {
+        return { success: false, error: lockResult.error };
+      }
+    }
 
-  const updateData = {
-    ...sanitizedData,
-    updatedAt: new Date().toISOString(),
-  };
+    // Get current tool data for audit logging
+    const currentToolDoc = await toolsCol.doc(id).get();
+    if (!currentToolDoc.exists) {
+      return { success: false, error: 'Tool not found' };
+    }
+    const currentTool = currentToolDoc.data() as Tool;
 
-  await toolsCol.doc(id).update(updateData);
+    // Sanitize data on backend for security
+    const sanitizedData = sanitizeToolData(data);
 
-  // Invalidate cache after updating tool
-  toolsCache.invalidate('all-tools');
-  logger.info({ id }, "Tool updated successfully, cache invalidated");
+    const updateData = {
+      ...sanitizedData,
+      updatedAt: new Date().toISOString(),
+    };
+
+    // Perform the update
+    await toolsCol.doc(id).update(updateData);
+
+    // Increment version for optimistic locking
+    const newVersion = await incrementVersion(id);
+
+    // Log audit event if request context provided
+    if (req) {
+      const changes = Object.keys(sanitizedData).map(key => ({
+        field: key,
+        oldValue: currentTool[key as keyof Tool],
+        newValue: sanitizedData[key as keyof typeof sanitizedData]
+      }));
+
+      await logAuditEvent(req, 'UPDATE', 'tool', id, changes);
+    }
+
+    // Invalidate cache after updating tool
+    toolsCache.invalidate('all-tools');
+    logger.info({ id, newVersion }, "Tool updated successfully, cache invalidated");
+
+    return { success: true, newVersion };
+  } catch (error) {
+    logger.error({ error, id }, "Failed to update tool");
+    return { success: false, error: 'Failed to update tool' };
+  }
 }
 
 /**

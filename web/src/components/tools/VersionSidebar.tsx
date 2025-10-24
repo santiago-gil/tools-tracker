@@ -26,7 +26,7 @@ export function VersionSidebar({
           <button
             type="button"
             onClick={onAddVersion}
-            className="text-xs text-[var(--sk-red)] hover:text-[var(--sk-red-dark)] font-medium"
+            className="text-xs btn-secondary px-2 py-1 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 active:scale-95"
           >
             + Add
           </button>
@@ -38,10 +38,10 @@ export function VersionSidebar({
               key={idx}
               onClick={() => onSelectVersion(idx)}
               type="button"
-              className={`w-full text-left p-3 rounded-lg transition min-h-[80px] elevation-interactive ${
+              className={`w-full text-left p-3 rounded-lg transition-all duration-200 min-h-[80px] elevation-1 ${
                 selectedIndex === idx
-                  ? 'elevation-2 border-2 border-[var(--sk-red)]'
-                  : 'elevation-1 hover:elevation-2'
+                  ? 'ring-2 ring-[var(--sk-red)] ring-offset-2 ring-offset-gray-50 dark:ring-offset-gray-800'
+                  : 'hover:ring-1 hover:ring-gray-300 dark:hover:ring-gray-600 hover:ring-offset-1 hover:ring-offset-gray-50 dark:hover:ring-offset-gray-800'
               }`}
             >
               <div className="flex items-start justify-between gap-2">
@@ -67,7 +67,7 @@ export function VersionSidebar({
                       e.stopPropagation();
                       onRemoveVersion(idx);
                     }}
-                    className="text-red-600 hover:text-red-700 text-sm cursor-pointer p-1 rounded hover:bg-red-50"
+                    className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm cursor-pointer p-1 rounded hover:underline"
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => {

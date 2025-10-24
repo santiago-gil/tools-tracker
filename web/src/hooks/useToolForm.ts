@@ -116,10 +116,15 @@ export function useToolForm(tool?: Tool | null, categories: string[] = []) {
 
     const handleRemoveVersion = (idx: number) => {
         if (versions.length > 1) {
-            const updated = versions.filter((_: ToolVersion, i: number) => i !== idx);
-            setValue('versions', updated);
-            if (selectedVersionIdx >= updated.length) {
-                setSelectedVersionIdx(updated.length - 1);
+            const versionToDelete = versions[idx];
+            const confirmMessage = `Are you sure you want to delete version "${versionToDelete.versionName}"? This action cannot be undone.`;
+
+            if (confirm(confirmMessage)) {
+                const updated = versions.filter((_: ToolVersion, i: number) => i !== idx);
+                setValue('versions', updated);
+                if (selectedVersionIdx >= updated.length) {
+                    setSelectedVersionIdx(updated.length - 1);
+                }
             }
         }
     };

@@ -3,6 +3,7 @@
  */
 
 import type { Request, Response, NextFunction } from "express";
+import logger from "../utils/logger/index.js";
 
 /**
  * Security headers middleware
@@ -108,6 +109,48 @@ export function requestSizeLimit(req: Request, res: Response, next: NextFunction
     if (contentLength > MAX_SIZE) {
         return res.status(413).json({ error: 'Request entity too large' });
     }
+
+    next();
+}
+
+/**
+ * Request logging middleware for audit trails
+ */
+export function requestLogger(req: Request, res: Response, next: NextFunction) {
+    const startTime = Date.now();
+    const requestId = Math.random().toString(36).substring(2, 15);
+
+    // Add request ID to response headers
+    res.setHeader('X-Request-ID', requestId);
+
+    // Log incoming request
+    logger.info({
+        requestId,
+        method: req.method,
+        url: req.url,
+        ip: req.ip || req.connection.remoteAddress,
+        userAgent: req.get('User-Agent'),
+        contentLength: req.get('Content-Length'),
+        timestamp: new Date().toISOString()
+    }, 'Incoming request');
+
+    // Override res.end to log response
+    const originalEnd = res.end;
+    res.end = function (chunk?: any, encoding?: any) {
+        const duration = Date.now() - startTime;
+
+        logger.info({
+            requestId,
+            method: req.method,
+            url: req.url,
+            statusCode: res.statusCode,
+            duration: `${duration}ms`,
+            contentLength: res.get('Content-Length'),
+            timestamp: new Date().toISOString()
+        }, 'Request completed');
+
+        return originalEnd.call(this, chunk, encoding);
+    };
 
     next();
 }

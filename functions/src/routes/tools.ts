@@ -2,6 +2,7 @@ import { Router } from "express";
 import { authMiddleware, requirePerm } from "../middleware/index.js";
 import { validateBody, validateParams } from "../middleware/validate.js";
 import { refreshRateLimit } from "../middleware/security.js";
+import { checkOptimisticLock } from "../middleware/optimisticLocking.js";
 import { toolSchema, idParamSchema } from "../utils/validate.js";
 import {
   getAllTools,
@@ -96,6 +97,7 @@ router.put(
   requirePerm("edit"),
   validateParams(idParamSchema),
   validateBody(toolSchema),
+  checkOptimisticLock,
   async (req: AuthedRequest, res, next) => {
     logger.info(
       { uid: req.user?.uid, id: req.params.id },
@@ -103,13 +105,29 @@ router.put(
     );
     try {
       const { id } = req.params;
-      await updateTool(id, req.body);
-      logger.info({ id }, "PUT /tools/:id success");
+      const expectedVersion = req.headers['x-expected-version'] as string;
 
-      // Return success message instead of 204
+      const result = await updateTool(
+        id,
+        req.body,
+        req,
+        expectedVersion ? parseInt(expectedVersion) : undefined
+      );
+
+      if (!result.success) {
+        return res.status(409).json({
+          error: result.error,
+          code: 'OPTIMISTIC_LOCK_CONFLICT',
+          currentVersion: result.newVersion
+        });
+      }
+
+      logger.info({ id, newVersion: result.newVersion }, "PUT /tools/:id success");
+
       res.json({
         success: true,
-        message: "Tool updated"
+        message: "Tool updated",
+        version: result.newVersion
       });
     } catch (err) {
       next(err);

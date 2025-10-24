@@ -62,36 +62,60 @@ export function UsersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+        <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
           User Management
         </h2>
-        <p className="text-gray-600 dark:text-gray-300 mt-1">
+        <p className="mt-1" style={{ color: 'var(--text-secondary)' }}>
           Manage user roles and permissions.
         </p>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="elevation-2 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+          <table className="min-w-full">
+            <thead>
+              <tr style={{ backgroundColor: 'var(--surface-1)' }}>
+                <th
+                  className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
                   User
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th
+                  className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
                   Role
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th
+                  className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
                   Permissions
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="divide-y" style={{ divideColor: 'var(--border-light)' }}>
               {users.map((user) => (
-                <tr key={user.uid} className="hover:elevation-1 transition-colors">
+                <tr
+                  key={user.uid}
+                  className="transition-colors duration-200"
+                  style={{
+                    backgroundColor: 'var(--surface-0)',
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.backgroundColor = 'var(--surface-1)')
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.backgroundColor = 'var(--surface-0)')
+                  }
+                >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div
                       className="text-sm font-medium"
@@ -110,7 +134,12 @@ export function UsersPage() {
                         handleRoleChange(user.uid, e.target.value as UserRole)
                       }
                       disabled={updateUser.isPending || user.role === 'admin'} // prevent demotion of self
-                      className="text-sm border-gray-300 rounded-lg focus:ring-[var(--primary)] focus:border-[var(--primary)]"
+                      className="text-sm rounded-lg transition-all duration-200 focus:ring-2 focus:ring-[var(--sk-red)] focus:ring-offset-2"
+                      style={{
+                        backgroundColor: 'var(--surface-1)',
+                        borderColor: 'var(--border-light)',
+                        color: 'var(--text-primary)',
+                      }}
                     >
                       <option value="viewer">Viewer</option>
                       <option value="ops">Ops</option>
@@ -124,10 +153,11 @@ export function UsersPage() {
                         .map(([key]) => (
                           <span
                             key={key}
-                            className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize"
+                            className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium capitalize border"
                             style={{
-                              backgroundColor: 'var(--surface-2)',
+                              backgroundColor: 'var(--surface-1)',
                               color: 'var(--text-secondary)',
+                              borderColor: 'var(--border-light)',
                             }}
                           >
                             {key}
@@ -139,7 +169,7 @@ export function UsersPage() {
                     <button
                       onClick={() => handleDelete(user)}
                       disabled={deleteUser.isPending}
-                      className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                      className="btn-secondary text-sm px-3 py-1 text-red-700 dark:text-red-300 border-red-300 dark:border-red-700 transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-400 dark:hover:border-red-600 active:scale-95 disabled:opacity-50"
                     >
                       Delete
                     </button>

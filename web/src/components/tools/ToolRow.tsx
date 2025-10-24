@@ -18,7 +18,7 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
   if (!tool.versions || tool.versions.length === 0) {
     return (
       <div className="border rounded-xl overflow-hidden bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 p-4">
-        <div className="text-gray-500 dark:text-gray-400">
+        <div style={{ color: 'var(--text-tertiary)' }}>
           No versions available for {tool.name}
         </div>
       </div>
@@ -34,21 +34,14 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
           {/* Left side - Tool info and version tabs */}
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3
+              <h2
                 className="text-lg font-semibold flex-shrink-0"
                 style={{ color: 'var(--text-primary)' }}
               >
                 {tool.name}
-              </h3>
+              </h2>
               {currentVersion?.sk_recommended && (
-                <span
-                  className="px-2.5 py-0.5 rounded-full text-xs font-medium flex-shrink-0"
-                  style={{
-                    backgroundColor: 'var(--badge-recommended-bg)',
-                    color: 'var(--badge-recommended-text)',
-                    borderColor: 'var(--badge-recommended-border)',
-                  }}
-                >
+                <span className="px-2 py-1 rounded-md text-xs font-medium flex-shrink-0 border badge-holographic">
                   SK Recommended
                 </span>
               )}
@@ -88,13 +81,19 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
           <div className="flex flex-col gap-3 lg:items-end">
             <div className="flex items-center gap-4 text-sm flex-wrap">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
+                <span
+                  className="text-xs font-medium"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
                   GTM:
                 </span>
                 <Badge status={currentVersion?.trackables?.gtm?.status || 'Unknown'} />
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
+                <span
+                  className="text-xs font-medium"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
                   Ads:
                 </span>
                 <Badge
@@ -102,13 +101,19 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
                 />
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
+                <span
+                  className="text-xs font-medium"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
                   GA4:
                 </span>
                 <Badge status={currentVersion?.trackables?.ga4?.status || 'Unknown'} />
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
+                <span
+                  className="text-xs font-medium"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
                   MSA:
                 </span>
                 <Badge status={currentVersion?.trackables?.msa?.status || 'Unknown'} />
@@ -123,7 +128,7 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
                       e.stopPropagation();
                       onEdit();
                     }}
-                    className="text-sm text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white hover:underline font-medium"
+                    className="btn-secondary text-sm px-3 py-1 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 active:scale-95"
                   >
                     Edit
                   </button>
@@ -134,7 +139,7 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
                       e.stopPropagation();
                       onDelete();
                     }}
-                    className="text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:underline font-medium"
+                    className="btn-secondary text-sm px-3 py-1 text-red-700 dark:text-red-300 border-red-300 dark:border-red-700 transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-400 dark:hover:border-red-600 active:scale-95"
                   >
                     Delete
                   </button>
@@ -153,9 +158,9 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
         >
           {currentVersion.team_considerations && (
             <div>
-              <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
                 Web Team Considerations
-              </h4>
+              </h3>
               <p className="text-sm text-gray-700 dark:text-gray-300">
                 {currentVersion.team_considerations}
               </p>
@@ -176,13 +181,16 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
               };
               return (
                 <div key={key} className="space-y-2">
-                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
                     {labels[key] || key}
-                  </h4>
+                  </h3>
 
                   {trackable?.notes && (
                     <div>
-                      <h5 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                      <h5
+                        className="text-xs font-medium mb-1"
+                        style={{ color: 'var(--text-tertiary)' }}
+                      >
                         Notes
                       </h5>
                       <p className="text-sm text-gray-700 dark:text-gray-300">
@@ -193,7 +201,10 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
 
                   {trackable?.example_site && (
                     <div>
-                      <h5 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                      <h5
+                        className="text-xs font-medium mb-1"
+                        style={{ color: 'var(--text-tertiary)' }}
+                      >
                         Example Site
                       </h5>
                       <a
@@ -209,7 +220,10 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
 
                   {trackable?.documentation && (
                     <div>
-                      <h5 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                      <h5
+                        className="text-xs font-medium mb-1"
+                        style={{ color: 'var(--text-tertiary)' }}
+                      >
                         Documentation
                       </h5>
                       <a

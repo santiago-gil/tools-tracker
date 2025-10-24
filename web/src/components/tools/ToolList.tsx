@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { ToolRow } from './ToolRow';
 import { ToolFormModal } from './ToolFormModal';
 import { ToolFilters } from './ToolFilters';
@@ -27,6 +27,28 @@ export function ToolList() {
   const [showSKRecommendedOnly, setShowSKRecommendedOnly] = useState(false);
   const [editingTool, setEditingTool] = useState<Tool | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+
+  // Detect platform for keyboard shortcut display
+  const isMac =
+    typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+  const modifierKey = isMac ? '⌘' : 'Ctrl';
+
+  // Add keyboard shortcut for search (Ctrl+K / Cmd+K)
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+        event.preventDefault();
+        const searchInput = document.getElementById('search-tools') as HTMLInputElement;
+        if (searchInput) {
+          searchInput.focus();
+          searchInput.select();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Debounce search query to improve performance
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
@@ -101,10 +123,10 @@ export function ToolList() {
   if (error) {
     return (
       <div className="text-center py-12">
-        <div className="text-red-600 text-lg font-semibold mb-2">
+        <div className="text-red-600 dark:text-red-400 text-lg font-semibold mb-2">
           Failed to load tools
         </div>
-        <p className="text-gray-600">{(error as Error).message}</p>
+        <p style={{ color: 'var(--text-secondary)' }}>{(error as Error).message}</p>
       </div>
     );
   }
@@ -123,12 +145,22 @@ export function ToolList() {
             placeholder="Search tools..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="input-base pr-12"
+            className="input-base pr-20"
           />
+          {/* Keyboard shortcut indicator */}
+          <div className="absolute right-14 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none">
+            <kbd className="px-1.5 py-0.5 text-xs font-mono bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded border border-gray-300 dark:border-gray-600">
+              {modifierKey}
+            </kbd>
+            <span className="text-gray-400 dark:text-gray-500 text-xs">+</span>
+            <kbd className="px-1.5 py-0.5 text-xs font-mono bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded border border-gray-300 dark:border-gray-600">
+              K
+            </kbd>
+          </div>
           <button
             onClick={() => refreshTools.mutate()}
             disabled={refreshTools.isPending}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed z-10 elevation-interactive"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed z-10 transition-colors duration-200"
             title="Refresh tools data"
           >
             {refreshTools.isPending ? (
@@ -153,25 +185,30 @@ export function ToolList() {
         <div className="flex gap-3">
           <label
             htmlFor="sk-recommended-filter"
-            className="flex items-center gap-2 px-4 py-2 rounded-lg border cursor-pointer transition"
-            style={{
-              backgroundColor: 'var(--badge-recommended-bg)',
-              color: 'var(--badge-recommended-text)',
-              borderColor: 'var(--badge-recommended-border)',
-            }}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all duration-200 active:scale-95 ${
+              showSKRecommendedOnly
+                ? 'badge-holographic'
+                : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500'
+            }`}
           >
             <input
               id="sk-recommended-filter"
               type="checkbox"
               checked={showSKRecommendedOnly}
               onChange={(e) => setShowSKRecommendedOnly(e.target.checked)}
-              className="h-4 w-4 rounded"
+              className="h-5 w-5 rounded"
+              style={{
+                accentColor: showSKRecommendedOnly ? '#ffffff' : undefined,
+              }}
             />
             <span className="text-sm font-medium whitespace-nowrap">SK Recommended</span>
           </label>
 
           {user?.permissions?.add && (
-            <button onClick={() => setShowAddModal(true)} className="btn-primary">
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="btn-primary text-sm px-3 py-2"
+            >
               + Add Tool
             </button>
           )}
@@ -186,7 +223,7 @@ export function ToolList() {
       />
 
       {!isLoading && (
-        <div className="text-sm text-gray-600 dark:text-gray-400">
+        <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
           Showing {filteredTools.length} of {tools?.length ?? 0} tools
           {showSKRecommendedOnly && ' (SK Recommended)'}
         </div>
@@ -195,7 +232,7 @@ export function ToolList() {
       {isLoading ? (
         <LoadingSpinner className="py-12" />
       ) : filteredTools.length === 0 ? (
-        <p className="text-center py-12 text-gray-500 dark:text-gray-400">
+        <p className="text-center py-12" style={{ color: 'var(--text-tertiary)' }}>
           No tools found.
         </p>
       ) : (

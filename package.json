@@ -1,9 +1,17 @@
 {
+  "name": "tools-dev",
+  "version": "1.0.0",
+  "scripts": {
+    "test:robustness": "node scripts/test-robustness.js",
+    "test:stress": "node scripts/stress-test.js",
+    "test:all": "npm run test:robustness && npm run test:stress"
+  },
   "dependencies": {
     "csv-parse": "^6.1.0",
     "csv-parser": "^3.2.0",
     "dotenv": "^17.2.3",
     "firebase-admin": "^13.5.0",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "node-fetch": "^2.6.7"
   }
 }
