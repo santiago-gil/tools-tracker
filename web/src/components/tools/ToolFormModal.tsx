@@ -44,11 +44,19 @@ export function ToolFormModal({
   } = useToolForm(tool, categories);
 
   const onFormSubmit = (data: Partial<Tool>) => {
-    // Handle custom category case
-    if (data.category === '__custom__') {
-      // The actual custom category value should be in the form field
-      // This will be handled by the form's register function
-      console.warn('Custom category selected but value not properly set');
+    // Handle custom category case - check if we're in custom category mode
+    if (showCustomCategory) {
+      // Get the actual custom category value from the form
+      const customCategoryValue = data.category;
+
+      // If the custom category field is empty, prevent submission
+      if (!customCategoryValue || customCategoryValue.trim() === '') {
+        console.error('Custom category is required when in custom category mode');
+        return; // Prevent submission
+      }
+
+      // Ensure the category value is properly trimmed
+      data.category = customCategoryValue.trim();
     }
     onSubmit(data);
   };
