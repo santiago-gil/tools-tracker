@@ -89,6 +89,8 @@ export function useToolForm(tool?: Tool | null, categories: string[] = []) {
         } else {
             setShowCustomCategory(false);
             setValue('category', value);
+            // Clear any validation errors when selecting a valid category
+            clearErrors('category');
         }
     };
 

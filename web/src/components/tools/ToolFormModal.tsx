@@ -44,6 +44,12 @@ export function ToolFormModal({
   } = useToolForm(tool, categories);
 
   const onFormSubmit = (data: Partial<Tool>) => {
+    // Handle custom category case
+    if (data.category === '__custom__') {
+      // The actual custom category value should be in the form field
+      // This will be handled by the form's register function
+      console.warn('Custom category selected but value not properly set');
+    }
     onSubmit(data);
   };
 
