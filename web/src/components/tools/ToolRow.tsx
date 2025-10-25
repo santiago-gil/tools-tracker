@@ -3,6 +3,16 @@ import type { Tool, ToolVersion } from '../../types';
 import { ToolRowHeader } from './ToolRowHeader';
 import { ToolRowExpanded } from './ToolRowExpanded';
 
+// Check if a version has expandable content
+const hasExpandableContent = (version: ToolVersion): boolean => {
+  const hasTeamConsiderations = !!version?.team_considerations;
+  const hasTrackableContent = Object.entries(version?.trackables || {}).some(
+    ([, trackable]) =>
+      trackable?.notes || trackable?.example_site || trackable?.documentation,
+  );
+  return hasTeamConsiderations || hasTrackableContent;
+};
+
 interface ToolRowProps {
   tool: Tool;
   onEdit: () => void;
@@ -14,27 +24,35 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
   const [selectedVersionIdx, setSelectedVersionIdx] = useState(0);
   const [isInteracting, setIsInteracting] = useState(false);
   const toolRowRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<number | null>(null);
 
-  const currentVersion = tool.versions[selectedVersionIdx];
+  // Validate selectedVersionIdx and compute currentVersion safely
+  const isValidIndex =
+    selectedVersionIdx >= 0 && selectedVersionIdx < tool.versions.length;
+  const currentVersion = isValidIndex ? tool.versions[selectedVersionIdx] : undefined;
 
-  // Check if the currently selected version has expandable content
-  const hasExpandableContent = (version: ToolVersion): boolean => {
-    const hasTeamConsiderations = !!version.team_considerations;
-    const hasTrackableContent = Object.entries(version.trackables).some(
-      ([, trackable]) =>
-        trackable?.notes || trackable?.example_site || trackable?.documentation,
-    );
-    return hasTeamConsiderations || hasTrackableContent;
-  };
+  // Reset selectedVersionIdx if it's out of bounds
+  useEffect(() => {
+    if (!isValidIndex && tool.versions.length > 0) {
+      setSelectedVersionIdx(0);
+    }
+  }, [isValidIndex, tool.versions.length]);
 
-  const isExpandable = hasExpandableContent(currentVersion);
+  const isExpandable = currentVersion ? hasExpandableContent(currentVersion) : false;
 
   // Collapse if switching to a version without expandable content
   useEffect(() => {
-    if (!isExpandable && expanded) {
-      setExpanded(false);
-    }
-  }, [isExpandable, expanded]);
+    if (!isExpandable) setExpanded(false);
+  }, [isExpandable]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   // Scroll to expanded tool if it's not in viewport
   useEffect(() => {
@@ -82,12 +100,20 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
         onEdit={() => {
           setIsInteracting(true);
           onEdit();
-          setTimeout(() => setIsInteracting(false), 200);
+          // Clear any existing timeout
+          if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+          }
+          timeoutRef.current = setTimeout(() => setIsInteracting(false), 200);
         }}
         onDelete={() => {
           setIsInteracting(true);
           onDelete();
-          setTimeout(() => setIsInteracting(false), 200);
+          // Clear any existing timeout
+          if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+          }
+          timeoutRef.current = setTimeout(() => setIsInteracting(false), 200);
         }}
       />
 

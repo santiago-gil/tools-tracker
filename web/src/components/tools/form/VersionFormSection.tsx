@@ -1,4 +1,9 @@
-import type { UseFormRegister, FieldErrors, UseFormSetValue } from 'react-hook-form';
+import type {
+  UseFormRegister,
+  FieldErrors,
+  UseFormSetValue,
+  UseFormWatch,
+} from 'react-hook-form';
 import type { ToolFormData, VersionFormData } from '../../../lib/validation.js';
 import { FormField } from '../../common/FormField';
 import { SKRecommendedBadge } from '../../common/SKRecommendedBadge';
@@ -10,6 +15,7 @@ interface VersionFormSectionProps {
   versionIndex: number;
   isEditing: boolean;
   setValue: UseFormSetValue<ToolFormData>;
+  watch: UseFormWatch<ToolFormData>;
 }
 
 export function VersionFormSection({
@@ -19,6 +25,7 @@ export function VersionFormSection({
   versionIndex,
   isEditing,
   setValue,
+  watch,
 }: VersionFormSectionProps) {
   return (
     <div className="space-y-4">
@@ -39,11 +46,13 @@ export function VersionFormSection({
         />
       </FormField>
 
-      <SKRecommendedBadge isRecommended={version.sk_recommended}>
+      <SKRecommendedBadge
+        isRecommended={watch(`versions.${versionIndex}.sk_recommended`) ?? false}
+      >
         <input
           id={`sk-recommended-${versionIndex}`}
           type="checkbox"
-          checked={version.sk_recommended ?? false}
+          checked={watch(`versions.${versionIndex}.sk_recommended`) ?? false}
           onChange={(e) =>
             setValue(`versions.${versionIndex}.sk_recommended`, e.target.checked)
           }

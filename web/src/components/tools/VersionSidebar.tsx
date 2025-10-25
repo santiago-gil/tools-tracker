@@ -50,7 +50,7 @@ export function VersionSidebar({
               className={`w-full text-left p-3 rounded-lg transition-all duration-200 min-h-[80px] elevation-1 ${
                 selectedIndex === idx
                   ? version.sk_recommended
-                    ? 'badge-holographic hover:badge-holographic'
+                    ? 'badge-holographic hover:badge-holographic ring-2 ring-[var(--sk-red)] ring-offset-2 ring-offset-gray-50 dark:ring-offset-gray-800'
                     : 'ring-2 ring-[var(--sk-red)] ring-offset-2 ring-offset-gray-50 dark:ring-offset-gray-800'
                   : version.sk_recommended
                   ? 'badge-holographic hover:badge-holographic'

@@ -1,12 +1,12 @@
 export interface SKRecommendedBadgeProps {
-  isRecommended: boolean;
+  isRecommended?: boolean;
   children: React.ReactNode;
   className?: string;
   onClick?: () => void;
 }
 
 export function SKRecommendedBadge({
-  isRecommended,
+  isRecommended = true,
   children,
   className = '',
   onClick,

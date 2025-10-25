@@ -7,7 +7,7 @@ import { getButtonClasses } from '../../utils/buttonVariants';
 
 interface ToolRowHeaderProps {
   tool: Tool;
-  currentVersion: ToolVersion;
+  currentVersion: ToolVersion | undefined;
   selectedVersionIdx: number;
   expanded: boolean;
   onToggleExpanded?: () => void;
@@ -42,6 +42,7 @@ export function ToolRowHeader({
         e.preventDefault();
         e.stopPropagation();
         const prevIdx = idx > 0 ? idx - 1 : tool.versions.length - 1;
+        onVersionSelect(prevIdx);
         versionTabRefs.current[prevIdx]?.focus();
         break;
       }
@@ -49,6 +50,7 @@ export function ToolRowHeader({
         e.preventDefault();
         e.stopPropagation();
         const nextIdx = idx < tool.versions.length - 1 ? idx + 1 : 0;
+        onVersionSelect(nextIdx);
         versionTabRefs.current[nextIdx]?.focus();
         break;
       }
@@ -61,12 +63,14 @@ export function ToolRowHeader({
       case 'Home':
         e.preventDefault();
         e.stopPropagation();
+        onVersionSelect(0);
         versionTabRefs.current[0]?.focus();
         break;
       case 'End': {
         e.preventDefault();
         e.stopPropagation();
         const lastIdx = tool.versions.length - 1;
+        onVersionSelect(lastIdx);
         versionTabRefs.current[lastIdx]?.focus();
         break;
       }
@@ -80,7 +84,7 @@ export function ToolRowHeader({
           ? 'cursor-pointer hover:bg-gray-50/50 dark:hover:bg-gray-700/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-inset'
           : ''
       }`}
-      onClick={onToggleExpanded}
+      onClick={onToggleExpanded ? onToggleExpanded : undefined}
       onKeyDown={onToggleExpanded ? handleKeyDown : undefined}
       tabIndex={onToggleExpanded ? 0 : undefined}
       role={onToggleExpanded ? 'button' : undefined}
@@ -99,10 +103,7 @@ export function ToolRowHeader({
               {tool.name}
             </h2>
             {currentVersion?.sk_recommended && (
-              <SKRecommendedBadge
-                isRecommended={true}
-                className="text-xs px-2 py-1 flex-shrink-0"
-              >
+              <SKRecommendedBadge className="text-xs px-2 py-1 flex-shrink-0">
                 <span className="text-xs font-medium">SK Recommended</span>
               </SKRecommendedBadge>
             )}
@@ -158,7 +159,7 @@ export function ToolRowHeader({
                   role="tab"
                   aria-selected={selectedVersionIdx === idx}
                   aria-controls={`tool-${tool.id}-version-${idx}`}
-                  tabIndex={0}
+                  tabIndex={selectedVersionIdx === idx ? 0 : -1}
                 >
                   {version.versionName}
                 </button>
