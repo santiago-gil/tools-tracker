@@ -25,7 +25,6 @@ export const TRACKABLE_STATUSES: TrackableStatus[] = [
 export interface Tool {
   id?: string;
   name: string;
-  platform: string;
   category: string;
   versions: ToolVersion[];
   updatedAt?: string;
@@ -52,12 +51,11 @@ export interface UserInfo {
   name?: string;
 }
 
-export type UserRole = "admin" | "editor" | "viewer";
+export type UserRole = "admin" | "ops" | "viewer";
 
 export interface User {
   uid: string;
   email: string;
-  name?: string;
   role: UserRole;
   permissions?: {
     add: boolean;
@@ -78,7 +76,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, User['permissions']> = {
     delete: true,
     manageUsers: true,
   },
-  editor: {
+  ops: {
     add: true,
     edit: true,
     delete: false,
@@ -105,13 +103,15 @@ export interface UserResponse {
 }
 
 export interface CreateToolResponse {
-  tool: Tool;
+  success: boolean;
+  id: string;
   message: string;
 }
 
 export interface UpdateToolResponse {
-  tool: Tool;
+  success: boolean;
   message: string;
+  version: number;
 }
 
 export interface DeleteToolResponse {
