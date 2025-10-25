@@ -1,4 +1,5 @@
 import { Badge } from '../common/Badge';
+import { SKRecommendedBadge } from '../common/SKRecommendedBadge';
 import type { Tool, ToolVersion } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
 import { useRef } from 'react';
@@ -9,7 +10,7 @@ interface ToolRowHeaderProps {
   currentVersion: ToolVersion;
   selectedVersionIdx: number;
   expanded: boolean;
-  onToggleExpanded: () => void;
+  onToggleExpanded?: () => void;
   onVersionSelect: (idx: number) => void;
   onEdit: () => void;
   onDelete: () => void;
@@ -31,7 +32,7 @@ export function ToolRowHeader({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      onToggleExpanded();
+      onToggleExpanded?.();
     }
   };
 
@@ -39,12 +40,14 @@ export function ToolRowHeader({
     switch (e.key) {
       case 'ArrowLeft': {
         e.preventDefault();
+        e.stopPropagation();
         const prevIdx = idx > 0 ? idx - 1 : tool.versions.length - 1;
         versionTabRefs.current[prevIdx]?.focus();
         break;
       }
       case 'ArrowRight': {
         e.preventDefault();
+        e.stopPropagation();
         const nextIdx = idx < tool.versions.length - 1 ? idx + 1 : 0;
         versionTabRefs.current[nextIdx]?.focus();
         break;
@@ -52,14 +55,17 @@ export function ToolRowHeader({
       case 'Enter':
       case ' ':
         e.preventDefault();
+        e.stopPropagation();
         onVersionSelect(idx);
         break;
       case 'Home':
         e.preventDefault();
+        e.stopPropagation();
         versionTabRefs.current[0]?.focus();
         break;
       case 'End': {
         e.preventDefault();
+        e.stopPropagation();
         const lastIdx = tool.versions.length - 1;
         versionTabRefs.current[lastIdx]?.focus();
         break;
@@ -69,13 +75,21 @@ export function ToolRowHeader({
 
   return (
     <div
-      className="p-4 cursor-pointer hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-inset"
+      className={`p-4 transition-colors duration-150 ${
+        onToggleExpanded
+          ? 'cursor-pointer hover:bg-gray-50/50 dark:hover:bg-gray-700/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-inset'
+          : ''
+      }`}
       onClick={onToggleExpanded}
-      onKeyDown={handleKeyDown}
-      tabIndex={0}
-      role="button"
-      aria-expanded={expanded}
-      aria-label={`${expanded ? 'Collapse' : 'Expand'} details for ${tool.name}`}
+      onKeyDown={onToggleExpanded ? handleKeyDown : undefined}
+      tabIndex={onToggleExpanded ? 0 : undefined}
+      role={onToggleExpanded ? 'button' : undefined}
+      aria-expanded={onToggleExpanded ? expanded : undefined}
+      aria-label={
+        onToggleExpanded
+          ? `${expanded ? 'Collapse' : 'Expand'} details for ${tool.name}`
+          : undefined
+      }
     >
       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3">
         {/* Left side - Tool info and version tabs */}
@@ -85,29 +99,34 @@ export function ToolRowHeader({
               {tool.name}
             </h2>
             {currentVersion?.sk_recommended && (
-              <span className="px-2 py-1 rounded-md text-xs font-medium flex-shrink-0 border badge-holographic">
-                SK Recommended
-              </span>
-            )}
-            {/* Expand/Collapse indicator */}
-            <div
-              className={`ml-2 transition-transform duration-200 text-tertiary ${
-                expanded ? 'rotate-180' : 'rotate-0'
-              }`}
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                aria-hidden="true"
-                focusable="false"
+              <SKRecommendedBadge
+                isRecommended={true}
+                className="text-xs px-2 py-1 flex-shrink-0"
               >
-                <polyline points="6,9 12,15 18,9"></polyline>
-              </svg>
-            </div>
+                <span className="text-xs font-medium">SK Recommended</span>
+              </SKRecommendedBadge>
+            )}
+            {/* Expand/Collapse indicator - only show if expandable */}
+            {onToggleExpanded && (
+              <div
+                className={`ml-2 transition-transform duration-200 text-tertiary ${
+                  expanded ? 'rotate-180' : 'rotate-0'
+                }`}
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <polyline points="6,9 12,15 18,9"></polyline>
+                </svg>
+              </div>
+            )}
           </div>
           <p className="text-xs mt-0.5 text-secondary">{tool.category}</p>
 
@@ -129,13 +148,17 @@ export function ToolRowHeader({
                   onKeyDown={(e) => handleVersionKeyDown(e, idx)}
                   className={`filter-btn text-xs ${
                     selectedVersionIdx === idx
-                      ? 'filter-btn-active'
+                      ? version.sk_recommended
+                        ? 'badge-holographic hover:badge-holographic'
+                        : 'filter-btn-active'
+                      : version.sk_recommended
+                      ? 'badge-holographic hover:badge-holographic'
                       : 'filter-btn-inactive'
                   }`}
                   role="tab"
                   aria-selected={selectedVersionIdx === idx}
                   aria-controls={`tool-${tool.id}-version-${idx}`}
-                  tabIndex={selectedVersionIdx === idx ? 0 : -1}
+                  tabIndex={0}
                 >
                   {version.versionName}
                 </button>

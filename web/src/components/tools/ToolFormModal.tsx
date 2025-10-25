@@ -39,6 +39,7 @@ export function ToolFormModal({
     handleCategoryChange,
     handleBackToCategoryList,
     onFormError,
+    setValue,
   } = useToolForm(tool, categories);
 
   const onFormSubmit = (data: Partial<Tool>) => {
@@ -102,6 +103,7 @@ export function ToolFormModal({
                     errors={errors}
                     versionIndex={selectedVersionIdx}
                     isEditing={isEditing}
+                    setValue={setValue}
                   />
 
                   <TrackableFieldsSection

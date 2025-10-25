@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import type { Tool } from '../../types';
+import type { Tool, ToolVersion } from '../../types';
 import { ToolRowHeader } from './ToolRowHeader';
 import { ToolRowExpanded } from './ToolRowExpanded';
 
@@ -12,7 +12,29 @@ interface ToolRowProps {
 export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
   const [expanded, setExpanded] = useState(false);
   const [selectedVersionIdx, setSelectedVersionIdx] = useState(0);
+  const [isInteracting, setIsInteracting] = useState(false);
   const toolRowRef = useRef<HTMLDivElement>(null);
+
+  const currentVersion = tool.versions[selectedVersionIdx];
+
+  // Check if the currently selected version has expandable content
+  const hasExpandableContent = (version: ToolVersion): boolean => {
+    const hasTeamConsiderations = !!version.team_considerations;
+    const hasTrackableContent = Object.entries(version.trackables).some(
+      ([, trackable]) =>
+        trackable?.notes || trackable?.example_site || trackable?.documentation,
+    );
+    return hasTeamConsiderations || hasTrackableContent;
+  };
+
+  const isExpandable = hasExpandableContent(currentVersion);
+
+  // Collapse if switching to a version without expandable content
+  useEffect(() => {
+    if (!isExpandable && expanded) {
+      setExpanded(false);
+    }
+  }, [isExpandable, expanded]);
 
   // Scroll to expanded tool if it's not in viewport
   useEffect(() => {
@@ -41,14 +63,12 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
     );
   }
 
-  const currentVersion = tool.versions[selectedVersionIdx];
-
   return (
     <div
       ref={toolRowRef}
       className={`card elevation-2 elevation-interactive transition-all duration-200 ${
         expanded ? 'expanded' : 'overflow-hidden'
-      }`}
+      } ${isInteracting ? 'elevation-maintained' : ''}`}
       role="article"
       aria-label={`Tool: ${tool.name}`}
     >
@@ -57,10 +77,18 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
         currentVersion={currentVersion}
         selectedVersionIdx={selectedVersionIdx}
         expanded={expanded}
-        onToggleExpanded={() => setExpanded(!expanded)}
+        onToggleExpanded={isExpandable ? () => setExpanded(!expanded) : undefined}
         onVersionSelect={setSelectedVersionIdx}
-        onEdit={onEdit}
-        onDelete={onDelete}
+        onEdit={() => {
+          setIsInteracting(true);
+          onEdit();
+          setTimeout(() => setIsInteracting(false), 200);
+        }}
+        onDelete={() => {
+          setIsInteracting(true);
+          onDelete();
+          setTimeout(() => setIsInteracting(false), 200);
+        }}
       />
 
       {/* Expanded Details */}
