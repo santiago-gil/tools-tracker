@@ -169,7 +169,7 @@ export const ToolList = memo(function ToolList() {
             className="input-base pr-20"
           />
           {/* Keyboard shortcut indicator */}
-          <div className="absolute right-14 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none">
+          <div className="absolute right-14 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none z-10">
             <kbd className="px-1.5 py-0.5 text-xs font-mono bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded border border-gray-300 dark:border-gray-600">
               {modifierKey}
             </kbd>
@@ -181,11 +181,11 @@ export const ToolList = memo(function ToolList() {
           <button
             onClick={handleRefresh}
             disabled={refreshTools.isPending}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed z-10 transition-colors duration-200"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed z-10 transition-colors duration-200 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
             title="Refresh tools data"
           >
             {refreshTools.isPending ? (
-              <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-4 h-4 border-2 border-gray-400 dark:border-gray-500 border-t-transparent rounded-full animate-spin"></div>
             ) : (
               <svg
                 className="w-4 h-4"
@@ -206,7 +206,7 @@ export const ToolList = memo(function ToolList() {
         <div className="flex gap-3">
           <SKRecommendedBadge
             isRecommended={showSKRecommendedOnly}
-            className="active:scale-95"
+            className="active:scale-95 h-10 flex items-center"
           >
             <input
               id="sk-recommended-filter"
@@ -224,7 +224,10 @@ export const ToolList = memo(function ToolList() {
           </SKRecommendedBadge>
 
           {user?.permissions?.add && (
-            <button onClick={handleAddTool} className="btn-primary text-sm px-3 py-2">
+            <button
+              onClick={handleAddTool}
+              className="btn-primary text-sm px-3 py-2 h-10 flex items-center"
+            >
               + Add Tool
             </button>
           )}
