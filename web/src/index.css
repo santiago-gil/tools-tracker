@@ -553,6 +553,11 @@
     }
   }
 
+  /* Override holographic border for selected SK recommended versions */
+  .badge-holographic.border-2.border-\[var\(--sk-red\)\] {
+    border-color: var(--sk-red) !important;
+  }
+
 
   /* Enhanced badge styles with proper contrast */
   .badge-base {

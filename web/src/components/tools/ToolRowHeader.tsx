@@ -5,6 +5,27 @@ import { useAuth } from '../../hooks/useAuth';
 import { useRef } from 'react';
 import { getButtonClasses } from '../../utils/buttonVariants';
 
+/**
+ * Helper function to generate version tab classes based on selection state and SK recommendation
+ */
+function getVersionTabClasses(isSelected: boolean, isSkRecommended: boolean): string {
+  const baseClasses = 'filter-btn text-xs';
+
+  if (isSelected) {
+    if (isSkRecommended) {
+      return `${baseClasses} badge-holographic border-2 border-[var(--sk-red)] shadow-lg shadow-purple-200 dark:shadow-purple-900/50`;
+    } else {
+      return `${baseClasses} border-2 border-[var(--sk-red)] text-gray-900 dark:text-white`;
+    }
+  } else {
+    if (isSkRecommended) {
+      return `${baseClasses} badge-holographic hover:badge-holographic`;
+    } else {
+      return `${baseClasses} filter-btn-inactive text-gray-900 dark:text-white`;
+    }
+  }
+}
+
 interface ToolRowHeaderProps {
   tool: Tool;
   currentVersion: ToolVersion | undefined;
@@ -147,15 +168,10 @@ export function ToolRowHeader({
                     onVersionSelect(idx);
                   }}
                   onKeyDown={(e) => handleVersionKeyDown(e, idx)}
-                  className={`filter-btn text-xs ${
-                    selectedVersionIdx === idx
-                      ? version.sk_recommended
-                        ? 'badge-holographic hover:badge-holographic'
-                        : 'filter-btn-active'
-                      : version.sk_recommended
-                      ? 'badge-holographic hover:badge-holographic'
-                      : 'filter-btn-inactive'
-                  }`}
+                  className={getVersionTabClasses(
+                    selectedVersionIdx === idx,
+                    version.sk_recommended,
+                  )}
                   role="tab"
                   aria-selected={selectedVersionIdx === idx}
                   aria-controls={`tool-${tool.id}-version-${idx}`}

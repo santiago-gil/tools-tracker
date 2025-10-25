@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Badge } from '../common/Badge';
-import type { ToolVersion } from '../../types';
+import type { ToolVersion, TrackableStatus } from '../../types';
 
 interface VersionSidebarProps {
   versions: ToolVersion[];
@@ -8,6 +8,18 @@ interface VersionSidebarProps {
   onSelectVersion: (index: number) => void;
   onAddVersion: () => void;
   onRemoveVersion: (index: number) => void;
+}
+
+interface ProcessedTrackable {
+  key: string;
+  label: string;
+  status: TrackableStatus;
+}
+
+interface TrackablesAnalysis {
+  meaningful: ProcessedTrackable[];
+  unknown: ProcessedTrackable[];
+  hasAny: boolean;
 }
 
 export function VersionSidebar({
@@ -23,6 +35,47 @@ export function VersionSidebar({
       (version, idx) =>
         `version-${idx}-${version.versionName.replace(/[^a-zA-Z0-9]/g, '-')}`,
     );
+  }, [versions]);
+
+  // Memoized trackables processing logic
+  const trackablesAnalysis = useMemo(() => {
+    const analysis: Record<number, TrackablesAnalysis> = {};
+
+    versions.forEach((version, idx) => {
+      const labels: Record<string, string> = {
+        gtm: 'GTM',
+        google_ads: 'Ads',
+        ga4: 'GA4',
+        msa: 'MSA',
+      };
+
+      const meaningful: ProcessedTrackable[] = [];
+      const unknown: ProcessedTrackable[] = [];
+
+      Object.entries(version.trackables).forEach(([key, trackable]) => {
+        if (trackable && trackable.status) {
+          const processed: ProcessedTrackable = {
+            key,
+            label: labels[key] || key.toUpperCase(),
+            status: trackable.status,
+          };
+
+          if (trackable.status === 'Unknown') {
+            unknown.push(processed);
+          } else {
+            meaningful.push(processed);
+          }
+        }
+      });
+
+      analysis[idx] = {
+        meaningful,
+        unknown,
+        hasAny: meaningful.length > 0 || unknown.length > 0,
+      };
+    });
+
+    return analysis;
   }, [versions]);
 
   return (
@@ -47,11 +100,11 @@ export function VersionSidebar({
               key={versionKeys[idx]}
               onClick={() => onSelectVersion(idx)}
               type="button"
-              className={`w-full text-left p-3 rounded-lg transition-all duration-200 min-h-[80px] elevation-1 ${
+              className={`w-full text-left p-2 rounded-lg transition-all duration-200 min-h-[60px] elevation-1 ${
                 selectedIndex === idx
                   ? version.sk_recommended
-                    ? 'badge-holographic hover:badge-holographic ring-2 ring-[var(--sk-red)] ring-offset-2 ring-offset-gray-50 dark:ring-offset-gray-800'
-                    : 'ring-2 ring-[var(--sk-red)] ring-offset-2 ring-offset-gray-50 dark:ring-offset-gray-800'
+                    ? 'badge-holographic border-2 border-[var(--sk-red)] shadow-lg shadow-purple-200 dark:shadow-purple-900/50'
+                    : 'border-2 border-[var(--sk-red)]'
                   : version.sk_recommended
                   ? 'badge-holographic hover:badge-holographic'
                   : 'hover:ring-1 hover:ring-gray-300 dark:hover:ring-gray-600 hover:ring-offset-1 hover:ring-offset-gray-50 dark:hover:ring-offset-gray-800'
@@ -59,19 +112,38 @@ export function VersionSidebar({
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate mb-2">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate mb-1">
                     {version.versionName}
                   </p>
-                  <div className="flex gap-1 flex-wrap min-h-[20px]">
-                    {Object.entries(version.trackables)
-                      .filter(([, value]: [string, unknown]) => value)
-                      .map(([key, trackable]) => (
-                        <Badge
-                          key={key}
-                          status={trackable?.status || 'Unknown'}
-                          compact
-                        />
-                      ))}
+                  <div className="grid grid-cols-2 gap-1 min-h-[16px]">
+                    {(() => {
+                      const analysis = trackablesAnalysis[idx];
+
+                      if (analysis.meaningful.length === 0) {
+                        if (analysis.unknown.length > 0) {
+                          return (
+                            <div className="col-span-2 text-xs text-gray-500 dark:text-gray-400 italic">
+                              Service status unknown
+                            </div>
+                          );
+                        } else {
+                          return (
+                            <div className="col-span-2 text-xs text-gray-500 dark:text-gray-400 italic">
+                              No service status configured
+                            </div>
+                          );
+                        }
+                      }
+
+                      return analysis.meaningful.map((trackable) => (
+                        <div key={trackable.key} className="flex items-center gap-1">
+                          <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                            {trackable.label}:
+                          </span>
+                          <Badge status={trackable.status} compact />
+                        </div>
+                      ));
+                    })()}
                   </div>
                 </div>
                 {versions.length > 1 && (
