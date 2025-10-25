@@ -37,10 +37,7 @@ export function VersionMetaSection({ version, onChange }: VersionMetaSectionProp
           id="sk_recommended"
           checked={version.sk_recommended ?? false}
           onChange={(e) => handleChange('sk_recommended', e.target.checked)}
-          className="h-5 w-5 rounded cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          style={{
-            accentColor: version.sk_recommended ? '#8b5cf6' : undefined,
-          }}
+          className="custom-checkbox"
         />
         <label
           htmlFor="sk_recommended"

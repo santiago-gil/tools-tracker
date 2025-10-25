@@ -42,10 +42,7 @@ export function VersionFormSection({
           id={`sk-recommended-${versionIndex}`}
           type="checkbox"
           {...register(`versions.${versionIndex}.sk_recommended`)}
-          className="h-5 w-5 rounded cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          style={{
-            accentColor: version.sk_recommended ? '#8b5cf6' : undefined,
-          }}
+          className="custom-checkbox"
         />
         <span className="ml-3 text-sm font-medium">SK Recommended</span>
       </SKRecommendedBadge>
