@@ -3,6 +3,7 @@ import logger from "../utils/logger/index.js";
 import { createUserDoc } from "../services/users.js";
 import { db } from "../utils/firebase.js";
 import { getAuth } from "firebase-admin/auth";
+import { COLLECTIONS } from "../config/collections.js";
 
 export const onUserCreated = auth.user().onCreate(async (user) => {
   const { uid, email, photoURL, displayName } = user;
@@ -30,7 +31,7 @@ export const onUserCreated = auth.user().onCreate(async (user) => {
   }
 
   try {
-    const ref = db.collection("users").doc(uid);
+    const ref = db.collection(COLLECTIONS.USERS).doc(uid);
     const snapshot = await ref.get();
 
     if (!snapshot.exists) {
@@ -49,7 +50,7 @@ export const onUserDeleted = auth.user().onDelete(async (user) => {
   const { uid, email } = user;
   logger.info({ uid, email }, "onUserDeleted trigger fired");
   try {
-    await db.collection("users").doc(uid).delete();
+    await db.collection(COLLECTIONS.USERS).doc(uid).delete();
     logger.info({ uid, email }, "Deleted user doc from Firestore");
   } catch (err) {
     logger.error({ uid, email, err }, "Error deleting user doc");

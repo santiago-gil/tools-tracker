@@ -34,8 +34,16 @@ const updatedBySchema = z.object({
 });
 
 export const toolSchema = z.object({
-  name: z.string().min(1, "Platform name is required").max(200),
-  category: z.string().min(1, "Category is required").max(100),
+  name: z.string()
+    .min(1, "Platform name is required")
+    .max(200)
+    .transform((val: string) => val.trim())
+    .refine((val: string) => val.length > 0, "Platform name cannot be empty after trimming"),
+  category: z.string()
+    .min(1, "Category is required")
+    .max(100)
+    .transform((val: string) => val.trim())
+    .refine((val: string) => val.length > 0, "Category cannot be empty after trimming"),
   versions: z.array(toolVersionSchema).min(1),
   updatedAt: z.string().optional(),
   createdAt: z.string().optional(),
@@ -59,12 +67,26 @@ export const userPermissionsSchema = z.object({
 
 export const userSchema = z.object({
   uid: z.string().min(1, 'User UID is required'),
-  email: z.string().email('Must be a valid email'),
+  email: z.preprocess(
+    (val: unknown) => typeof val === 'string' ? val.trim().toLowerCase() : val,
+    z.string().min(1, "Email is required").email('Must be a valid email')
+  ),
   role: z.enum(['admin', 'ops', 'viewer']).default('viewer'),
   permissions: userPermissionsSchema.default({}),
 });
 
 export type UserInput = z.infer<typeof userSchema>;
+
+/**
+ * Partial user update schema for PUT requests
+ * Only allows updating role and permissions, whitelisting specific fields
+ */
+export const userUpdateSchema = z.object({
+  role: z.enum(['admin', 'ops', 'viewer']).optional(),
+  permissions: userPermissionsSchema.partial().optional(),
+}).strict(); // strict() ensures no additional properties are allowed
+
+export type UserUpdateInput = z.infer<typeof userUpdateSchema>;
 
 /**
  * =========================

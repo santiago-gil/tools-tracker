@@ -1,7 +1,6 @@
 import { getAuth } from "firebase-admin/auth";
 import type { Response, NextFunction } from "express";
 import type { AuthedRequest } from "../types/http.js";
-import { db } from "../utils/firebase.js";
 import { createUserDoc, getUserByUid } from "../services/users.js";
 import logger from "../utils/logger/index.js";
 
@@ -14,7 +13,7 @@ export async function authMiddleware(
   _res: Response,
   next: NextFunction
 ) {
-  const header = req.headers.authorization || "";
+  const header = req.headers.authorization ?? "";
   const match = header.match(/^Bearer (.+)$/);
 
   if (!match) {
@@ -58,8 +57,8 @@ export async function authMiddleware(
           const newUser = await createUserDoc(
             decoded.uid,
             decoded.email,
-            decoded.picture,
-            decoded.name
+            typeof decoded.picture === 'string' ? decoded.picture : undefined,
+            typeof decoded.name === 'string' ? decoded.name : undefined
           );
           userDoc = newUser;
 

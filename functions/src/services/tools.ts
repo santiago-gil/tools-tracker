@@ -4,14 +4,14 @@ import { db } from "../utils/firebase.js";
 import type { QueryDocumentSnapshot } from "firebase-admin/firestore";
 import logger from "../utils/logger/index.js";
 import { toolsCache } from "./cache.js";
-import { sanitizeToolData } from "../utils/sanitize.js";
 import { logAuditEvent } from "./audit.js";
 import { verifyOptimisticLock, incrementVersion } from "../middleware/optimisticLocking.js";
 import type { AuthedRequest } from "../types/http.js";
+import { COLLECTIONS } from "../config/collections.js";
 import dayjs from 'dayjs';
 
-// Use tools_v2 collection directly
-const toolsCol = db.collection("tools_v2");
+// Use tools collection from config
+const toolsCol = db.collection(COLLECTIONS.TOOLS);
 
 /**
  * Convert various date formats to ISO string using dayjs
@@ -21,7 +21,7 @@ function convertToDateString(dateValue: unknown): string {
 
   try {
     // Handle Firestore Timestamp objects
-    if (dateValue && typeof dateValue === 'object') {
+    if (typeof dateValue === 'object') {
       const obj = dateValue as Record<string, unknown>;
 
       // Check if it's a Firestore Timestamp
@@ -36,10 +36,16 @@ function convertToDateString(dateValue: unknown): string {
     }
 
     // Use dayjs to parse and convert
-    return dayjs(dateValue as any).toISOString();
+    return dayjs(dateValue as string | number | Date).toISOString();
   } catch (error) {
-    console.warn('Could not convert date value:', dateValue);
-    return String(dateValue || '');
+    console.warn('Could not convert date value:', dateValue, 'Error:', error);
+
+    // Handle different types of dateValue more gracefully
+    if (typeof dateValue === 'object') {
+      return '';
+    }
+
+    return String(dateValue);
   }
 }
 
@@ -50,7 +56,7 @@ function convertToDateString(dateValue: unknown): string {
 export async function getAllTools(forceRefresh = false): Promise<Tool[]> {
   logger.info({ forceRefresh }, "Fetching all tools with caching");
 
-  return toolsCache.get(
+  return await toolsCache.get(
     'all-tools',
     async () => {
       logger.info("Cache miss - fetching from Firestore");
@@ -63,7 +69,7 @@ export async function getAllTools(forceRefresh = false): Promise<Tool[]> {
         if (data._optimisticVersion === undefined) {
           logger.info({ toolId: d.id }, 'Tool missing _optimisticVersion, initializing to 0');
           // Update the document in the background (don't wait for it)
-          d.ref.update({ _optimisticVersion: 0 }).catch(error => {
+          d.ref.update({ _optimisticVersion: 0 }).catch((error: unknown) => {
             logger.error({ error, toolId: d.id }, 'Failed to initialize _optimisticVersion');
           });
           data._optimisticVersion = 0;
@@ -87,7 +93,7 @@ export async function getAllTools(forceRefresh = false): Promise<Tool[]> {
  * @deprecated Use getAllTools() with caching instead
  */
 export async function getTools(): Promise<Tool[]> {
-  return getAllTools();
+  return await getAllTools();
 }
 
 /**
@@ -168,11 +174,8 @@ export async function getToolById(id: string): Promise<Tool | null> {
 export async function addTool(data: ToolInput): Promise<string> {
   logger.info({ data }, "Adding new tool");
 
-  // Sanitize data on backend for security
-  const sanitizedData = sanitizeToolData(data);
-
   const toolData = {
-    ...sanitizedData,
+    ...data,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     _optimisticVersion: 0, // Initialize version for new tools
@@ -214,26 +217,25 @@ export async function updateTool(
     }
     const currentTool = currentToolDoc.data() as Tool;
 
-    // Sanitize data on backend for security
-    const sanitizedData = sanitizeToolData(data);
-
     const updateData = {
-      ...sanitizedData,
+      ...data,
       updatedAt: new Date().toISOString(),
     };
 
     // Perform the update
     await toolsCol.doc(id).update(updateData);
 
+    // Firestore update() always returns a WriteResult, so no need to check
+
     // Increment version for optimistic locking
     const newVersion = await incrementVersion(id);
 
     // Log audit event if request context provided
     if (req) {
-      const changes = Object.keys(sanitizedData).map(key => ({
+      const changes = Object.keys(data).map(key => ({
         field: key,
         oldValue: currentTool[key as keyof Tool],
-        newValue: sanitizedData[key as keyof typeof sanitizedData]
+        newValue: data[key as keyof typeof data]
       }));
 
       await logAuditEvent(req, 'UPDATE', 'tool', id, changes);
@@ -257,6 +259,8 @@ export async function deleteTool(id: string): Promise<void> {
   logger.info({ id }, "Deleting tool");
 
   await toolsCol.doc(id).delete();
+
+  // Firestore delete() always returns a WriteResult, so no need to check
 
   // Invalidate cache after deleting tool
   toolsCache.invalidate('all-tools');

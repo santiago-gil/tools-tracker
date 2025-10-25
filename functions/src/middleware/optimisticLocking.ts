@@ -6,6 +6,7 @@ import { db } from "../utils/firebase.js";
 import logger from "../utils/logger/index.js";
 import type { AuthedRequest } from "../types/http.js";
 import type { Response, NextFunction } from "express";
+import { COLLECTIONS } from "../config/collections.js";
 
 export interface OptimisticLockRequest extends AuthedRequest {
     optimisticLock?: {
@@ -32,9 +33,19 @@ export function checkOptimisticLock(req: OptimisticLockRequest, res: Response, n
         });
     }
 
+    // Validate that the version is a valid integer
+    const versionNumber = parseInt(expectedVersion, 10);
+    if (isNaN(versionNumber) || versionNumber < 0) {
+        logger.warn({ toolId: req.params.id, userId: req.user?.uid, expectedVersion }, 'Invalid version header format');
+        return res.status(400).json({
+            error: 'Invalid version format. Version must be a non-negative integer.',
+            code: 'INVALID_VERSION_FORMAT'
+        });
+    }
+
     // Store the expected version for use in the route handler
     req.optimisticLock = {
-        expectedVersion: parseInt(expectedVersion),
+        expectedVersion: versionNumber,
         currentVersion: 0 // Will be set by the route handler
     };
 
@@ -49,14 +60,14 @@ export async function verifyOptimisticLock(
     expectedVersion: number
 ): Promise<{ success: boolean; currentVersion?: number; error?: string }> {
     try {
-        const toolDoc = await db.collection('tools_v2').doc(toolId).get();
+        const toolDoc = await db.collection(COLLECTIONS.TOOLS).doc(toolId).get();
 
         if (!toolDoc.exists) {
             return { success: false, error: 'Tool not found' };
         }
 
-        const toolData = toolDoc.data();
-        let currentVersion = toolData?._optimisticVersion;
+        const toolData = toolDoc.data() as { _optimisticVersion?: number };
+        let currentVersion = toolData._optimisticVersion;
 
         // If tool doesn't have _optimisticVersion, initialize it to 0
         if (currentVersion === undefined) {
@@ -91,7 +102,7 @@ export async function verifyOptimisticLock(
  */
 export async function incrementVersion(toolId: string): Promise<number> {
     try {
-        const toolRef = db.collection('tools_v2').doc(toolId);
+        const toolRef = db.collection(COLLECTIONS.TOOLS).doc(toolId);
         const newVersion = await db.runTransaction(async (transaction) => {
             const toolDoc = await transaction.get(toolRef);
 
@@ -99,7 +110,8 @@ export async function incrementVersion(toolId: string): Promise<number> {
                 throw new Error('Tool not found');
             }
 
-            const currentVersion = toolDoc.data()?._optimisticVersion || 0;
+            const toolData = toolDoc.data() as { _optimisticVersion?: number };
+            const currentVersion = toolData._optimisticVersion ?? 0;
             const newVersion = currentVersion + 1;
 
             transaction.update(toolRef, { _optimisticVersion: newVersion });

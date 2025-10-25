@@ -2,7 +2,7 @@
  * Simple robustness tests for core functionality
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
 describe('Robustness Tests', () => {
   describe('Optimistic Locking Logic', () => {

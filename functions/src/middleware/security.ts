@@ -28,9 +28,6 @@ export function securityHeaders(req: Request, res: Response, next: NextFunction)
         "frame-ancestors 'none'"
     ].join('; '));
 
-    // Prevent MIME type sniffing
-    res.setHeader('X-Content-Type-Options', 'nosniff');
-
     // Referrer Policy
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
 
@@ -48,7 +45,7 @@ const RATE_LIMIT = 100; // requests per window
 const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 
 export function rateLimit(req: Request, res: Response, next: NextFunction) {
-    const clientId = req.ip || req.connection.remoteAddress || 'unknown';
+    const clientId = req.ip?.trim() ?? req.connection.remoteAddress ?? 'unknown';
     const now = Date.now();
 
     const clientData = requestCounts.get(clientId);
@@ -74,7 +71,7 @@ export function rateLimit(req: Request, res: Response, next: NextFunction) {
  * Special rate limiting for refresh endpoint - prevents spam
  */
 export function refreshRateLimit(req: Request, res: Response, next: NextFunction) {
-    const clientId = req.ip || req.connection.remoteAddress || 'unknown';
+    const clientId = req.ip?.trim() ?? req.connection.remoteAddress ?? 'unknown';
     const key = `refresh_${clientId}`;
     const now = Date.now();
     const REFRESH_WINDOW_MS = 30 * 1000; // 30 seconds
@@ -103,7 +100,7 @@ export function refreshRateLimit(req: Request, res: Response, next: NextFunction
  * Request size limiting
  */
 export function requestSizeLimit(req: Request, res: Response, next: NextFunction) {
-    const contentLength = parseInt(req.headers['content-length'] || '0');
+    const contentLength = parseInt(req.headers['content-length'] ?? '0');
     const MAX_SIZE = 1024 * 1024; // 1MB
 
     if (contentLength > MAX_SIZE) {
@@ -128,15 +125,15 @@ export function requestLogger(req: Request, res: Response, next: NextFunction) {
         requestId,
         method: req.method,
         url: req.url,
-        ip: req.ip || req.connection.remoteAddress,
+        ip: req.ip?.trim() ? req.ip : req.connection.remoteAddress,
         userAgent: req.get('User-Agent'),
         contentLength: req.get('Content-Length'),
         timestamp: new Date().toISOString()
     }, 'Incoming request');
 
     // Override res.end to log response
-    const originalEnd = res.end;
-    res.end = function (chunk?: any, encoding?: any) {
+    const originalEnd = res.end.bind(res);
+    res.end = function (chunk?: unknown, encoding?: unknown) {
         const duration = Date.now() - startTime;
 
         logger.info({
@@ -149,7 +146,8 @@ export function requestLogger(req: Request, res: Response, next: NextFunction) {
             timestamp: new Date().toISOString()
         }, 'Request completed');
 
-        return originalEnd.call(this, chunk, encoding);
+        // Call the original end method with proper types
+        return originalEnd(chunk as string | Buffer, encoding as BufferEncoding);
     };
 
     next();
@@ -161,7 +159,7 @@ export function requestLogger(req: Request, res: Response, next: NextFunction) {
 export function corsConfig(req: Request, res: Response, next: NextFunction) {
     const origin = req.headers.origin;
     const allowedOrigins = [
-        process.env.ALLOWED_ORIGIN || `https://${process.env.GCLOUD_PROJECT}.web.app`,
+        process.env.ALLOWED_ORIGIN ?? `https://${process.env.GCLOUD_PROJECT}.web.app`,
         `https://${process.env.GCLOUD_PROJECT}.firebaseapp.com`,
         'http://localhost:3000',    // Development
         'http://localhost:5002'     // Firebase emulator

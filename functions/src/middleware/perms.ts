@@ -4,7 +4,7 @@ import { getUserByUid } from "../services/users.js";
 import logger from "../utils/logger/index.js";
 
 // Cache user permissions to prevent timing attacks
-const permissionCache = new Map<string, { permissions: any; timestamp: number }>();
+const permissionCache = new Map<string, { permissions: Record<string, boolean>; timestamp: number }>();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 // Function to invalidate permission cache when user permissions change
@@ -25,7 +25,7 @@ export function requirePerm(
     const cached = permissionCache.get(req.user.uid);
     const now = Date.now();
 
-    let user;
+    let user: { permissions?: Record<string, boolean> } | null;
     if (cached && (now - cached.timestamp) < CACHE_DURATION) {
       // Use cached permissions
       user = { permissions: cached.permissions };
@@ -42,7 +42,7 @@ export function requirePerm(
 
     if (!user?.permissions?.[action]) {
       logger.warn(
-        { uid: req.user.uid, action, role: user?.role },
+        { uid: req.user.uid, action },
         "Permission denied"
       );
       return next({

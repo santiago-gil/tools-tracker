@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { authMiddleware, requirePerm } from "../middleware/index.js";
-import { validateParams } from "../middleware/validate.js";
-import { uidParamSchema } from "../utils/validate.js";
+import { validateParams, validateBody } from "../middleware/validate.js";
+import { asyncHandler } from "../middleware/asyncHandler.js";
+import { uidParamSchema, userUpdateSchema, type UserUpdateInput } from "../utils/validate.js";
 import {
   listUsers,
   getUserByUid,
@@ -9,6 +10,7 @@ import {
   deleteUser,
 } from "../services/users.js";
 import type { AuthedRequest } from "../types/http.js";
+import type { User } from "../types/Users.js";
 import logger from "../utils/logger/index.js";
 
 const router = Router();
@@ -20,18 +22,15 @@ router.use(authMiddleware);
  * GET /users
  * Admin-only: list all users
  */
-router.get("/", requirePerm("manageUsers"), async (req: AuthedRequest, res, next) => {
+router.get("/", requirePerm("manageUsers"), asyncHandler(async (req: AuthedRequest, res) => {
   logger.info({ uid: req.user?.uid }, "GET /users called");
-  try {
-    const users = await listUsers();
-    logger.info({ count: users.length }, "GET /users success");
 
-    // Wrap in object for consistency
-    res.json({ users });
-  } catch (err) {
-    next(err);
-  }
-});
+  const users = await listUsers();
+  logger.info({ count: users.length }, "GET /users success");
+
+  // Wrap in object for consistency
+  res.json({ users });
+}));
 
 /**
  * GET /users/:uid
@@ -41,38 +40,34 @@ router.get("/", requirePerm("manageUsers"), async (req: AuthedRequest, res, next
 router.get(
   "/:uid",
   validateParams(uidParamSchema),
-  async (req: AuthedRequest, res, next) => {
-    try {
-      if (!req.user) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-
-      const { uid } = req.params;
-
-      // req.user.role is now populated by authMiddleware
-      if (req.user.role !== "admin" && req.user.uid !== uid) {
-        logger.warn(
-          { requester: req.user.uid, target: uid },
-          "Forbidden user access"
-        );
-        return res.status(403).json({ error: "Forbidden" });
-      }
-
-      const userDoc = await getUserByUid(uid);
-
-      if (!userDoc) {
-        logger.warn({ uid }, "User document not found");
-        return res.status(404).json({ error: "User not found" });
-      }
-
-      logger.info({ uid }, "GET /users/:uid success");
-
-      // Wrap in object
-      res.json({ user: userDoc });
-    } catch (err) {
-      next(err);
+  asyncHandler(async (req: AuthedRequest, res) => {
+    if (!req.user) {
+      return res.status(401).json({ error: "Unauthorized" });
     }
-  }
+
+    const { uid } = req.params;
+
+    // req.user.role is now populated by authMiddleware
+    if (req.user.role !== "admin" && req.user.uid !== uid) {
+      logger.warn(
+        { requester: req.user.uid, target: uid },
+        "Forbidden user access"
+      );
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    const userDoc = await getUserByUid(uid);
+
+    if (!userDoc) {
+      logger.warn({ uid }, "User document not found");
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    logger.info({ uid }, "GET /users/:uid success");
+
+    // Wrap in object
+    res.json({ user: userDoc });
+  })
 );
 
 /**
@@ -83,23 +78,30 @@ router.put(
   "/:uid",
   requirePerm("manageUsers"),
   validateParams(uidParamSchema),
-  async (req: AuthedRequest, res, next) => {
+  validateBody(userUpdateSchema),
+  asyncHandler(async (req: AuthedRequest, res) => {
+    const { uid } = req.params;
+    // req.body is now validated and typed by validateBody middleware
+    const updateData = req.body as unknown as UserUpdateInput;
+
     logger.info(
-      { uid: req.params.uid, update: req.body, by: req.user?.uid },
+      { uid, update: updateData, by: req.user?.uid },
       "PUT /users/:uid called"
     );
-    try {
-      const { uid } = req.params;
-      await updateUser(uid, req.body);
-      logger.info({ uid }, "PUT /users/:uid success");
 
-      // Return updated user
-      const updated = await getUserByUid(uid);
-      res.json({ user: updated });
-    } catch (err) {
-      next(err);
+    await updateUser(uid, updateData as Partial<Omit<User, "uid" | "createdAt">>);
+    logger.info({ uid }, "PUT /users/:uid success");
+
+    // Return updated user - check if user still exists
+    const updated = await getUserByUid(uid);
+    if (!updated) {
+      logger.error({ uid }, "User not found after update - this should not happen");
+      return res.status(404).json({ error: "User not found" });
     }
-  }
+
+    logger.info({ uid }, "PUT /users/:uid success - user updated");
+    res.json({ user: updated });
+  })
 );
 
 /**
@@ -110,22 +112,19 @@ router.delete(
   "/:uid",
   requirePerm("manageUsers"),
   validateParams(uidParamSchema),
-  async (req: AuthedRequest, res, next) => {
+  asyncHandler(async (req: AuthedRequest, res) => {
     logger.info(
       { uid: req.params.uid, by: req.user?.uid },
       "DELETE /users/:uid called"
     );
-    try {
-      const { uid } = req.params;
-      await deleteUser(uid);
-      logger.info({ uid }, "DELETE /users/:uid success");
 
-      // Return success message
-      res.json({ success: true, message: "User deleted" });
-    } catch (err) {
-      next(err);
-    }
-  }
+    const { uid } = req.params;
+    await deleteUser(uid);
+    logger.info({ uid }, "DELETE /users/:uid success");
+
+    // Return success message
+    res.json({ success: true, message: "User deleted" });
+  })
 );
 
 export default router;

@@ -4,8 +4,9 @@ import { db } from "../utils/firebase.js";
 import type { QueryDocumentSnapshot } from "firebase-admin/firestore";
 import logger from "../utils/logger/index.js";
 import { invalidatePermissionCache } from "../middleware/perms.js";
+import { COLLECTIONS } from "../config/collections.js";
 
-const usersCol = db.collection("users");
+const usersCol = db.collection(COLLECTIONS.USERS);
 
 export const DEFAULT_ROLE: User["role"] = "viewer";
 
@@ -61,6 +62,8 @@ export async function createUserDoc(
 
   await usersCol.doc(uid).set(userWithoutUid);
 
+  // Firestore set() always returns a WriteResult, so no need to check
+
   logger.info(
     { uid, role: userWithoutUid.role, permissions: userWithoutUid.permissions, photoURL, displayName },
     "User document created"
@@ -115,6 +118,8 @@ export async function updateUser(
     updatedAt: new Date(),
   });
 
+  // Firestore update() always returns a WriteResult, so no need to check
+
   // Invalidate permission cache when user permissions change
   invalidatePermissionCache(uid);
 
@@ -122,9 +127,26 @@ export async function updateUser(
 }
 
 export async function deleteUser(uid: string): Promise<void> {
-  logger.info({ uid }, "Deleting user from Firestore and Auth");
-  await usersCol.doc(uid).delete();
-  await getAuth().deleteUser(uid);
-  logger.info({ uid }, "User deleted successfully");
+  logger.info({ uid }, "Deleting user from Auth and Firestore");
+
+  try {
+    // Delete Auth user first to prevent orphaned Auth users
+    await getAuth().deleteUser(uid);
+    logger.info({ uid }, "Auth user deleted successfully");
+  } catch (error) {
+    logger.error({ uid, error }, "Failed to delete Auth user");
+    throw error; // Re-throw to prevent Firestore deletion
+  }
+
+  try {
+    await usersCol.doc(uid).delete();
+    logger.info({ uid }, "Firestore user document deleted successfully");
+  } catch (error) {
+    logger.error({ uid, error }, "Failed to delete Firestore user document after Auth deletion");
+    // Note: Auth user is already deleted, so we can't rollback
+    throw error;
+  }
+
+  logger.info({ uid }, "User deleted successfully from both Auth and Firestore");
 }
 

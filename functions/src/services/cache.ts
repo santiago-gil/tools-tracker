@@ -18,6 +18,7 @@ interface CacheConfig {
 
 class SmartCache<T> {
     private cache = new Map<string, CacheEntry<T>>();
+    private inFlightFetches = new Map<string, Promise<T>>();
     private config: CacheConfig;
     private globalVersion = 0;
 
@@ -38,7 +39,7 @@ class SmartCache<T> {
 
         // Force refresh if requested
         if (forceRefresh) {
-            return this.fetchAndCache(key, fetcher);
+            return await this.fetchAndCache(key, fetcher);
         }
 
         // Return cached data if fresh
@@ -54,7 +55,7 @@ class SmartCache<T> {
         }
 
         // Fetch fresh data
-        return this.fetchAndCache(key, fetcher);
+        return await this.fetchAndCache(key, fetcher);
     }
 
     /**
@@ -91,6 +92,30 @@ class SmartCache<T> {
      * Fetch data and cache it
      */
     private async fetchAndCache(key: string, fetcher: () => Promise<T>): Promise<T> {
+        // Check if there's already an in-flight fetch for this key
+        const existingFetch = this.inFlightFetches.get(key);
+        if (existingFetch) {
+            return existingFetch;
+        }
+
+        // Create new fetch promise
+        const fetchPromise = this.performFetch(key, fetcher);
+
+        // Store the promise in inFlightFetches
+        this.inFlightFetches.set(key, fetchPromise);
+
+        try {
+            return await fetchPromise;
+        } finally {
+            // Always remove from inFlightFetches when done
+            this.inFlightFetches.delete(key);
+        }
+    }
+
+    /**
+     * Perform the actual fetch operation
+     */
+    private async performFetch(key: string, fetcher: () => Promise<T>): Promise<T> {
         const data = await fetcher();
         const now = Date.now();
 
