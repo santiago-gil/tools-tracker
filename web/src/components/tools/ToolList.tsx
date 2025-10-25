@@ -141,6 +141,10 @@ export const ToolList = memo(function ToolList() {
     setEditingTool(null);
   }, []);
 
+  const handleClearSearch = useCallback(() => {
+    setSearchQuery('');
+  }, []);
+
   if (error) {
     return (
       <div className="text-center py-12">
@@ -166,22 +170,47 @@ export const ToolList = memo(function ToolList() {
             placeholder="Search tools..."
             value={searchQuery}
             onChange={handleSearchChange}
-            className="input-base pr-20"
+            className="input-base pr-28 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
           />
-          {/* Keyboard shortcut indicator */}
-          <div className="absolute right-14 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none z-10">
-            <kbd className="px-1.5 py-0.5 text-xs font-mono bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded border border-gray-300 dark:border-gray-600">
-              {modifierKey}
-            </kbd>
-            <span className="text-gray-400 dark:text-gray-500 text-xs">+</span>
-            <kbd className="px-1.5 py-0.5 text-xs font-mono bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded border border-gray-300 dark:border-gray-600">
-              K
-            </kbd>
-          </div>
+          {/* Clear button - only show when there's text */}
+          {searchQuery && (
+            <button
+              onClick={handleClearSearch}
+              className="absolute right-16 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 z-20 transition-colors duration-200 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+              title="Clear search"
+              aria-label="Clear search"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          )}
+          {/* Keyboard shortcut indicator - only show when search is empty */}
+          {!searchQuery && (
+            <div className="absolute right-20 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none z-10">
+              <kbd className="px-1.5 py-0.5 text-xs font-mono bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded border border-gray-300 dark:border-gray-600">
+                {modifierKey}
+              </kbd>
+              <span className="text-gray-400 dark:text-gray-500 text-xs">+</span>
+              <kbd className="px-1.5 py-0.5 text-xs font-mono bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded border border-gray-300 dark:border-gray-600">
+                K
+              </kbd>
+            </div>
+          )}
           <button
             onClick={handleRefresh}
             disabled={refreshTools.isPending}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed z-10 transition-colors duration-200 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed z-20 transition-colors duration-200 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
             title="Refresh tools data"
           >
             {refreshTools.isPending ? (
