@@ -15,7 +15,6 @@ import {
 import { useAuth } from '../../hooks/useAuth';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useToolFiltering } from '../../hooks/useToolFiltering';
-import { useWindowSize } from '../../hooks/useWindowSize';
 import type { Tool } from '../../types';
 
 export const ToolList = memo(function ToolList() {
@@ -67,9 +66,6 @@ export const ToolList = memo(function ToolList() {
     selectedCategory,
     showSKRecommendedOnly,
   });
-
-  // Get window size for responsive virtual scrolling
-  const { height: windowHeight } = useWindowSize();
 
   const handleSubmit = useCallback(
     async (toolData: Partial<Tool>) => {
@@ -157,7 +153,7 @@ export const ToolList = memo(function ToolList() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col space-y-6">
       {/* Controls */}
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="flex-1 relative">
@@ -291,35 +287,37 @@ export const ToolList = memo(function ToolList() {
         </div>
       )}
 
-      {isLoading ? (
-        <LoadingSpinner className="py-12" />
-      ) : filteredTools.length === 0 ? (
-        <p className="text-center py-12" style={{ color: 'var(--text-tertiary)' }}>
-          No tools found.
-        </p>
-      ) : (
-        <div className="relative">
-          <DynamicVirtualizedList
-            items={filteredTools}
-            defaultItemHeight={120} // Approximate height of each ToolRow when collapsed
-            containerHeight={Math.min(600, windowHeight * 0.6)} // Responsive height
-            renderItem={({ item: tool, index }) => (
-              <div
-                key={tool.id}
-                className={`${index === 0 ? 'virtual-first-item' : ''} mb-3`}
-              >
-                <ToolRow
-                  tool={tool}
-                  onEdit={() => handleEditTool(tool)}
-                  onDelete={() => handleDelete(tool)}
-                />
-              </div>
-            )}
-            className="custom-scrollbar"
-            overscan={5} // Render 5 extra items above/below for smooth scrolling
-          />
-        </div>
-      )}
+      <div className="flex-1 flex flex-col min-h-0">
+        {isLoading ? (
+          <LoadingSpinner className="py-12" />
+        ) : filteredTools.length === 0 ? (
+          <p className="text-center py-12" style={{ color: 'var(--text-tertiary)' }}>
+            No tools found.
+          </p>
+        ) : (
+          <div className="relative flex-1 min-h-0">
+            <DynamicVirtualizedList
+              items={filteredTools}
+              defaultItemHeight={120} // Approximate height of each ToolRow when collapsed
+              containerHeight="100%" // Use full available height
+              renderItem={({ item: tool, index }) => (
+                <div
+                  key={tool.id}
+                  className={`${index === 0 ? 'virtual-first-item' : ''} mb-3`}
+                >
+                  <ToolRow
+                    tool={tool}
+                    onEdit={() => handleEditTool(tool)}
+                    onDelete={() => handleDelete(tool)}
+                  />
+                </div>
+              )}
+              className="custom-scrollbar"
+              overscan={5} // Render 5 extra items above/below for smooth scrolling
+            />
+          </div>
+        )}
+      </div>
 
       {(showAddModal || editingTool) && (
         <ToolFormModal
