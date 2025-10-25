@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { Tool } from '../../types';
 import { ToolRowHeader } from './ToolRowHeader';
 import { ToolRowExpanded } from './ToolRowExpanded';
@@ -12,6 +12,25 @@ interface ToolRowProps {
 export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
   const [expanded, setExpanded] = useState(false);
   const [selectedVersionIdx, setSelectedVersionIdx] = useState(0);
+  const toolRowRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to expanded tool if it's not in viewport
+  useEffect(() => {
+    if (expanded && toolRowRef.current) {
+      const element = toolRowRef.current;
+      const rect = element.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+
+      // Check if the element is not fully visible
+      if (rect.bottom > viewportHeight || rect.top < 0) {
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+          inline: 'nearest',
+        });
+      }
+    }
+  }, [expanded]);
 
   // Safety check for versions array
   if (!tool.versions || tool.versions.length === 0) {
@@ -26,6 +45,7 @@ export function ToolRow({ tool, onEdit, onDelete }: ToolRowProps) {
 
   return (
     <div
+      ref={toolRowRef}
       className={`card elevation-2 elevation-interactive transition-all duration-200 ${
         expanded ? 'expanded' : 'overflow-hidden'
       }`}
