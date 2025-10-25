@@ -213,10 +213,7 @@ export const ToolList = memo(function ToolList() {
               type="checkbox"
               checked={showSKRecommendedOnly}
               onChange={handleSKRecommendedChange}
-              className="h-5 w-5 rounded cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              style={{
-                accentColor: showSKRecommendedOnly ? '#8b5cf6' : undefined,
-              }}
+              className="custom-checkbox"
             />
             <span className="ml-3 text-sm font-medium whitespace-nowrap">
               SK Recommended
