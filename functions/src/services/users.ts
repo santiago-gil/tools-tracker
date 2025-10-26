@@ -5,6 +5,7 @@ import type { QueryDocumentSnapshot } from "firebase-admin/firestore";
 import logger from "../utils/logger/index.js";
 import { invalidatePermissionCache } from "../middleware/perms.js";
 import { COLLECTIONS } from "../config/collections.js";
+import { validateUserUpdate } from "../utils/validate.js";
 
 const usersCol = db.collection(COLLECTIONS.USERS);
 
@@ -98,11 +99,16 @@ export async function listUsers(): Promise<User[]> {
   }));
 }
 
+
 export async function updateUser(
   uid: string,
-  data: Partial<Omit<User, "uid" | "createdAt">>
+  data: Partial<Omit<User, "uid" | "createdAt">>,
+  requesterUid: string
 ): Promise<void> {
-  logger.info({ uid, update: data }, "Updating user document");
+  logger.info({ uid, update: data, requester: requesterUid }, "Updating user document");
+
+  // Security validation
+  await validateUserUpdate(uid, data, requesterUid);
 
   // Automatically adjust permissions when role changes
   if (data.role && !data.permissions) {

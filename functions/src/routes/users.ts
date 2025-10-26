@@ -80,16 +80,21 @@ router.put(
   validateParams(uidParamSchema),
   validateBody(userUpdateSchema),
   asyncHandler(async (req: AuthedRequest, res) => {
+    if (!req.user?.uid) {
+      logger.error("Missing user context in authenticated request");
+      return res.status(500).json({ error: "Internal server error" });
+    }
+
     const { uid } = req.params;
     // req.body is now validated and typed by validateBody middleware
     const updateData = req.body as unknown as UserUpdateInput;
 
     logger.info(
-      { uid, update: updateData, by: req.user?.uid },
+      { uid, update: updateData, by: req.user.uid },
       "PUT /users/:uid called"
     );
 
-    await updateUser(uid, updateData as Partial<Omit<User, "uid" | "createdAt">>);
+    await updateUser(uid, updateData as Partial<Omit<User, "uid" | "createdAt">>, req.user.uid);
     logger.info({ uid }, "PUT /users/:uid success");
 
     // Return updated user - check if user still exists

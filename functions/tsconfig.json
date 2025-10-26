@@ -4,10 +4,11 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "outDir": "lib",
-    "rootDir": "src",
     "paths": {
-      "*": ["*", "*.ts"]
+      "*": ["*", "*.ts"],
+      "@shared/schemas": ["../shared/schemas"],
+      "@shared/schemas/*": ["../shared/schemas/*"]
     }
   },
-  "include": ["src", "migrate.js"]
+  "include": ["src", "migrate.js", "../shared/schemas"]
 }

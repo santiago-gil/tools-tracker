@@ -16,6 +16,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useToolFiltering } from '../../hooks/useToolFiltering';
 import type { Tool } from '../../types';
+import type { ToolFormData } from '@shared/schemas';
 
 export const ToolList = memo(function ToolList() {
   const { user } = useAuth();
@@ -68,22 +69,33 @@ export const ToolList = memo(function ToolList() {
   });
 
   const handleSubmit = useCallback(
-    async (toolData: Partial<Tool>) => {
+    async (toolData: ToolFormData) => {
       // Backend will handle sanitization and validation
       try {
         if (editingTool?.id) {
           await updateTool.mutateAsync({
             id: editingTool.id,
-            tool: toolData,
+            tool: toolData as Partial<
+              Omit<
+                Tool,
+                'id' | 'createdAt' | 'updatedAt' | 'updatedBy' | '_optimisticVersion'
+              >
+            >,
             expectedVersion: editingTool._optimisticVersion || 0,
           });
           setEditingTool(null);
         } else {
-          await createTool.mutateAsync(toolData as Omit<Tool, 'id'>);
+          await createTool.mutateAsync(
+            toolData as Omit<Tool, 'id' | 'createdAt' | 'updatedAt' | 'updatedBy'>,
+          );
           setShowAddModal(false);
         }
       } catch (error) {
-        console.error('Error in handleSubmit:', error);
+        // Error handling is done by the mutation hooks (toast notifications)
+        // Log error for development debugging
+        if (import.meta.env.DEV) {
+          console.error('Tool save error:', error);
+        }
       }
     },
     [editingTool?.id, editingTool?._optimisticVersion, updateTool, createTool],

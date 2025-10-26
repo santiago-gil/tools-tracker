@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm, type FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toolFormSchema, type ToolFormData } from '../lib/validation.js';
+import { ToolFormSchema, type ToolFormData } from '@shared/schemas';
 import type { Tool, ToolVersion } from '../types';
 import { createEmptyTrackables } from '../utils/trackableFields';
 
@@ -31,17 +31,14 @@ export function useToolForm(tool?: Tool | null, categories: string[] = []) {
         watch,
         setValue,
         clearErrors,
+        setError,
     } = useForm<ToolFormData>({
-        resolver: zodResolver(toolFormSchema),
+        resolver: zodResolver(ToolFormSchema),
         defaultValues: tool
             ? {
                 name: tool.name,
                 category: tool.category,
                 versions: tool.versions,
-                // Backend now returns dates as ISO strings
-                createdAt: tool.createdAt,
-                updatedAt: tool.updatedAt,
-                updatedBy: tool.updatedBy,
             }
             : {
                 name: '',
@@ -50,8 +47,8 @@ export function useToolForm(tool?: Tool | null, categories: string[] = []) {
             },
     });
 
-    const versions = watch('versions');
-    const currentVersion = versions[selectedVersionIdx];
+    const versions = watch('versions') as ToolFormData['versions'];
+    const currentVersion = versions[selectedVersionIdx] as ToolFormData['versions'][0];
 
     const handleAddVersion = () => {
         // Create a completely clean version with all fields reset to default values
@@ -71,7 +68,7 @@ export function useToolForm(tool?: Tool | null, categories: string[] = []) {
             const confirmMessage = `Are you sure you want to delete version "${versionToDelete.versionName}"? This action cannot be undone.`;
 
             if (confirm(confirmMessage)) {
-                const updated = versions.filter((_: ToolVersion, i: number) => i !== idx);
+                const updated = versions.filter((_: ToolFormData['versions'][0], i: number) => i !== idx);
                 setValue('versions', updated);
                 if (selectedVersionIdx >= updated.length) {
                     setSelectedVersionIdx(updated.length - 1);
@@ -101,7 +98,11 @@ export function useToolForm(tool?: Tool | null, categories: string[] = []) {
     };
 
     const onFormError = (errors: FieldErrors<ToolFormData>) => {
-        console.error('Form validation errors:', errors);
+        // Form validation errors are handled by field-level error display
+        // Development-only logging for debugging validation issues
+        if (import.meta.env.DEV) {
+            console.debug('Form validation errors:', errors);
+        }
     };
 
     return {
@@ -112,6 +113,7 @@ export function useToolForm(tool?: Tool | null, categories: string[] = []) {
         watch,
         setValue,
         clearErrors,
+        setError,
 
         // Version management
         versions,

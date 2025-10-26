@@ -1,9 +1,10 @@
-import type { UseFormRegister } from 'react-hook-form';
-import type { ToolFormData } from '../../../lib/validation.js';
+import type { UseFormRegister, FieldErrors } from 'react-hook-form';
+import type { ToolFormData } from '@shared/schemas';
 import { TrackableFieldInput } from '../TrackableFieldInput';
 
 interface TrackableFieldsSectionProps {
   register: UseFormRegister<ToolFormData>;
+  errors: FieldErrors<ToolFormData>;
   versionIndex: number;
 }
 
@@ -17,6 +18,7 @@ const trackableLabels: Record<(typeof trackableKeys)[number], string> = {
 
 export function TrackableFieldsSection({
   register,
+  errors,
   versionIndex,
 }: TrackableFieldsSectionProps) {
   return (
@@ -31,6 +33,7 @@ export function TrackableFieldsSection({
           trackableKey={key}
           label={trackableLabels[key]}
           register={register}
+          errors={errors}
           versionIndex={versionIndex}
         />
       ))}

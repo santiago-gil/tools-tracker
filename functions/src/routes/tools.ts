@@ -4,7 +4,8 @@ import { validateBody, validateParams } from "../middleware/validate.js";
 import { refreshRateLimit } from "../middleware/security.js";
 import { checkOptimisticLock } from "../middleware/optimisticLocking.js";
 import { asyncHandler } from "../middleware/asyncHandler.js";
-import { toolSchema, idParamSchema, type ToolInput } from "../utils/validate.js";
+import { CreateToolSchema, UpdateToolSchema, idParamSchema, type CreateTool, type UpdateTool } from "../utils/validate.js";
+import { type Tool } from "../types/Tool.js";
 import {
   getAllTools,
   addTool,
@@ -13,6 +14,7 @@ import {
 } from "../services/index.js";
 import logger from "../utils/logger/index.js";
 import { AuthedRequest } from "../types/http.js";
+
 
 const router = Router();
 
@@ -61,20 +63,24 @@ router.get("/refresh", refreshRateLimit, asyncHandler(async (req: AuthedRequest,
 router.post(
   "/",
   requirePerm("add"),
-  validateBody(toolSchema),
+  validateBody(CreateToolSchema),
   asyncHandler(async (req: AuthedRequest, res) => {
+    // The validation middleware has already validated the body
+    const toolData = req.body as CreateTool;
+
     logger.info(
-      { uid: req.user?.uid, platform: (req.body as ToolInput).name },
+      { uid: req.user?.uid ?? 'unknown', platform: toolData.name },
       "POST /tools called"
     );
 
-    const id = await addTool(req.body as ToolInput);
-    logger.info({ id }, "POST /tools success");
+    const createdTool = await addTool(toolData);
+    const toolWithId = createdTool as Tool & { id: string };
+    logger.info({ id: toolWithId.id }, "POST /tools success");
 
-    // Return created resource
+    // Return created resource with full tool data
     res.status(201).json({
       success: true,
-      id,
+      tool: toolWithId,
       message: "Tool created"
     });
   })
@@ -88,9 +94,12 @@ router.put(
   "/:id",
   requirePerm("edit"),
   validateParams(idParamSchema),
-  validateBody(toolSchema),
+  validateBody(UpdateToolSchema),
   checkOptimisticLock,
   asyncHandler(async (req: AuthedRequest, res) => {
+    // The validation middleware has already validated the body
+    const updateData = req.body as UpdateTool;
+
     logger.info(
       { uid: req.user?.uid, id: req.params.id },
       "PUT /tools/:id called"
@@ -113,7 +122,7 @@ router.put(
 
     const result = await updateTool(
       id,
-      req.body as Partial<ToolInput>,
+      updateData,
       req,
       versionNumber
     );
@@ -126,10 +135,23 @@ router.put(
       });
     }
 
+    if (!result.tool) {
+      logger.error({ id }, "Tool update succeeded but no tool returned");
+      return res.status(500).json({
+        success: false,
+        message: "Tool updated but failed to retrieve",
+        error: "Internal server error"
+      });
+    }
+
     logger.info({ id, newVersion: result.newVersion }, "PUT /tools/:id success");
+
+    // At this point, we know result.success is true and result.tool exists
+    const updatedTool = result.tool as Tool & { id: string };
 
     res.json({
       success: true,
+      tool: updatedTool,
       message: "Tool updated",
       version: result.newVersion
     });

@@ -1,5 +1,5 @@
-import type { UseFormRegister } from 'react-hook-form';
-import type { ToolFormData } from '../../lib/validation.js';
+import type { UseFormRegister, FieldErrors } from 'react-hook-form';
+import type { ToolFormData } from '@shared/schemas';
 import { TRACKABLE_STATUSES } from '../../types';
 import { FormField } from '../common/FormField';
 
@@ -7,6 +7,7 @@ interface TrackableFieldInputProps {
   trackableKey: 'gtm' | 'ga4' | 'google_ads' | 'msa';
   label: string;
   register: UseFormRegister<ToolFormData>;
+  errors: FieldErrors<ToolFormData>;
   versionIndex: number;
 }
 
@@ -14,6 +15,7 @@ export function TrackableFieldInput({
   trackableKey,
   label,
   register,
+  errors,
   versionIndex,
 }: TrackableFieldInputProps) {
   const statusKey = `versions.${versionIndex}.trackables.${trackableKey}.status` as const;
@@ -47,7 +49,14 @@ export function TrackableFieldInput({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField label="Example Site" id={`${trackableKey}-example-${versionIndex}`}>
+        <FormField
+          label="Example Site"
+          error={
+            errors.versions?.[versionIndex]?.trackables?.[trackableKey]?.example_site
+              ?.message
+          }
+          id={`${trackableKey}-example-${versionIndex}`}
+        >
           <input
             type="url"
             {...register(exampleSiteKey)}
@@ -56,7 +65,14 @@ export function TrackableFieldInput({
           />
         </FormField>
 
-        <FormField label="Documentation Link" id={`${trackableKey}-docs-${versionIndex}`}>
+        <FormField
+          label="Documentation Link"
+          error={
+            errors.versions?.[versionIndex]?.trackables?.[trackableKey]?.documentation
+              ?.message
+          }
+          id={`${trackableKey}-docs-${versionIndex}`}
+        >
           <input
             type="url"
             {...register(docKey)}

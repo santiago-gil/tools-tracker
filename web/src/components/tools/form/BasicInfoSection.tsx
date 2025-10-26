@@ -1,5 +1,5 @@
 import type { UseFormRegister, FieldErrors } from 'react-hook-form';
-import type { ToolFormData } from '../../../lib/validation.js';
+import type { ToolFormData } from '@shared/schemas';
 import { FormField } from '../../common/FormField';
 
 interface BasicInfoSectionProps {
@@ -22,12 +22,7 @@ export function BasicInfoSection({
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField
-          label="Platform Name"
-          required
-          error={errors.name?.message}
-          id="platform-name"
-        >
+        <FormField label="Name" required error={errors.name?.message} id="platform-name">
           <input
             {...register('name')}
             className="input-base"

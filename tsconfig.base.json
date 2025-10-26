@@ -7,6 +7,10 @@
     "esModuleInterop": true,
     "sourceMap": true,
     "baseUrl": ".",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"]
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "paths": {
+      "@shared/schemas": ["./shared/schemas"],
+      "@shared/schemas/*": ["./shared/schemas/*"]
+    }
   }
 }

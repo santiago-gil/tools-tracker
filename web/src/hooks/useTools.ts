@@ -33,7 +33,7 @@ export function useUpdateTool() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, tool, expectedVersion }: { id: string; tool: Partial<Tool>; expectedVersion?: number }) =>
+    mutationFn: ({ id, tool, expectedVersion }: { id: string; tool: Partial<Omit<Tool, 'id' | 'createdAt' | 'updatedAt' | 'updatedBy' | '_optimisticVersion'>>; expectedVersion?: number }) =>
       toolsApi.update(id, tool, expectedVersion),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['tools'] });

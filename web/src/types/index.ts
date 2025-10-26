@@ -1,153 +1,89 @@
-// types/index.ts
+/**
+ * =========================
+ * TYPES - DERIVED FROM SHARED SCHEMAS
+ * =========================
+ * 
+ * All types are now derived from the shared schemas in lib/schemas.ts
+ * This ensures consistency across the entire application.
+ */
 
-export type TrackableStatus =
-  | "Yes"
-  | "No"
-  | "Partial"
-  | "Special"
-  | "Unknown";
+// Re-export all types from shared schemas
+export {
+  // Core types
+  type TrackableStatus,
+  type UserRole,
 
-export interface TrackableField {
-  status: TrackableStatus;
-  notes?: string;
-  example_site?: string;
-  documentation?: string;
-}
+  // Data types
+  type TrackableField,
+  type Trackables,
+  type Tool,
+  type ToolVersion,
+  type User,
+  type UserInfo,
+  type UserPermissions,
+  type UserUpdate,
 
-export const TRACKABLE_STATUSES: TrackableStatus[] = [
-  "Yes",
-  "No",
-  "Partial",
-  "Special",
-  "Unknown"
-];
+  // Form types
+  type ToolFormData,
+  type VersionFormData,
 
-export interface Tool {
-  id?: string;
-  name: string;
-  category: string;
-  versions: ToolVersion[];
-  updatedAt?: string;
-  createdAt?: string;
-  updatedBy?: UserInfo;
-  _optimisticVersion?: number;
-}
+  // API response types
+  type ToolsResponse,
+  type SingleToolResponse,
+  type UsersResponse,
+  type SingleUserResponse,
+  type CreateToolResponse,
+  type UpdateToolResponse,
+  type DeleteToolResponse,
 
-export interface ToolVersion {
-  versionName: string;
-  trackables: {
-    gtm?: TrackableField;
-    ga4?: TrackableField;
-    google_ads?: TrackableField;
-    msa?: TrackableField;
-  };
-  team_considerations?: string;
-  sk_recommended: boolean;
-}
+  // Request types
+  type CreateTool,
+  type UpdateTool,
 
-export interface UserInfo {
-  uid?: string;
-  email?: string;
-  name?: string;
-}
+  // Constants
+  TRACKABLE_STATUSES,
+  ROLE_PERMISSIONS,
+} from '@shared/schemas';
 
-export type UserRole = "admin" | "ops" | "viewer";
+// Import types for use in this file
+import type {
+  User as UserType,
+  CreateTool as CreateToolType,
+  UpdateTool as UpdateToolType,
+  UserUpdate as UserUpdateType,
+} from '@shared/schemas';
 
-export interface User {
-  uid: string;
-  email: string;
-  role: UserRole;
-  permissions?: {
-    add: boolean;
-    edit: boolean;
-    delete: boolean;
-    manageUsers: boolean;
-  };
-  createdAt: string;
-  updatedAt?: string;
-  photoURL?: string;
-  displayName?: string;
-}
-
-export const ROLE_PERMISSIONS: Record<UserRole, User['permissions']> = {
-  admin: {
-    add: true,
-    edit: true,
-    delete: true,
-    manageUsers: true,
-  },
-  ops: {
-    add: true,
-    edit: true,
-    delete: false,
-    manageUsers: false,
-  },
-  viewer: {
-    add: false,
-    edit: false,
-    delete: false,
-    manageUsers: false,
-  },
+// Legacy type aliases for backward compatibility
+export type CreateToolRequest = {
+  tool: CreateToolType;
 };
 
-export interface ToolsResponse {
-  tools: Tool[];
-}
-
-export interface UsersResponse {
-  users: User[];
-}
-
-export interface UserResponse {
-  user: User;
-}
-
-export interface CreateToolResponse {
-  success: boolean;
+export type UpdateToolRequest = {
   id: string;
-  message: string;
-}
+  tool: UpdateToolType;
+};
 
-export interface UpdateToolResponse {
-  success: boolean;
-  message: string;
-  version: number;
-}
+export type CreateUserRequest = {
+  user: Omit<UserType, "uid" | "createdAt">;
+};
 
-export interface DeleteToolResponse {
-  message: string;
-}
-
-export interface CreateToolRequest {
-  tool: Omit<Tool, "id">;
-}
-
-export interface UpdateToolRequest {
-  id: string;
-  tool: Partial<Tool>;
-}
-
-export interface CreateUserRequest {
-  user: Omit<User, "uid" | "createdAt">;
-}
-
-export interface UpdateUserRequest {
+export type UpdateUserRequest = {
   uid: string;
-  user: Partial<User>;
-}
+  user: UserUpdateType;
+};
 
-export interface ErrorResponse {
+export type ErrorResponse = {
   error: string;
   message?: string;
-}
+};
 
-export interface SuccessResponse {
+export type SuccessResponse = {
   message: string;
-}
+};
 
-export interface AuthContextType {
-  user: User | null;
+export type AuthContextType = {
+  user: UserType | null;
   loading: boolean;
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
-}
+};

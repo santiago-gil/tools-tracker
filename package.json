@@ -2,6 +2,12 @@
   "name": "tools-dev",
   "version": "1.0.0",
   "scripts": {
+    "clean": "npm run clean:functions && npm run clean:web",
+    "clean:functions": "cd functions && npm run clean",
+    "clean:web": "cd web && npm run clean",
+    "build:clean": "npm run clean && npm run build:functions && npm run build:web",
+    "build:functions": "cd functions && npm run build",
+    "build:web": "cd web && npm run build",
     "test:robustness": "node scripts/test-robustness.js",
     "test:stress": "node scripts/stress-test.js",
     "test:all": "npm run test:robustness && npm run test:stress"

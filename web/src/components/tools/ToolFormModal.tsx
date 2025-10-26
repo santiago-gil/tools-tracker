@@ -6,13 +6,14 @@ import { BasicInfoSection } from './form/BasicInfoSection';
 import { VersionFormSection } from './form/VersionFormSection';
 import { TrackableFieldsSection } from './form/TrackableFieldsSection';
 import { VersionSidebar } from './VersionSidebar';
-import type { Tool } from '../../types';
+import type { Tool, ToolVersion } from '../../types';
+import type { ToolFormData } from '@shared/schemas';
 
 interface ToolFormModalProps {
   tool?: Tool | null;
   categories: string[];
   onClose: () => void;
-  onSubmit: (tool: Partial<Tool>) => void;
+  onSubmit: (tool: ToolFormData) => void;
   isSubmitting: boolean;
 }
 
@@ -41,23 +42,32 @@ export function ToolFormModal({
     onFormError,
     setValue,
     watch,
+    setError,
   } = useToolForm(tool, categories);
 
-  const onFormSubmit = (data: Partial<Tool>) => {
+  const onFormSubmit = (data: ToolFormData) => {
     // Handle custom category case - check if we're in custom category mode
     if (showCustomCategory) {
-      // Get the actual custom category value from the form
-      const customCategoryValue = data.category;
+      // Get the actual custom category value from the form and trim it once
+      const trimmed = (data.category || '').trim();
 
       // If the custom category field is empty, prevent submission
-      if (!customCategoryValue || customCategoryValue.trim() === '') {
-        console.error('Custom category is required when in custom category mode');
+      if (!trimmed) {
+        // Set field error for the category field
+        setError('category', {
+          type: 'manual',
+          message: 'Custom category name is required',
+        });
+
         return; // Prevent submission
       }
 
-      // Ensure the category value is properly trimmed
-      data.category = customCategoryValue.trim();
+      // Assign the trimmed value
+      data.category = trimmed;
     }
+
+    // Note: URL sanitization and validation is now handled by the Zod schemas
+    // No need for manual sanitization here - the schemas will transform the data
     onSubmit(data);
   };
 
@@ -85,7 +95,7 @@ export function ToolFormModal({
           {/* Sidebar (versions) - only show in edit mode */}
           {isEditing && (
             <VersionSidebar
-              versions={versions}
+              versions={versions as ToolVersion[]}
               selectedIndex={selectedVersionIdx}
               onSelectVersion={setSelectedVersionIdx}
               onAddVersion={handleAddVersion}
@@ -124,6 +134,7 @@ export function ToolFormModal({
 
                   <TrackableFieldsSection
                     register={register}
+                    errors={errors}
                     versionIndex={selectedVersionIdx}
                   />
                 </>

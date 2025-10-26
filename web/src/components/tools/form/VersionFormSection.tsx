@@ -4,7 +4,7 @@ import type {
   UseFormSetValue,
   UseFormWatch,
 } from 'react-hook-form';
-import type { ToolFormData, VersionFormData } from '../../../lib/validation.js';
+import type { ToolFormData, VersionFormData } from '@shared/schemas';
 import { FormField } from '../../common/FormField';
 import { SKRecommendedBadge } from '../../common/SKRecommendedBadge';
 
@@ -65,6 +65,7 @@ export function VersionFormSection({
       <div className="border-t pt-4">
         <FormField
           label="Web Team Considerations"
+          error={errors.versions?.[versionIndex]?.team_considerations?.message}
           id={`team-considerations-${versionIndex}`}
         >
           <textarea

@@ -3,7 +3,7 @@ import type {
   Tool,
   User,
   ToolsResponse,
-  UserResponse,
+  SingleUserResponse,
   UsersResponse,
   CreateToolResponse,
   UpdateToolResponse,
@@ -69,7 +69,7 @@ export const toolsApi = {
       method: 'POST',
       body: JSON.stringify(tool),
     }),
-  update: (id: string, tool: Partial<Tool>, expectedVersion?: number) =>
+  update: (id: string, tool: Partial<Omit<Tool, 'id' | 'createdAt' | 'updatedAt' | 'updatedBy' | '_optimisticVersion'>>, expectedVersion?: number) =>
     fetchApi<UpdateToolResponse>(`/tools/${id}`, {
       method: 'PUT',
       body: JSON.stringify(tool),
@@ -80,10 +80,10 @@ export const toolsApi = {
 };
 
 export const usersApi = {
-  getCurrent: (uid: string) => fetchApi<UserResponse>(`/users/${uid}`),
+  getCurrent: (uid: string) => fetchApi<SingleUserResponse>(`/users/${uid}`),
   getAll: () => fetchApi<UsersResponse>('/users'),
-  update: (uid: string, data: Partial<User>) =>
-    fetchApi<UserResponse>(`/users/${uid}`, {
+  update: (uid: string, data: Partial<Omit<User, 'uid' | 'createdAt' | 'updatedAt'>>) =>
+    fetchApi<SingleUserResponse>(`/users/${uid}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     }),

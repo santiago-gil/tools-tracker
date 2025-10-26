@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "build:clean": "rm -rf dist && pnpm run build",
+    "clean": "rimraf dist",
+    "build:clean": "pnpm run clean && pnpm run build",
     "deploy": "pnpm run build:clean && cd .. && firebase deploy --only hosting",
     "preview": "vite preview",
     "lint": "eslint .",
@@ -22,7 +23,7 @@
     "react-error-boundary": "^4.0.13",
     "react-hook-form": "^7.63.0",
     "react-hot-toast": "^2.4.1",
-    "zod": "^3.25.76"
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
@@ -35,6 +36,7 @@
     "eslint-plugin-react-refresh": "^0.4.14",
     "globals": "^15.11.0",
     "postcss": "^8.4.47",
+    "rimraf": "^6.0.0",
     "tailwindcss": "^3.4.14",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.11.0",

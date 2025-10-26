@@ -1,5 +1,24 @@
 import type { Tool } from "../types/Tool.js";
-import type { ToolInput } from "../utils/validate.js";
+import type { CreateTool, UpdateTool } from "../utils/validate.js";
+
+// Type for tools returned from service functions (with required ID)
+type ToolWithId = Tool & { id: string };
+
+// Type for successful update results
+type UpdateResult = {
+  success: true;
+  tool: ToolWithId;
+  newVersion: number;
+};
+
+// Type for failed update results
+type UpdateError = {
+  success: false;
+  error: string;
+  newVersion?: number;
+};
+
+type UpdateToolResult = UpdateResult | UpdateError;
 import { db } from "../utils/firebase.js";
 import type { QueryDocumentSnapshot } from "firebase-admin/firestore";
 import logger from "../utils/logger/index.js";
@@ -171,7 +190,7 @@ export async function getToolById(id: string): Promise<Tool | null> {
 /**
  * Add a new tool
  */
-export async function addTool(data: ToolInput): Promise<string> {
+export async function addTool(data: CreateTool): Promise<ToolWithId> {
   logger.info({ data }, "Adding new tool");
 
   const toolData = {
@@ -187,7 +206,11 @@ export async function addTool(data: ToolInput): Promise<string> {
   toolsCache.invalidate('all-tools');
   logger.info({ id: docRef.id }, "Tool added successfully, cache invalidated");
 
-  return docRef.id;
+  // Return the full tool object
+  return {
+    id: docRef.id,
+    ...toolData,
+  };
 }
 
 /**
@@ -195,10 +218,10 @@ export async function addTool(data: ToolInput): Promise<string> {
  */
 export async function updateTool(
   id: string,
-  data: Partial<ToolInput>,
+  data: UpdateTool,
   req?: AuthedRequest,
   expectedVersion?: number
-): Promise<{ success: boolean; newVersion?: number; error?: string }> {
+): Promise<UpdateToolResult> {
   logger.info({ id, data, expectedVersion }, "Updating tool");
 
   try {
@@ -206,7 +229,7 @@ export async function updateTool(
     if (expectedVersion !== undefined) {
       const lockResult = await verifyOptimisticLock(id, expectedVersion);
       if (!lockResult.success) {
-        return { success: false, error: lockResult.error };
+        return { success: false, error: lockResult.error || 'Optimistic lock failed' }; // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
       }
     }
 
@@ -245,7 +268,18 @@ export async function updateTool(
     toolsCache.invalidate('all-tools');
     logger.info({ id, newVersion }, "Tool updated successfully, cache invalidated");
 
-    return { success: true, newVersion };
+    // Construct updated tool object from existing data and update payload
+    const updatedTool = {
+      id,
+      ...currentTool,
+      ...updateData,
+      _optimisticVersion: newVersion,
+      // Convert Firestore Timestamps to ISO strings
+      createdAt: currentTool.createdAt ? convertToDateString(currentTool.createdAt) : undefined,
+      updatedAt: updateData.updatedAt ? convertToDateString(updateData.updatedAt) : undefined,
+    };
+
+    return { success: true, tool: updatedTool, newVersion };
   } catch (error) {
     logger.error({ error, id }, "Failed to update tool");
     return { success: false, error: 'Failed to update tool' };

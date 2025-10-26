@@ -11,15 +11,11 @@ export const UsersPage = memo(function UsersPage() {
   const deleteUser = useDeleteUser();
 
   const handleRoleChange = async (uid: string, role: UserRole) => {
-    try {
-      const newPermissions = ROLE_PERMISSIONS[role];
-      await updateUser.mutateAsync({
-        uid,
-        data: { role, permissions: newPermissions },
-      });
-    } catch (err) {
-      console.error('Failed to update user role', err);
-    }
+    const newPermissions = ROLE_PERMISSIONS[role];
+    await updateUser.mutateAsync({
+      uid,
+      data: { role, permissions: newPermissions },
+    });
   };
 
   const handleDelete = async (user: User) => {
@@ -31,11 +27,7 @@ export const UsersPage = memo(function UsersPage() {
       return;
     }
 
-    try {
-      await deleteUser.mutateAsync(user.uid);
-    } catch (err) {
-      console.error('Failed to delete user', err);
-    }
+    await deleteUser.mutateAsync(user.uid);
   };
 
   if (isLoading) {
