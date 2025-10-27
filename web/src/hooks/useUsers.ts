@@ -3,13 +3,14 @@ import { usersApi } from '../lib/api.js';
 import type { User } from '../types';
 import toast from 'react-hot-toast';
 
-export function useUsers() {
+export function useUsers(enabled = true) {
   return useQuery({
     queryKey: ['users'],
     queryFn: async () => {
       const { users } = await usersApi.getAll();
       return users;
     },
+    enabled,
   });
 }
 

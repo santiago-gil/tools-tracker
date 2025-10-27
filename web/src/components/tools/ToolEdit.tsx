@@ -55,6 +55,10 @@ export function ToolEdit() {
     null,
   );
 
+  // Track successful saves to force ToolFormModal remount with fresh data
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [justSaved, setJustSaved] = useState(false);
+
   // Dummy state for tool filtering (required by hook)
   const [searchQuery] = useState('');
   const [selectedCategory] = useState('');
@@ -69,6 +73,16 @@ export function ToolEdit() {
     selectedCategory,
     showSKRecommendedOnly: false,
   });
+
+  // Track when cache updates after a save to refresh the form
+  useEffect(() => {
+    if (!justSaved || !editingTool) return;
+
+    // Increment refresh key after the cache has updated and component has re-rendered
+    // This ensures ToolFormModal remounts with fresh cached data
+    setRefreshKey((prev) => prev + 1);
+    setJustSaved(false);
+  }, [editingTool, justSaved]);
 
   // Navigate to tool after save - runs when tools cache updates after save
   useEffect(() => {
@@ -131,6 +145,9 @@ export function ToolEdit() {
         })();
         const selectedVersion = toolData.versions[safeVersionIdx];
         const newVersionName = selectedVersion?.versionName;
+
+        // Mark that we just saved - this will trigger a refresh after cache updates
+        setJustSaved(true);
 
         // Store navigation info for after cache updates
         const categorySlug = normalizeName(toolData.category);
@@ -212,7 +229,7 @@ export function ToolEdit() {
 
   return (
     <ToolFormModal
-      key={`edit-${editingTool.id}-${versionName ?? editingTool._optimisticVersion ?? 'no-version'}`}
+      key={`edit-${editingTool.id}-${versionName ?? editingTool._optimisticVersion ?? 'no-version'}-${refreshKey}`}
       tool={editingTool}
       categories={categories}
       onClose={handleClose}

@@ -910,12 +910,15 @@
     scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
   }
 
-  html::-webkit-scrollbar {
+  /* Shared Scrollbar Base - Common properties for all scrollbars */
+  html::-webkit-scrollbar,
+  .custom-scrollbar::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
 
-  html::-webkit-scrollbar-track {
+  html::-webkit-scrollbar-track,
+  .custom-scrollbar::-webkit-scrollbar-track {
     background: transparent;
   }
 
@@ -928,36 +931,10 @@
     background: rgba(107, 114, 128, 0.7);
   }
 
-  /* Dark mode scrollbar */
-  .dark html {
-    scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
-  }
-
-  .dark html::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .dark html::-webkit-scrollbar-thumb {
-    background: rgba(75, 85, 99, 0.5);
-  }
-
-  .dark html::-webkit-scrollbar-thumb:hover {
-    background: rgba(107, 114, 128, 0.7);
-  }
-
-  /* Custom Scrollbar Styling (for specific elements) */
+  /* Custom Scrollbar - Element-specific overrides */
   .custom-scrollbar {
     scrollbar-width: thin;
     scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
@@ -972,20 +949,27 @@
     background-clip: content-box;
   }
 
+  /* Dark mode - Consolidated rules for both html and custom-scrollbar */
+  .dark html::-webkit-scrollbar-thumb,
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(75, 85, 99, 0.5);
+  }
+
+  .dark html::-webkit-scrollbar-thumb:hover,
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(107, 114, 128, 0.7);
+  }
+
+  .dark html {
+    scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
+  }
+
   .dark .custom-scrollbar {
     scrollbar-color: rgba(75, 85, 99, 0.5) rgba(17, 24, 39, 0.5);
   }
 
   .dark .custom-scrollbar::-webkit-scrollbar-track {
     background: rgba(17, 24, 39, 0.5);
-  }
-
-  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(75, 85, 99, 0.5);
-  }
-
-  .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(107, 114, 128, 0.7);
   }
 
 /* Modal body scroll lock */
