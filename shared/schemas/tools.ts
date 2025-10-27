@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { TrackablesSchema } from './trackables.js';
 import { UserInfoSchema } from './users.js';
-import { createRequiredStringField, createOptionalDateTimeField, createSlugField } from './validationUtils.js';
+import { createRequiredStringField, createOptionalDateTimeField } from './validationUtils.js';
 
 /**
  * =========================
@@ -13,15 +13,25 @@ import { createRequiredStringField, createOptionalDateTimeField, createSlugField
 
 export const ToolVersionSchema = z.object({
     versionName: createRequiredStringField(1, 100, 'Version name'),
-    slug: createSlugField(3, 200).optional(),
     trackables: TrackablesSchema,
-    // Transform empty strings to undefined so Firestore ignores them
+    // Keep empty strings as empty strings - don't transform to undefined
     team_considerations: z.string()
         .max(2000, 'Team considerations too long')
-        .transform(val => (val?.trim() ?? '') === '' ? undefined : val)
-        .optional(),
+        .default('')
+        .optional(), // Make it optional for backward compatibility with existing data
     sk_recommended: z.boolean().default(false),
 });
+
+/**
+ * Validates that all version names within a tool are unique (case-insensitive)
+ * Returns true if no duplicates, false if duplicates found
+ */
+function validateUniqueVersionNames(versions: Array<{ versionName: string }> | undefined): boolean {
+    if (!versions || versions.length === 0) return true;
+    const versionNames = versions.map(v => v.versionName.toLowerCase());
+    const uniqueNames = new Set(versionNames);
+    return uniqueNames.size === versionNames.length;
+}
 
 // Base tool schema for API input/output
 export const ToolSchema = z.object({
@@ -34,12 +44,15 @@ export const ToolSchema = z.object({
     updatedBy: UserInfoSchema.optional(),
     _optimisticVersion: z.number().int().min(0).optional(),
 
-    // Slug-related fields (added during migration)
-    normalizedName: createSlugField(1, 200).optional(),
-    _slugLastUpdated: createOptionalDateTimeField('Slug last updated'),
-    _slugMigrationVersion: z.number().int().min(0).optional(),
-    _slugMigrationDate: createOptionalDateTimeField('Slug migration date'),
-});
+    // Normalized fields for efficient lookups
+    normalizedName: z.string().optional(), // For per-category uniqueness validation
+}).refine(
+    (data) => validateUniqueVersionNames(data.versions),
+    {
+        message: 'Duplicate version names are not allowed within the same tool',
+        path: ['versions'],
+    }
+);
 
 // Tool creation schema (without id, timestamps)
 export const CreateToolSchema = ToolSchema.omit({
@@ -48,6 +61,14 @@ export const CreateToolSchema = ToolSchema.omit({
     updatedAt: true,
     updatedBy: true,
     _optimisticVersion: true,
+}).superRefine((data, ctx) => {
+    if (!validateUniqueVersionNames(data.versions)) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Duplicate version names are not allowed within the same tool',
+            path: ['versions'],
+        });
+    }
 });
 
 // Tool update schema (partial, for PUT requests)
@@ -57,9 +78,17 @@ export const UpdateToolSchema = ToolSchema.partial().omit({
     updatedAt: true,
     updatedBy: true,
     _optimisticVersion: true,
-    _slugLastUpdated: true,
-    _slugMigrationVersion: true,
-    _slugMigrationDate: true,
+}).superRefine((data, ctx) => {
+    // Only check for duplicates if versions field is being updated
+    if (data.versions && Array.isArray(data.versions)) {
+        if (!validateUniqueVersionNames(data.versions)) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Duplicate version names are not allowed within the same tool',
+                path: ['versions'],
+            });
+        }
+    }
 });
 
 // Export types

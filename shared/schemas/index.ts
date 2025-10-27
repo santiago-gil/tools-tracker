@@ -36,8 +36,8 @@ export * from './api.js';
 // Validation utilities
 export * from './validationUtils.js';
 
-// Slug utilities
-export * from './slugUtils.js';
+// String utilities
+export * from './stringUtils.js';
 
 /**
  * =========================

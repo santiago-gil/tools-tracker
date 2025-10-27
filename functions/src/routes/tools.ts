@@ -2,7 +2,7 @@ import { Router } from "express";
 import { authMiddleware, requirePerm } from "../middleware/index.js";
 import { validateBody, validateParams } from "../middleware/validate.js";
 import { refreshRateLimit } from "../middleware/security.js";
-import { checkOptimisticLock } from "../middleware/optimisticLocking.js";
+import { checkOptimisticLock, type OptimisticLockRequest } from "../middleware/optimisticLocking.js";
 import { asyncHandler } from "../middleware/asyncHandler.js";
 import { CreateToolSchema, UpdateToolSchema, idParamSchema, type CreateTool, type UpdateTool } from "../utils/validate.js";
 import type { Tool } from '../../../shared/schemas/index.js';
@@ -11,7 +11,7 @@ import {
   deleteTool,
   getToolById,
 } from "../services/index.js";
-import { updateToolWithSlugs, addToolWithSlugs, findToolBySlugDB } from "../services/toolSlugService.js";
+import { updateTool, addTool } from "../services/tools.js";
 import logger from "../utils/logger/index.js";
 import { AuthedRequest } from "../types/http.js";
 
@@ -56,56 +56,8 @@ router.get("/refresh", refreshRateLimit, asyncHandler(async (req: AuthedRequest,
   });
 }));
 
-/**
- * GET /tools/slug/:slug
- * Find tool by slug using database lookup (O(n*m) scan)
- * Note: Normal app flow uses O(1) client-side lookup via cached tools.
- * This endpoint is primarily for direct URL access or fallback scenarios.
- */
-router.get("/slug/:slug", asyncHandler(async (req: AuthedRequest, res) => {
-  const { slug } = req.params;
-
-  logger.info(
-    { uid: req.user?.uid, slug },
-    "GET /tools/slug/:slug called"
-  );
-
-  if (!slug || typeof slug !== 'string') {
-    return res.status(400).json({
-      success: false,
-      error: "Invalid slug parameter",
-      code: 'INVALID_SLUG'
-    });
-  }
-
-  try {
-    const result = await findToolBySlugDB(slug);
-
-    if (!result) {
-      logger.info({ slug }, "Tool not found by slug");
-      return res.status(404).json({
-        success: false,
-        error: "Tool not found",
-        code: 'TOOL_NOT_FOUND'
-      });
-    }
-
-    logger.info({ slug, toolId: result.tool.id }, "GET /tools/slug/:slug success");
-
-    res.json({
-      success: true,
-      tool: result.tool,
-      version: result.version
-    });
-  } catch (error) {
-    logger.error({ slug, error }, "Error in slug lookup");
-    res.status(500).json({
-      success: false,
-      error: "Internal server error",
-      code: 'INTERNAL_ERROR'
-    });
-  }
-}));
+// Note: GET /tools/slug/:slug endpoint removed with Option C (nested paths)
+// URLs are now /tools/:category/:tool with ?v=version query param
 
 /**
  * GET /tools/:id
@@ -151,7 +103,7 @@ router.post(
       "POST /tools called"
     );
 
-    const createdTool = await addToolWithSlugs(toolData);
+    const createdTool = await addTool(toolData);
     const toolWithId = createdTool as Tool & { id: string };
     logger.info({ id: toolWithId.id }, "POST /tools success");
 
@@ -174,7 +126,7 @@ router.put(
   validateParams(idParamSchema),
   validateBody(UpdateToolSchema),
   checkOptimisticLock,
-  asyncHandler(async (req: AuthedRequest, res) => {
+  asyncHandler(async (req: OptimisticLockRequest, res) => {
     // The validation middleware has already validated the body
     const updateData = req.body as UpdateTool;
 
@@ -184,21 +136,19 @@ router.put(
     );
 
     const { id } = req.params;
-    const expectedVersion = req.headers['x-expected-version'] as string;
-
-    // Parse and validate version if provided
-    let versionNumber: number | undefined;
-    if (expectedVersion) {
-      versionNumber = parseInt(expectedVersion, 10);
-      if (isNaN(versionNumber) || versionNumber < 0) {
-        return res.status(400).json({
-          error: 'Invalid version format. Version must be a non-negative integer.',
-          code: 'INVALID_VERSION_FORMAT'
-        });
-      }
+    // The checkOptimisticLock middleware has already validated and parsed the version
+    // and stored it in req.optimisticLock.expectedVersion
+    if (!req.optimisticLock) {
+      logger.error({ id }, 'Optimistic lock data missing after middleware');
+      return res.status(400).json({
+        success: false,
+        error: 'Optimistic locking data missing. Please refresh and try again.',
+        code: 'MISSING_LOCK_DATA'
+      });
     }
+    const versionNumber = req.optimisticLock.expectedVersion;
 
-    const result = await updateToolWithSlugs(
+    const result = await updateTool(
       id,
       updateData,
       req,
@@ -206,6 +156,33 @@ router.put(
     );
 
     if (!result.success) {
+      // Use structured error codes from service layer for type-safe error routing
+      // Service returns { success: false, error, errorCode } for validation errors
+      // or { success: false, error } for optimistic lock conflicts
+
+      // Check for structured error codes first (preferred approach)
+      if (result.errorCode === 'DUPLICATE_VERSION' || result.errorCode === 'FIELD_EXISTS') {
+        return res.status(400).json({
+          success: false,
+          error: result.error,
+          code: 'VALIDATION_ERROR'
+        });
+      }
+
+      // Fallback: type-safe string check for backwards compatibility
+      // This guards against calling includes() on non-strings
+      if (typeof result.error === 'string' && (
+        result.error.includes('Duplicate version names') ||
+        result.error.includes('already exists')
+      )) {
+        return res.status(400).json({
+          success: false,
+          error: result.error,
+          code: 'VALIDATION_ERROR'
+        });
+      }
+
+      // All other errors are treated as optimistic lock conflicts (HTTP 409)
       return res.status(409).json({
         error: result.error,
         code: 'OPTIMISTIC_LOCK_CONFLICT',
@@ -213,18 +190,9 @@ router.put(
       });
     }
 
-    if (!result.tool) {
-      logger.error({ id }, "Tool update succeeded but no tool returned");
-      return res.status(500).json({
-        success: false,
-        message: "Tool updated but failed to retrieve",
-        error: "Internal server error"
-      });
-    }
-
     logger.info({ id, newVersion: result.newVersion }, "PUT /tools/:id success");
 
-    // At this point, we know result.success is true and result.tool exists
+    // At this point, TypeScript guarantees result.success is true and result.tool exists
     const updatedTool = result.tool as Tool & { id: string };
 
     res.json({

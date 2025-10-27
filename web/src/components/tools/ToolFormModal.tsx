@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
 import { useToolForm } from '../../hooks/useToolForm';
 import { FormHeader } from './form/FormHeader';
 import { BasicInfoSection } from './form/BasicInfoSection';
@@ -12,8 +12,10 @@ interface ToolFormModalProps {
   tool?: Tool | null;
   categories: string[];
   onClose: () => void;
-  onSubmit: (tool: ToolFormData) => void;
+  onSubmit: (tool: ToolFormData, versionIdx?: number) => void;
   isSubmitting: boolean;
+  initialVersionName?: string | null;
+  onVersionSelect?: (versionName: string) => void;
 }
 
 export function ToolFormModal({
@@ -22,8 +24,19 @@ export function ToolFormModal({
   onClose,
   onSubmit,
   isSubmitting,
+  initialVersionName,
+  onVersionSelect,
 }: ToolFormModalProps) {
   const isEditing = !!tool;
+
+  // Find initial version index if versionName is provided
+  const initialVersionIdx = useMemo(() => {
+    if (initialVersionName && tool) {
+      const idx = tool.versions.findIndex((v) => v.versionName === initialVersionName);
+      return idx >= 0 ? idx : 0;
+    }
+    return 0;
+  }, [initialVersionName, tool]);
 
   const {
     register,
@@ -43,6 +56,26 @@ export function ToolFormModal({
     watch,
     setError,
   } = useToolForm(tool, categories);
+
+  // Override selected version with URL version if provided
+  useEffect(() => {
+    if (initialVersionName && initialVersionIdx !== selectedVersionIdx) {
+      setSelectedVersionIdx(initialVersionIdx);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialVersionIdx]);
+
+  // Update URL when version is selected in edit mode
+  const handleVersionChange = useCallback(
+    (idx: number) => {
+      setSelectedVersionIdx(idx);
+      // Update URL to reflect selected version
+      if (onVersionSelect && versions[idx]) {
+        onVersionSelect(versions[idx].versionName);
+      }
+    },
+    [versions, setSelectedVersionIdx, onVersionSelect],
+  );
 
   const onFormSubmit = (data: ToolFormData) => {
     // Handle custom category case - check if we're in custom category mode
@@ -67,7 +100,7 @@ export function ToolFormModal({
 
     // Note: URL sanitization and validation is now handled by the Zod schemas
     // No need for manual sanitization here - the schemas will transform the data
-    onSubmit(data);
+    onSubmit(data, selectedVersionIdx);
   };
 
   // Lock body scroll when modal is open
@@ -99,9 +132,10 @@ export function ToolFormModal({
           {/* Sidebar (versions) - only show in edit mode */}
           {isEditing && (
             <VersionSidebar
+              key={`sidebar-${selectedVersionIdx}-${versions.length}`}
               versions={versions as ToolVersion[]}
               selectedIndex={selectedVersionIdx}
-              onSelectVersion={setSelectedVersionIdx}
+              onSelectVersion={handleVersionChange}
               onAddVersion={handleAddVersion}
               onRemoveVersion={handleRemoveVersion}
             />

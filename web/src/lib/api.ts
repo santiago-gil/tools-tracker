@@ -1,7 +1,6 @@
 import { auth } from './firebase';
 import type {
   Tool,
-  ToolVersion,
   User,
   ToolsResponse,
   SingleToolResponse,
@@ -20,6 +19,62 @@ class ApiError extends Error {
     this.name = 'ApiError';
     this.status = status;
   }
+}
+
+/**
+ * Extracts an error message from API error data using a fallback chain.
+ * Tries multiple strategies to get the most informative error message.
+ */
+function extractErrorMessage(errorData: unknown, response: Response): string {
+  // Try direct error property
+  let errorMessage = (errorData && typeof errorData === 'object' && 'error' in errorData)
+    ? (errorData as { error?: string }).error
+    : undefined;
+
+  // Try validation errors array
+  if (!errorMessage && errorData && typeof errorData === 'object' && 'errors' in errorData) {
+    const errors = (errorData as { errors?: unknown[] }).errors;
+    if (Array.isArray(errors)) {
+      // Get the most relevant error message (usually the first one)
+      const firstError = errors[0];
+      if (firstError && typeof firstError === 'object') {
+        if ('message' in firstError && typeof firstError.message === 'string') {
+          errorMessage = firstError.message;
+        } else if ('path' in firstError) {
+          const path = (firstError as { path?: unknown }).path;
+          let field: string;
+
+          if (Array.isArray(path)) {
+            // Check if all elements are string or number
+            if (path.every(elem => typeof elem === 'string' || typeof elem === 'number')) {
+              field = path.join('.');
+            } else {
+              // Try to safely represent the array
+              try {
+                field = JSON.stringify(path);
+              } catch {
+                field = String(path);
+              }
+            }
+          } else if (typeof path === 'string') {
+            field = path;
+          } else {
+            // For objects or other types, produce a safe representation
+            try {
+              field = JSON.stringify(path);
+            } catch {
+              field = path !== null && path !== undefined ? String(path) : 'unknown';
+            }
+          }
+
+          errorMessage = `Validation failed on ${field}`;
+        }
+      }
+    }
+  }
+
+  // Fallback to generic message
+  return errorMessage || `HTTP ${response.status}: ${response.statusText}`;
 }
 
 
@@ -103,14 +158,11 @@ async function fetchApi<T>(endpoint: string, options: RequestInit = {}, retryCou
 
   try {
     const url = `/api${endpoint}`;
-    console.log('[API] Request:', { method: options?.method || 'GET', url, endpoint });
 
     const response = await fetch(url, {
       ...options,
       headers,
     });
-
-    console.log('[API] Response:', { status: response.status, statusText: response.statusText, url });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -136,10 +188,9 @@ async function fetchApi<T>(endpoint: string, options: RequestInit = {}, retryCou
           return fetchApi<T>(endpoint, options, retryCount + 1, true);
         }
 
-        // Don't retry other client errors (400, 404, 422, etc.)
         throw new ApiError(
           response.status,
-          errorData.error || `HTTP ${response.status}: ${response.statusText}`,
+          extractErrorMessage(errorData, response),
         );
       }
 
@@ -152,7 +203,7 @@ async function fetchApi<T>(endpoint: string, options: RequestInit = {}, retryCou
 
       throw new ApiError(
         response.status,
-        errorData.error || `HTTP ${response.status}: ${response.statusText}`,
+        extractErrorMessage(errorData, response),
       );
     }
 
@@ -184,7 +235,6 @@ export const toolsApi = {
   getAll: () => fetchApi<ToolsResponse>('/tools'),
   getById: (id: string) => fetchApi<SingleToolResponse>(`/tools/${id}`),
   refresh: () => fetchApi<ToolsResponse>('/tools/refresh'),
-  findBySlug: (slug: string) => fetchApi<{ success: boolean; tool: Tool; version: ToolVersion }>(`/tools/slug/${slug}`),
   create: (tool: Omit<Tool, 'id' | 'createdAt' | 'updatedAt' | 'updatedBy'>) =>
     fetchApi<CreateToolResponse>('/tools', {
       method: 'POST',

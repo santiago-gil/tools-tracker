@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
+import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
@@ -10,6 +11,10 @@ const __dirname = path.dirname(__filename);
 
 export default defineConfig({
   plugins: [
+    tanstackRouter({
+      target: 'react',
+      autoCodeSplitting: true, // Enable automatic code splitting
+    }),
     react(),
     svgr({
       svgrOptions: {

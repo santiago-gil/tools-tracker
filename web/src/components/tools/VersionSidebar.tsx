@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { FilePlus2, X } from 'lucide-react';
 import { Badge } from '../common/Badge';
 import type { ToolVersion, TrackableStatus } from '../../types';
@@ -23,13 +23,13 @@ interface TrackablesAnalysis {
   hasAny: boolean;
 }
 
-export function VersionSidebar({
+const VersionSidebarComponent = ({
   versions,
   selectedIndex,
   onSelectVersion,
   onAddVersion,
   onRemoveVersion,
-}: VersionSidebarProps) {
+}: VersionSidebarProps): JSX.Element => {
   // Create stable keys for versions based on versionName and index
   const versionKeys = useMemo(() => {
     return versions.map(
@@ -107,8 +107,8 @@ export function VersionSidebar({
                     ? 'badge-holographic border-2 border-[var(--sk-red)] shadow-lg shadow-purple-200 dark:shadow-purple-900/50'
                     : 'border-2 border-[var(--sk-red)]'
                   : version.sk_recommended
-                  ? 'badge-holographic hover:badge-holographic'
-                  : 'hover:ring-1 hover:ring-gray-300 dark:hover:ring-gray-600 hover:ring-offset-1 hover:ring-offset-gray-50 dark:hover:ring-offset-gray-800'
+                    ? 'badge-holographic hover:badge-holographic'
+                    : 'hover:ring-1 hover:ring-gray-300 dark:hover:ring-gray-600 hover:ring-offset-1 hover:ring-offset-gray-50 dark:hover:ring-offset-gray-800'
               }`}
             >
               <div className="flex items-start justify-between gap-2">
@@ -174,4 +174,72 @@ export function VersionSidebar({
       </div>
     </div>
   );
+};
+
+// Helper function to safely compare trackables objects
+// Compares only the status field for each trackable key
+function compareTrackables(
+  prev: ToolVersion['trackables'],
+  next: ToolVersion['trackables'],
+): boolean {
+  // Derive the set of keys dynamically from both prev and next
+  const prevKeys = Object.keys(prev || {}) as Array<keyof typeof prev>;
+  const nextKeys = Object.keys(next || {}) as Array<keyof typeof next>;
+  const allKeys = Array.from(new Set([...prevKeys, ...nextKeys]));
+
+  // Compare status for each key, treating missing entries as undefined
+  for (const key of allKeys) {
+    const prevStatus = prev?.[key]?.status;
+    const nextStatus = next?.[key]?.status;
+
+    if (prevStatus !== nextStatus) {
+      return false;
+    }
+  }
+
+  return true;
 }
+
+export const VersionSidebar = React.memo(
+  VersionSidebarComponent,
+  (prevProps, nextProps) => {
+    // Custom comparison function
+    // Note: Callback props (onSelectVersion, onAddVersion, onRemoveVersion) should be
+    // memoized in the parent component using useCallback for optimal re-render prevention
+    const callbacksEqual =
+      prevProps.onSelectVersion === nextProps.onSelectVersion &&
+      prevProps.onAddVersion === nextProps.onAddVersion &&
+      prevProps.onRemoveVersion === nextProps.onRemoveVersion;
+
+    if (!callbacksEqual) {
+      return false;
+    }
+
+    const selectedIndexEqual = prevProps.selectedIndex === nextProps.selectedIndex;
+
+    if (!selectedIndexEqual) {
+      return false;
+    }
+
+    if (prevProps.versions.length !== nextProps.versions.length) {
+      return false;
+    }
+
+    return prevProps.versions.every((v, idx) => {
+      const nextVersion = nextProps.versions[idx];
+      if (!nextVersion) {
+        return false;
+      }
+
+      const basicPropsEqual =
+        v.versionName === nextVersion.versionName &&
+        v.sk_recommended === nextVersion.sk_recommended;
+
+      if (!basicPropsEqual) {
+        return false;
+      }
+
+      return compareTrackables(v.trackables, nextVersion.trackables);
+    });
+  },
+);

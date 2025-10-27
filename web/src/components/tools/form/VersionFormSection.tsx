@@ -43,6 +43,7 @@ export function VersionFormSection({
           {...register(`versions.${versionIndex}.versionName`)}
           className="input-base"
           placeholder="e.g., v1, v2, 2024+, Beta, etc."
+          autoComplete="off"
         />
       </FormField>
 

@@ -23,13 +23,11 @@ export function TrackableFieldsSection({
 }: TrackableFieldsSectionProps) {
   return (
     <div className="space-y-4 border-t border-[var(--border-light)] pt-4">
-      <h4 className="text-base font-semibold text-primary">
-        Tracking Capabilities
-      </h4>
+      <h4 className="text-base font-semibold text-primary">Tracking Capabilities</h4>
 
       {trackableKeys.map((key) => (
         <TrackableFieldInput
-          key={key}
+          key={`${key}-${versionIndex}`}
           trackableKey={key}
           label={trackableLabels[key]}
           register={register}

@@ -1,17 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import type { Tool, ToolVersion } from '../../types';
+import type { Tool } from '../../types';
 import { ToolRowHeader } from './ToolRowHeader';
 import { ToolRowExpanded } from './ToolRowExpanded';
-
-// Check if a version has expandable content
-const hasExpandableContent = (version: ToolVersion): boolean => {
-  const hasTeamConsiderations = !!version?.team_considerations;
-  const hasTrackableContent = Object.entries(version?.trackables || {}).some(
-    ([, trackable]) =>
-      trackable?.notes || trackable?.example_site || trackable?.documentation,
-  );
-  return hasTeamConsiderations || hasTrackableContent;
-};
 
 interface ToolRowProps {
   tool: Tool;
@@ -21,6 +11,7 @@ interface ToolRowProps {
   onVersionSelect: (versionIdx: number) => void;
   onEdit: () => void;
   onDelete: () => void;
+  isNavigatedTo?: boolean; // Whether this tool was navigated to via URL
 }
 
 export function ToolRow({
@@ -31,6 +22,7 @@ export function ToolRow({
   onVersionSelect,
   onEdit,
   onDelete,
+  isNavigatedTo = false,
 }: ToolRowProps) {
   const [isInteracting, setIsInteracting] = useState(false);
   const toolRowRef = useRef<HTMLDivElement>(null);
@@ -48,18 +40,38 @@ export function ToolRow({
     propSelectedVersionIdx >= 0 && propSelectedVersionIdx < tool.versions.length;
   const currentVersion = isValidIndex ? tool.versions[propSelectedVersionIdx] : undefined;
 
-  const isExpandable = currentVersion ? hasExpandableContent(currentVersion) : false;
+  // Note: `hasExpandableContent` check removed - we don't auto-collapse anymore
+  // to allow navigation to tools without expandable content
 
-  // Collapse if switching to a version without expandable content
+  // Note: Removed auto-collapse logic - navigation via URL should work for all tools,
+  // regardless of whether they have expandable content or not. The URL navigation will
+  // select the correct version and scroll to the tool, even if it's not expandable.
+
+  // Scroll to tool if it was navigated to via URL (regardless of expandability)
   useEffect(() => {
-    if (!isExpandable && isExpanded) {
-      onToggleExpanded();
+    if (isNavigatedTo && toolRowRef.current) {
+      const element = toolRowRef.current;
+      // Small delay to ensure DOM is fully rendered
+      const id = window.setTimeout(() => {
+        if (element) {
+          element.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'nearest',
+          });
+        }
+      }, 100);
+
+      // Cleanup: clear timeout on unmount or when isNavigatedTo changes
+      return () => {
+        clearTimeout(id);
+      };
     }
-  }, [isExpandable, isExpanded, onToggleExpanded]);
+  }, [isNavigatedTo]);
 
-  // Scroll to expanded tool if it's not in viewport
+  // Scroll to expanded tool if it's not in viewport (for click-based expansion)
   useEffect(() => {
-    if (isExpanded && toolRowRef.current) {
+    if (isExpanded && !isNavigatedTo && toolRowRef.current) {
       const element = toolRowRef.current;
       const rect = element.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
@@ -73,7 +85,7 @@ export function ToolRow({
         });
       }
     }
-  }, [isExpanded]);
+  }, [isExpanded, isNavigatedTo]);
 
   // Safety check for versions array
   if (!tool.versions || tool.versions.length === 0) {
@@ -98,7 +110,7 @@ export function ToolRow({
         currentVersion={currentVersion}
         selectedVersionIdx={propSelectedVersionIdx}
         expanded={isExpanded}
-        onToggleExpanded={isExpandable ? onToggleExpanded : undefined}
+        onToggleExpanded={onToggleExpanded}
         onVersionSelect={handleVersionSelect}
         onEdit={() => {
           setIsInteracting(true);

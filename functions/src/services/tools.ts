@@ -1,5 +1,5 @@
 import type { Tool, CreateTool, UpdateTool } from '../../../shared/schemas/index.js';
-import { normalizeName } from '../../../shared/schemas/slugUtils.js';
+import { normalizeName } from '../../../shared/schemas/stringUtils.js';
 
 // Type for tools returned from service functions (with required ID)
 type ToolWithId = Tool & { id: string };
@@ -11,10 +11,11 @@ type UpdateResult = {
   newVersion: number;
 };
 
-// Type for failed update results
+// Type for failed update results with structured error codes
 type UpdateError = {
   success: false;
   error: string;
+  errorCode?: string;
   newVersion?: number;
 };
 
@@ -31,6 +32,16 @@ import dayjs from 'dayjs';
 
 // Use tools collection from config
 const toolsCol = db.collection(COLLECTIONS.TOOLS);
+
+/**
+ * Normalize versions to ensure team_considerations is always a string
+ */
+function normalizeVersions<T extends { team_considerations?: string | null | undefined }>(versions: T[]): Array<T & { team_considerations: string }> {
+  return versions.map(version => ({
+    ...version,
+    team_considerations: version.team_considerations ?? ''
+  }));
+}
 
 /**
  * Convert various date formats to ISO string using dayjs
@@ -92,9 +103,13 @@ export async function getAllTools(forceRefresh = false): Promise<Tool[]> {
           data._optimisticVersion = 0;
         }
 
+        // Ensure team_considerations is always a string for consistency
+        const normalizedVersions = normalizeVersions(data.versions);
+
         return {
           id: d.id,
           ...data,
+          versions: normalizedVersions,
           // Convert Firestore Timestamps to ISO strings
           createdAt: data.createdAt ? convertToDateString(data.createdAt) : undefined,
           updatedAt: data.updatedAt ? convertToDateString(data.updatedAt) : undefined,
@@ -191,15 +206,16 @@ export async function getToolById(id: string): Promise<Tool | null> {
 export async function addTool(data: CreateTool): Promise<ToolWithId> {
   logger.info({ data }, "Adding new tool");
 
-  // Check for duplicate tool names
+  // Check for duplicate tool names within the same category (case-insensitive)
   const normalizedName = normalizeName(data.name);
   const existingTools = await toolsCol
+    .where('category', '==', data.category)
     .where('normalizedName', '==', normalizedName)
     .get();
 
   if (!existingTools.empty) {
     const existingTool = existingTools.docs[0].data();
-    throw new Error(`Tool with name "${existingTool.name}" already exists. Please use a different name.`);
+    throw new Error(`Tool with name "${existingTool.name}" already exists in the "${data.category}" category. Please use a different name.`);
   }
 
   // Check for duplicate version names within tool
@@ -210,12 +226,16 @@ export async function addTool(data: CreateTool): Promise<ToolWithId> {
     throw new Error('Duplicate version names are not allowed within the same tool');
   }
 
+  // Normalize team_considerations before writing to ensure consistency
+  const normalizedVersions = normalizeVersions(data.versions);
+
   const toolData = {
     ...data,
     normalizedName, // Store normalized name for efficient queries
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     _optimisticVersion: 0, // Initialize version for new tools
+    versions: normalizedVersions,
   };
 
   const docRef = await toolsCol.add(toolData);
@@ -224,7 +244,7 @@ export async function addTool(data: CreateTool): Promise<ToolWithId> {
   toolsCache.invalidate('all-tools');
   logger.info({ id: docRef.id }, "Tool added successfully, cache invalidated");
 
-  // Return the full tool object
+  // Return the tool object constructed from docRef.id plus the normalized data
   return {
     id: docRef.id,
     ...toolData,
@@ -258,8 +278,51 @@ export async function updateTool(
     }
     const currentTool = currentToolDoc.data() as Tool;
 
+    // Merge with incoming data for validation
+    const mergedData = {
+      ...currentTool,
+      ...data,
+    };
+
+    // Check for duplicate tool names within the same category if name is changing
+    const nameChanged = data.name !== undefined && data.name !== currentTool.name;
+    if (nameChanged && data.name !== undefined) {
+      const newNormalizedName = normalizeName(data.name);
+      const category = currentTool.category; // Use existing category from the tool
+      const existingTools = await toolsCol
+        .where('category', '==', category)
+        .where('normalizedName', '==', newNormalizedName)
+        .get();
+
+      // Check if any OTHER tool (not this one) has this name in the same category
+      const conflictingTool = existingTools.docs.find(doc => doc.id !== id);
+      if (conflictingTool) {
+        const conflictingToolData = conflictingTool.data();
+        return {
+          success: false,
+          error: `Tool with name "${conflictingToolData.name}" already exists in the "${category}" category. Please use a different name.`,
+          errorCode: 'FIELD_EXISTS'
+        };
+      }
+    }
+
+    // Check for duplicate version names if versions are being updated
+    if (data.versions && Array.isArray(data.versions)) {
+      const versionNames = data.versions.map(v => v.versionName.toLowerCase());
+      const uniqueNames = new Set(versionNames);
+
+      if (uniqueNames.size !== versionNames.length) {
+        return {
+          success: false,
+          error: 'Duplicate version names are not allowed within the same tool',
+          errorCode: 'DUPLICATE_VERSION'
+        };
+      }
+    }
+
     const updateData = {
       ...data,
+      ...(nameChanged && { normalizedName: normalizeName(mergedData.name) }),
       updatedAt: new Date().toISOString(),
     };
 
@@ -286,15 +349,27 @@ export async function updateTool(
     toolsCache.invalidate('all-tools');
     logger.info({ id, newVersion }, "Tool updated successfully, cache invalidated");
 
-    // Construct updated tool object from existing data and update payload
+    // Read fresh tool data from Firestore to ensure we have the exact structure
+    const freshToolDoc = await toolsCol.doc(id).get();
+
+    if (!freshToolDoc.exists) {
+      return { success: false, error: 'Tool not found after update' };
+    }
+
+    const freshToolData = freshToolDoc.data() as Tool;
+
+    // Ensure team_considerations is always a string for consistency
+    const normalizedVersions = normalizeVersions(freshToolData.versions);
+
+    // Construct updated tool object from fresh data
     const updatedTool = {
       id,
-      ...currentTool,
-      ...updateData,
+      ...freshToolData,
+      versions: normalizedVersions,
       _optimisticVersion: newVersion,
       // Convert Firestore Timestamps to ISO strings
-      createdAt: currentTool.createdAt ? convertToDateString(currentTool.createdAt) : undefined,
-      updatedAt: updateData.updatedAt ? convertToDateString(updateData.updatedAt) : undefined,
+      createdAt: freshToolData.createdAt ? convertToDateString(freshToolData.createdAt) : undefined,
+      updatedAt: freshToolData.updatedAt ? convertToDateString(freshToolData.updatedAt) : undefined,
     };
 
     return { success: true, tool: updatedTool, newVersion };

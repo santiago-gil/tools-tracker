@@ -17,6 +17,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   // Listen for auth state changes across browser tabs
   useEffect(() => {
@@ -69,6 +70,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             // Only update if this is still the current request
             if (requestId === currentRequestId) {
+              // Clear any previous errors on successful auth
+              setError(null);
               // Merge Firebase Auth data with Firestore user data
               setUser({
                 ...firestoreUser,
@@ -88,6 +91,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               // If user document doesn't exist (404), it will be created by the backend trigger
               // For other errors, we should sign out to prevent showing stale data
               if (statusCode !== 404) {
+                // Set error state for authentication failures
+                setError(error instanceof Error ? error : new Error(String(error)));
                 // Sign out on auth errors or other failures
                 setFirebaseUser(null);
                 setUser(null);
@@ -100,6 +105,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } else {
           // Only update if this is still the current request
           if (requestId === currentRequestId) {
+            // Clear error when user signs out
+            setError(null);
             setUser(null);
           }
         }
@@ -154,7 +161,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ firebaseUser, user, loading, signInWithGoogle, signOut }}
+      value={{ firebaseUser, user, loading, error, signInWithGoogle, signOut }}
     >
       {children}
     </AuthContext.Provider>

@@ -1,9 +1,19 @@
+import { useEffect } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../../hooks/useAuth';
 import { CrownLogo } from '../layout/CrownLogo';
 import { DarkModeToggle } from '../common/DarkModeToggle';
 
 export function SignInPage() {
-  const { signInWithGoogle, loading } = useAuth();
+  const { signInWithGoogle, loading, user } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect to tools after successful sign-in
+  useEffect(() => {
+    if (!loading && user) {
+      navigate({ to: '/tools', replace: true });
+    }
+  }, [user, loading, navigate]);
 
   // Note: The router's beforeLoad hook handles redirecting authenticated users to /tools
   // This component only renders if user is not authenticated

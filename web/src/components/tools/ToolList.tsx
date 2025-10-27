@@ -1,5 +1,11 @@
 import { useState, useMemo, useEffect, memo, useCallback } from 'react';
-import { useRouter, useLocation } from '@tanstack/react-router';
+import {
+  useRouter,
+  useLocation,
+  useParams,
+  useSearch,
+  Outlet,
+} from '@tanstack/react-router';
 import { ToolRow } from './ToolRow';
 import { ToolFormModal } from './ToolFormModal';
 import { ToolFilters } from './ToolFilters';
@@ -16,9 +22,20 @@ import {
 import { useAuth } from '../../hooks/useAuth';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useToolFiltering } from '../../hooks/useToolFiltering';
-import { useSlugLookup, findToolBySlug, createSlug } from '../../utils/slugUtils';
+import {
+  useToolLookup,
+  findToolByUrlKey,
+  createToolUrlKey,
+} from '../../utils/toolLookup';
+import { normalizeName } from '@shared/schemas/stringUtils';
 import type { Tool } from '../../types';
 import type { ToolFormData } from '@shared/schemas';
+
+type PendingNavigation = {
+  category: string;
+  tool: string;
+  version?: string;
+};
 
 export const ToolList = memo(function ToolList() {
   const { user } = useAuth();
@@ -30,39 +47,47 @@ export const ToolList = memo(function ToolList() {
 
   const router = useRouter();
   const pathname = useLocation({ select: (l) => l.pathname });
+  const params = useParams({ strict: false }); // Use params from router
+  const searchParams = useSearch({ strict: false }); // Use search params from router
 
-  // Create O(1) slug lookup map with automatic cache invalidation
-  const slugLookupMap = useSlugLookup(tools || []);
+  // Get category and tool from route params (only present in /tools/$category/$tool route)
+  const category = params.category;
+  const toolName = params.tool;
+  const versionName = searchParams.v;
 
-  // Extract toolSlug from URL for optimized lookup
-  const toolSlug =
-    pathname.startsWith('/tools/') && pathname !== '/tools'
-      ? pathname.split('/')[2]
-      : null;
+  // Create O(1) tool lookup map for large datasets (250-500+ tools)
+  const toolLookupMap = useToolLookup(tools || []);
 
-  // Get expanded tool ID from URL params using O(1) client-side lookup
+  // Build URL key for lookup
+  const urlKey = useMemo(() => {
+    if (category && toolName) {
+      return createToolUrlKey(category, toolName);
+    }
+    return null;
+  }, [category, toolName]);
+
+  // Get expanded tool ID from URL params using O(1) lookup
   const expandedToolId = useMemo(() => {
-    if (toolSlug && tools) {
-      const result = findToolBySlug(slugLookupMap, toolSlug);
+    if (urlKey && tools) {
+      const result = findToolByUrlKey(toolLookupMap, urlKey);
       return result?.tool.id || null;
     }
     return null;
-  }, [toolSlug, tools, slugLookupMap]);
+  }, [urlKey, tools, toolLookupMap]);
 
-  // Get selected version index for the expanded tool
+  // Get selected version index for the expanded tool from search params
   const selectedVersionIdx = useMemo(() => {
-    if (toolSlug && tools) {
-      const result = findToolBySlug(slugLookupMap, toolSlug);
-      if (result) {
-        // Find the version index that matches the slug
-        const versionIdx = result.tool.versions.findIndex(
-          (v) => v.versionName === result.version.versionName,
-        );
-        return versionIdx >= 0 ? versionIdx : 0;
+    if (expandedToolId && tools && versionName) {
+      const tool = tools.find((t) => t.id === expandedToolId);
+      if (tool) {
+        const versionIdx = tool.versions.findIndex((v) => v.versionName === versionName);
+        if (versionIdx >= 0) {
+          return versionIdx;
+        }
       }
     }
     return 0; // Default to first version
-  }, [toolSlug, tools, slugLookupMap]);
+  }, [expandedToolId, tools, versionName]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -77,6 +102,38 @@ export const ToolList = memo(function ToolList() {
     [],
   );
   const modifierKey = useMemo(() => (isMac ? '⌘' : 'Ctrl'), [isMac]);
+
+  // Track pending navigation after save
+  const [pendingNavigation, setPendingNavigation] = useState<PendingNavigation | null>(
+    null,
+  );
+
+  // Navigate to tool after save - runs when tools cache updates after save
+  useEffect(() => {
+    if (!pendingNavigation || !tools) return;
+
+    const {
+      category: categorySlug,
+      tool: toolSlug,
+      version: versionSlug,
+    } = pendingNavigation;
+
+    // Build URL key and check if it exists in lookup map
+    const urlKey = createToolUrlKey(categorySlug, toolSlug);
+    const result = findToolByUrlKey(toolLookupMap, urlKey);
+
+    if (result) {
+      // Navigate to the updated tool
+      router.navigate({
+        to: '/tools/$category/$tool',
+        params: { category: categorySlug, tool: toolSlug },
+        search: versionSlug ? { v: versionSlug } : undefined,
+      });
+
+      // Reset pending navigation
+      setPendingNavigation(null);
+    }
+  }, [pendingNavigation, tools, toolLookupMap, router]);
 
   // Add keyboard shortcut for search (Ctrl+K / Cmd+K)
   useEffect(() => {
@@ -98,18 +155,30 @@ export const ToolList = memo(function ToolList() {
   // Debounce search query to improve performance
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
-  // Handle invalid slugs - redirect to /tools if slug doesn't match any tool
+  // Handle invalid URLs - redirect to /tools if category/tool doesn't match any tool
   useEffect(() => {
     if (
       pathname.startsWith('/tools/') &&
       pathname !== '/tools' &&
       tools &&
-      expandedToolId === null
+      expandedToolId === null &&
+      !isLoading && // Don't redirect while still loading
+      category &&
+      toolName // Only check if we have both parts
     ) {
-      // Invalid slug - redirect to /tools
+      // Invalid category/tool - redirect to /tools
       router.navigate({ to: '/tools' });
     }
-  }, [expandedToolId, tools, router, pathname]);
+  }, [
+    expandedToolId,
+    tools,
+    router,
+    pathname,
+    isLoading,
+    category,
+    toolName,
+    toolLookupMap,
+  ]);
 
   // Extract filtering logic into custom hook
   const { categories, filteredTools } = useToolFiltering({
@@ -120,7 +189,7 @@ export const ToolList = memo(function ToolList() {
   });
 
   const handleSubmit = useCallback(
-    async (toolData: ToolFormData) => {
+    async (toolData: ToolFormData, versionIdx?: number) => {
       // Backend will handle sanitization and validation
       try {
         if (editingTool?.id) {
@@ -134,7 +203,21 @@ export const ToolList = memo(function ToolList() {
             >,
             expectedVersion: editingTool._optimisticVersion || 0,
           });
-          setEditingTool(null);
+
+          // Store navigation info for after cache updates
+          const categorySlug = normalizeName(toolData.category);
+          const toolSlug = normalizeName(toolData.name);
+
+          // Get the new version name from the form data (which may have been renamed)
+          // Use the version index to find the correct version
+          const selectedVersion = toolData.versions?.[versionIdx ?? 0]?.versionName;
+
+          setPendingNavigation({
+            category: categorySlug,
+            tool: toolSlug,
+            ...(selectedVersion && { version: selectedVersion }),
+          });
+          setEditingTool(null); // Close modal immediately
         } else {
           await createTool.mutateAsync(
             toolData as Omit<Tool, 'id' | 'createdAt' | 'updatedAt' | 'updatedBy'>,
@@ -149,7 +232,7 @@ export const ToolList = memo(function ToolList() {
         }
       }
     },
-    [editingTool?.id, editingTool?._optimisticVersion, updateTool, createTool],
+    [editingTool, updateTool, createTool],
   );
 
   const handleDelete = useCallback(
@@ -195,9 +278,22 @@ export const ToolList = memo(function ToolList() {
     setShowAddModal(true);
   }, []);
 
-  const handleEditTool = useCallback((tool: Tool) => {
-    setEditingTool(tool);
-  }, []);
+  const handleEditTool = useCallback(
+    (tool: Tool) => {
+      // Navigate to edit route instead of opening modal
+      if (tool.id) {
+        const categorySlug = normalizeName(tool.category);
+        const toolSlug = normalizeName(tool.name);
+
+        router.navigate({
+          to: '/tools/$category/$tool/edit',
+          params: { category: categorySlug, tool: toolSlug },
+          search: versionName ? { v: versionName } : undefined,
+        });
+      }
+    },
+    [router, versionName],
+  );
 
   const handleCloseModal = useCallback(() => {
     setShowAddModal(false);
@@ -210,36 +306,16 @@ export const ToolList = memo(function ToolList() {
         // Collapse - navigate to /tools
         router.navigate({ to: '/tools' });
       } else {
-        // Expand - navigate to /tools/{toolSlug}
+        // Expand - navigate to /tools/{category}/{tool}
         const tool = tools?.find((t) => t.id === toolId);
         if (tool) {
-          // Use stored slug from versions array (inline structure matching production)
-          if (tool.versions.length > 0) {
-            const firstVersion = tool.versions[0];
+          const categorySlug = normalizeName(tool.category);
+          const toolSlug = normalizeName(tool.name);
 
-            // Use inline slug from version if available
-            if (firstVersion.slug) {
-              router.navigate({
-                to: '/tools/$toolSlug',
-                params: { toolSlug: firstVersion.slug },
-              });
-              return;
-            }
-          }
-
-          // Fallback: create slug if not available in stored data
-          try {
-            if (tool.versions.length > 0) {
-              const toolSlug = createSlug(tool.name, tool.versions[0].versionName);
-              router.navigate({ to: '/tools/$toolSlug', params: { toolSlug } });
-            } else {
-              const toolSlug = createSlug(tool.name, 'default');
-              router.navigate({ to: '/tools/$toolSlug', params: { toolSlug } });
-            }
-          } catch (error) {
-            console.error('Failed to create slug:', error);
-            router.navigate({ to: '/tools' });
-          }
+          router.navigate({
+            to: '/tools/$category/$tool',
+            params: { category: categorySlug, tool: toolSlug },
+          });
         }
       }
     },
@@ -251,15 +327,15 @@ export const ToolList = memo(function ToolList() {
     (toolId: string, versionIdx: number) => {
       const tool = tools?.find((t) => t.id === toolId);
       if (tool && tool.versions.length > versionIdx) {
-        try {
-          const version = tool.versions[versionIdx];
-          const toolSlug = createSlug(tool.name, version.versionName);
+        const categorySlug = normalizeName(tool.category);
+        const toolSlug = normalizeName(tool.name);
 
-          // Update URL immediately, even if tool is not expanded
-          router.navigate({ to: '/tools/$toolSlug', params: { toolSlug } });
-        } catch (error) {
-          console.error('Failed to create slug for version selection:', error);
-        }
+        // Update URL immediately, even if tool is not expanded
+        router.navigate({
+          to: '/tools/$category/$tool',
+          params: { category: categorySlug, tool: toolSlug },
+          search: { v: tool.versions[versionIdx].versionName },
+        });
       }
     },
     [router, tools],
@@ -268,6 +344,12 @@ export const ToolList = memo(function ToolList() {
   const handleClearSearch = useCallback(() => {
     setSearchQuery('');
   }, []);
+
+  // Check if we're on the edit route - if so, render outlet (let edit route handle it)
+  const isEditRoute = pathname.endsWith('/edit');
+  if (isEditRoute) {
+    return <Outlet />;
+  }
 
   if (error) {
     return (
@@ -410,6 +492,7 @@ export const ToolList = memo(function ToolList() {
                   tool={tool}
                   isExpanded={expandedToolId === tool.id}
                   selectedVersionIdx={expandedToolId === tool.id ? selectedVersionIdx : 0}
+                  isNavigatedTo={expandedToolId === tool.id && urlKey !== null}
                   onToggleExpanded={() => handleToggleExpanded(tool.id)}
                   onVersionSelect={(versionIdx) =>
                     handleVersionSelect(tool.id, versionIdx)
@@ -422,8 +505,14 @@ export const ToolList = memo(function ToolList() {
         )}
       </div>
 
+      {/* Show modal for add or edit */}
       {(showAddModal || editingTool) && (
         <ToolFormModal
+          key={
+            editingTool
+              ? `${editingTool.id}-${editingTool._optimisticVersion ?? 'no-version'}`
+              : 'new-tool'
+          }
           tool={editingTool}
           categories={categories}
           onClose={handleCloseModal}

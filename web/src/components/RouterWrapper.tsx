@@ -4,16 +4,17 @@ import { useAuth } from '../hooks/useAuth';
 import { router } from '../router';
 
 export function RouterWrapper() {
-  const { user, loading } = useAuth();
+  const { user, loading, error } = useAuth();
 
   const context = useMemo(
     () => ({
       auth: {
         user,
         loading,
+        error,
       },
     }),
-    [user, loading],
+    [user, loading, error],
   );
 
   return <RouterProvider router={router} context={context} />;

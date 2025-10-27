@@ -231,55 +231,6 @@ function createApiDocument() {
                         },
                     },
                 },
-                '/tools/slug/{slug}': {
-                    get: {
-                        summary: 'Find tool by slug',
-                        description: 'Lookup a tool and version by URL-friendly slug (format: tool-name--version-name)',
-                        tags: ['Tools'],
-                        security: [{ BearerAuth: [] }],
-                        parameters: [
-                            {
-                                name: 'slug',
-                                in: 'path',
-                                required: true,
-                                schema: {
-                                    type: 'string',
-                                },
-                                description: 'URL-friendly slug (e.g., "google-analytics--ga4")',
-                            },
-                        ],
-                        responses: {
-                            '200': {
-                                description: 'Tool and version found',
-                                content: {
-                                    'application/json': {
-                                        schema: z.object({
-                                            success: z.boolean(),
-                                            tool: toolSchema,
-                                            version: toolVersionSchema,
-                                        }),
-                                    },
-                                },
-                            },
-                            '404': {
-                                description: 'Tool not found',
-                                content: {
-                                    'application/json': {
-                                        schema: ErrorResponseSchema,
-                                    },
-                                },
-                            },
-                            '400': {
-                                description: 'Invalid slug format',
-                                content: {
-                                    'application/json': {
-                                        schema: ErrorResponseSchema,
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
                 '/tools/{id}': {
                     get: {
                         summary: 'Get tool by ID',

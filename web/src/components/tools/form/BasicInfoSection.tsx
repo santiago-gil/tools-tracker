@@ -27,6 +27,7 @@ export function BasicInfoSection({
             {...register('name')}
             className="input-base"
             placeholder="e.g., HubSpot Chat"
+            autoComplete="organization"
           />
         </FormField>
 
@@ -41,6 +42,7 @@ export function BasicInfoSection({
               {...register('category')}
               onChange={(e) => onCategoryChange(e.target.value)}
               className="input-base"
+              autoComplete="organization-title"
             >
               <option value="">Select a category...</option>
               {categories.map((cat) => (
@@ -57,6 +59,7 @@ export function BasicInfoSection({
                 className="input-base"
                 placeholder="Enter new category name..."
                 autoFocus
+                autoComplete="organization-title"
               />
               <button
                 type="button"

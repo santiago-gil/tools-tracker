@@ -26,8 +26,11 @@ export function useCreateTool() {
           // If cache is empty, keep it empty to avoid showing incomplete state
           // (there may be other tools in the database not yet in cache)
           if (!oldTools) return undefined;
+
           // Append the new tool to the list
-          return [...oldTools, response.tool];
+          const updatedTools = [...oldTools, response.tool];
+
+          return updatedTools;
         });
       }
 
@@ -47,8 +50,9 @@ export function useUpdateTool() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, tool, expectedVersion }: { id: string; tool: Partial<Omit<Tool, 'id' | 'createdAt' | 'updatedAt' | 'updatedBy' | '_optimisticVersion'>>; expectedVersion?: number }) =>
-      toolsApi.update(id, tool, expectedVersion),
+    mutationFn: ({ id, tool, expectedVersion }: { id: string; tool: Partial<Omit<Tool, 'id' | 'createdAt' | 'updatedAt' | 'updatedBy' | '_optimisticVersion'>>; expectedVersion?: number }) => {
+      return toolsApi.update(id, tool, expectedVersion);
+    },
     onSuccess: (response) => {
       // Update cache immediately with the updated tool from server
       if (response.success && response.tool) {

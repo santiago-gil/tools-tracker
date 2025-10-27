@@ -6,6 +6,7 @@ export interface AuthContextValue {
     firebaseUser: FirebaseUser | null;
     user: User | null;
     loading: boolean;
+    error: Error | null;
     signInWithGoogle: () => Promise<void>;
     signOut: () => Promise<void>;
 }

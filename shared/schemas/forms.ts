@@ -15,10 +15,10 @@ import { createRequiredStringFieldNoTrim } from './validationUtils.js';
 export const VersionFormSchema = z.object({
     versionName: createRequiredStringFieldNoTrim(1, 100, 'Version name'),
     trackables: TrackablesSchema,
-    // Allow null so we can distinguish "empty" from "don't update" in partial updates
+    // Keep empty strings as empty strings
     team_considerations: z.string()
         .max(2000, 'Team considerations too long')
-        .nullable()
+        .default('')
         .optional(),
     sk_recommended: z.boolean(),
 });
