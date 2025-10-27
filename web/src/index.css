@@ -448,7 +448,7 @@
 
   /* Interactive elevation changes */
   .elevation-interactive {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .elevation-interactive:hover {
@@ -490,8 +490,9 @@
   /* Button System - Independent sizing */
   .btn-primary {
     background: linear-gradient(135deg, rgba(220, 38, 38, 0.9) 0%, rgba(185, 28, 28, 0.9) 100%);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    /* Reduced blur for better performance */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border: 1px solid rgba(220, 38, 38, 0.3);
     color: white;
     font-weight: 500;
@@ -530,8 +531,9 @@
   /* Google Login Button - Glass Effect */
   .btn-google-glass {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    /* Reduced blur for better performance */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.3);
     color: var(--text-primary);
     font-weight: 500;
@@ -580,8 +582,9 @@
 
   .btn-secondary {
     background: rgba(248, 250, 252, 0.8);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    /* Reduced blur for better performance */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     color: var(--text-secondary);
     border: 1px solid rgba(203, 213, 225, 0.3);
     font-weight: 500;
@@ -771,8 +774,9 @@
     font-size: 0.75rem;
     border: 1px solid;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    /* Reduced blur for better performance */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
@@ -811,14 +815,15 @@
       rgba(59, 130, 246, 0.12) 50%, 
       rgba(16, 185, 129, 0.12) 75%, 
       rgba(168, 85, 247, 0.12) 100%);
+    /* Only animate when user hovers to avoid constant CPU usage */
     background-size: 400% 400%;
     animation: holographic-shift 6s ease-in-out infinite;
     border-color: rgba(168, 85, 247, 0.5);
     box-shadow: 
       0 0 6px rgba(168, 85, 247, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    /* Only hint GPU when animation is active */
     will-change: background-position;
-    transform: translateZ(0);
   }
 
   /* Dark mode - simple by default */
@@ -852,7 +857,6 @@
       0 0 8px rgba(168, 85, 247, 0.3),
       inset 0 1px 0 rgba(255, 255, 255, 0.15);
     will-change: background-position;
-    transform: translateZ(0);
   }
 
   @keyframes holographic-shift {
@@ -885,7 +889,7 @@
 
   /* Category Filter Buttons */
   .filter-btn {
-    @apply px-3 py-2 rounded-md font-medium transition-all duration-200 active:scale-95 border;
+    @apply px-3 py-2 rounded-md font-medium transition-colors duration-200 active:scale-95 border;
   }
 
   .filter-btn-active {

@@ -129,21 +129,28 @@ export function ToolEdit() {
 
         // Get the new version name from the form data (which may have been renamed)
         // Use the version index to find the correct version
-        // Validate and clamp versionIdx to prevent undefined access
-        // Defaults to 0 if versions array is empty or index is invalid (negative, non-integer, or out-of-range)
-        const safeVersionIdx = (() => {
-          if (!toolData.versions || toolData.versions.length === 0) return 0;
-          if (versionIdx === undefined || versionIdx === null) return 0;
-          if (
-            !Number.isInteger(versionIdx) ||
-            versionIdx < 0 ||
-            versionIdx >= toolData.versions.length
-          ) {
-            return 0;
+        // Handle empty versions array explicitly
+        const selectedVersion = (() => {
+          // If no versions array or it's empty, return undefined
+          if (!toolData.versions || toolData.versions.length === 0) {
+            return undefined;
           }
-          return versionIdx;
+
+          // Validate and clamp versionIdx to prevent undefined access
+          // Default to 0 only when versions exist and index is invalid
+          let safeVersionIdx = 0;
+          if (versionIdx !== undefined && versionIdx !== null) {
+            if (
+              Number.isInteger(versionIdx) &&
+              versionIdx >= 0 &&
+              versionIdx < toolData.versions.length
+            ) {
+              safeVersionIdx = versionIdx;
+            }
+          }
+
+          return toolData.versions[safeVersionIdx];
         })();
-        const selectedVersion = toolData.versions[safeVersionIdx];
         const newVersionName = selectedVersion?.versionName;
 
         // Mark that we just saved - this will trigger a refresh after cache updates

@@ -32,11 +32,12 @@ export function useCreateTool() {
 
           return updatedTools;
         });
-      }
 
-      // Note: No immediate invalidateQueries to avoid race condition
-      // where background refetch might overwrite the fresh response.tool.
-      // React Query will refetch on window focus or other triggers.
+        // Invalidate the query to ensure all components using it re-render with fresh data
+        // This is important because staleTime might prevent re-renders even after cache updates
+        // Set refetch: false to prevent background refetch since we already have fresh data
+        queryClient.invalidateQueries({ queryKey: ['tools'], refetchType: 'none' });
+      }
 
       toast.success(response.message || 'Tool created successfully');
     },
@@ -72,11 +73,12 @@ export function useUpdateTool() {
             return [...oldTools, response.tool];
           }
         });
-      }
 
-      // Note: No immediate invalidateQueries to avoid race condition
-      // where background refetch might overwrite the fresh response.tool.
-      // React Query will refetch on window focus or other triggers.
+        // Invalidate the query to ensure all components using it re-render with fresh data
+        // This is important because staleTime might prevent re-renders even after cache updates
+        // Set refetch: false to prevent background refetch since we already have fresh data
+        queryClient.invalidateQueries({ queryKey: ['tools'], refetchType: 'none' });
+      }
 
       toast.success(response.message || 'Tool updated successfully');
     },
@@ -99,11 +101,12 @@ export function useDeleteTool() {
           // Remove the deleted tool from the list
           return oldTools.filter((t) => t.id !== deletedId);
         });
-      }
 
-      // Note: No immediate invalidateQueries to avoid race condition
-      // where background refetch might overwrite the fresh tools list.
-      // React Query will refetch on window focus or other triggers.
+        // Invalidate the query to ensure all components using it re-render with fresh data
+        // This is important because staleTime might prevent re-renders even after cache updates
+        // Set refetch: false to prevent background refetch since we already have fresh data
+        queryClient.invalidateQueries({ queryKey: ['tools'], refetchType: 'none' });
+      }
 
       toast.success(response.message || 'Tool deleted successfully');
     },

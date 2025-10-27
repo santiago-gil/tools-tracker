@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect } from 'react';
 import type { Tool } from '../../types';
 import { ToolRowHeader } from './ToolRowHeader';
 import { ToolRowExpanded } from './ToolRowExpanded';
@@ -24,16 +24,8 @@ export function ToolRow({
   onDelete,
   isNavigatedTo = false,
 }: ToolRowProps) {
-  const [isInteracting, setIsInteracting] = useState(false);
   const toolRowRef = useRef<HTMLDivElement>(null);
-
-  // Handle version selection - notify parent only
-  const handleVersionSelect = useCallback(
-    (versionIdx: number) => {
-      onVersionSelect(versionIdx);
-    },
-    [onVersionSelect],
-  );
+  const hasScrolledRef = useRef(false);
 
   // Validate propSelectedVersionIdx and compute currentVersion safely
   const isValidIndex =
@@ -49,23 +41,22 @@ export function ToolRow({
 
   // Scroll to tool if it was navigated to via URL (regardless of expandability)
   useEffect(() => {
-    if (isNavigatedTo && toolRowRef.current) {
+    if (isNavigatedTo && toolRowRef.current && !hasScrolledRef.current) {
       const element = toolRowRef.current;
-      // Small delay to ensure DOM is fully rendered
-      const id = window.setTimeout(() => {
-        if (element) {
-          element.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-            inline: 'nearest',
-          });
-        }
-      }, 100);
+      hasScrolledRef.current = true;
 
-      // Cleanup: clear timeout on unmount or when isNavigatedTo changes
-      return () => {
-        clearTimeout(id);
-      };
+      // Wait for next animation frame to avoid blocking initial render
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (element) {
+            element.scrollIntoView({
+              behavior: 'auto',
+              block: 'center',
+              inline: 'nearest',
+            });
+          }
+        });
+      });
     }
   }, [isNavigatedTo]);
 
@@ -73,17 +64,26 @@ export function ToolRow({
   useEffect(() => {
     if (isExpanded && !isNavigatedTo && toolRowRef.current) {
       const element = toolRowRef.current;
-      const rect = element.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
 
-      // Check if the element is not fully visible
-      if (rect.bottom > viewportHeight || rect.top < 0) {
-        element.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-          inline: 'nearest',
-        });
-      }
+      // Use minimal timeout to avoid blocking render
+      const timeoutId = window.setTimeout(() => {
+        if (!element) return;
+
+        // Use getBoundingClientRect only when necessary
+        const rect = element.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+
+        // Only scroll if element is truly out of view
+        if (rect.bottom > viewportHeight || rect.top < 0) {
+          element.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+            inline: 'nearest',
+          });
+        }
+      }, 0); // Defer until after current call stack clears
+
+      return () => clearTimeout(timeoutId);
     }
   }, [isExpanded, isNavigatedTo]);
 
@@ -99,9 +99,9 @@ export function ToolRow({
   return (
     <div
       ref={toolRowRef}
-      className={`card elevation-2 elevation-interactive transition-all duration-200 ${
+      className={`card elevation-2 elevation-interactive transition-colors duration-200 ${
         isExpanded ? 'expanded' : 'overflow-hidden'
-      } ${isInteracting ? 'elevation-maintained' : ''}`}
+      }`}
       role="article"
       aria-label={`Tool: ${tool.name}`}
     >
@@ -111,16 +111,12 @@ export function ToolRow({
         selectedVersionIdx={propSelectedVersionIdx}
         expanded={isExpanded}
         onToggleExpanded={onToggleExpanded}
-        onVersionSelect={handleVersionSelect}
+        onVersionSelect={onVersionSelect}
         onEdit={() => {
-          setIsInteracting(true);
           onEdit();
-          setTimeout(() => setIsInteracting(false), 200);
         }}
         onDelete={() => {
-          setIsInteracting(true);
           onDelete();
-          setTimeout(() => setIsInteracting(false), 200);
         }}
       />
 

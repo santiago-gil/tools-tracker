@@ -101,7 +101,7 @@ const VersionSidebarComponent = ({
               key={versionKeys[idx]}
               onClick={() => onSelectVersion(idx)}
               type="button"
-              className={`w-full text-left p-2 rounded-lg transition-all duration-200 min-h-[60px] elevation-1 ${
+              className={`w-full text-left p-2 rounded-lg transition-colors duration-200 min-h-[60px] elevation-1 ${
                 selectedIndex === idx
                   ? version.sk_recommended
                     ? 'badge-holographic border-2 border-[var(--sk-red)] shadow-lg shadow-purple-200 dark:shadow-purple-900/50'

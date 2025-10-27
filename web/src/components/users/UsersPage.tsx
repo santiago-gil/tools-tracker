@@ -6,6 +6,8 @@ import { ConfirmDialog } from '../common/ConfirmDialog';
 import type { User, UserRole } from '../../types';
 import { ROLE_PERMISSIONS } from '../../types';
 import { getButtonClasses } from '../../utils/buttonVariants';
+import { logError } from '../../utils/errorLogging';
+import toast from 'react-hot-toast';
 
 export const UsersPage = memo(function UsersPage() {
   const { auth } = useRouteContext({ from: '/_authenticated/users' });
@@ -40,16 +42,28 @@ export const UsersPage = memo(function UsersPage() {
     });
   };
 
-  const handleDelete = async (user: User) => {
+  const handleDelete = (user: User) => {
     setPendingUser(user);
     setShowDeleteConfirm(true);
   };
 
   const handleConfirmDelete = async () => {
     if (pendingUser) {
-      await deleteUser.mutateAsync(pendingUser.uid);
-      setShowDeleteConfirm(false);
-      setPendingUser(null);
+      try {
+        await deleteUser.mutateAsync(pendingUser.uid);
+        setShowDeleteConfirm(false);
+        setPendingUser(null);
+      } catch (error) {
+        console.error('Failed to delete user:', error);
+        toast.error(error instanceof Error ? error.message : 'Failed to delete user');
+        // Log error in production for monitoring
+        logError(error, {
+          action: 'delete_user',
+          userId: pendingUser.uid,
+          email: pendingUser.email,
+        });
+        // Keep modal open to allow retry or cancel
+      }
     }
   };
 
@@ -120,7 +134,7 @@ export const UsersPage = memo(function UsersPage() {
                         onChange={(e) =>
                           handleRoleChange(user.uid, e.target.value as UserRole)
                         }
-                        disabled={updateUser.isPending || user.role === 'admin'} // prevent demotion of self
+                        disabled={updateUser.isPending || user.uid === auth.user?.uid} // prevent demotion of self
                         className="text-sm rounded-lg transition-all duration-200 focus:ring-2 focus:ring-[var(--sk-red)] focus:ring-offset-2 bg-surface-1 border-[var(--border-light)] text-primary"
                       >
                         <option value="viewer">Viewer</option>
@@ -169,6 +183,7 @@ export const UsersPage = memo(function UsersPage() {
           onConfirm={handleConfirmDelete}
           onCancel={handleCancelDelete}
           isDestructive
+          isLoading={deleteUser.isPending}
         />
       )}
     </>
