@@ -11,8 +11,11 @@ import './index.css';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
+      staleTime: 1000 * 60 * 2, // 2 minutes - reduced for better concurrent editing
+      gcTime: 1000 * 60 * 10, // 10 minutes - keep data in cache longer (v5: gcTime replaces cacheTime)
       retry: 1,
+      refetchOnWindowFocus: true, // Refetch when user returns to tab to see concurrent changes
+      refetchOnMount: true, // Refetch stale data on mount to surface concurrent edits from other users
     },
   },
 });

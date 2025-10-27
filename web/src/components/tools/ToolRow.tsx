@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { memo, useRef, useEffect } from 'react';
 import type { Tool } from '../../types';
 import { ToolRowHeader } from './ToolRowHeader';
 import { ToolRowExpanded } from './ToolRowExpanded';
@@ -14,7 +14,7 @@ interface ToolRowProps {
   isNavigatedTo?: boolean; // Whether this tool was navigated to via URL
 }
 
-export function ToolRow({
+function ToolRowComponent({
   tool,
   isExpanded,
   selectedVersionIdx: propSelectedVersionIdx,
@@ -112,12 +112,8 @@ export function ToolRow({
         expanded={isExpanded}
         onToggleExpanded={onToggleExpanded}
         onVersionSelect={onVersionSelect}
-        onEdit={() => {
-          onEdit();
-        }}
-        onDelete={() => {
-          onDelete();
-        }}
+        onEdit={onEdit}
+        onDelete={onDelete}
       />
 
       {/* Expanded Details */}
@@ -131,3 +127,8 @@ export function ToolRow({
     </div>
   );
 }
+
+export const ToolRow = memo(ToolRowComponent);
+
+// Set display name for better React DevTools debugging
+ToolRow.displayName = 'ToolRow';

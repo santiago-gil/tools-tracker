@@ -345,6 +345,41 @@ export const ToolList = memo(function ToolList() {
     setSearchQuery('');
   }, []);
 
+  // Create stable callback references for each tool to support memoization
+  const toolCallbacks = useMemo(() => {
+    if (!filteredTools) return new Map();
+
+    const callbacks = new Map<
+      string,
+      {
+        onToggleExpanded: () => void;
+        onVersionSelect: (versionIdx: number) => void;
+        onEdit: () => void;
+        onDelete: () => void;
+      }
+    >();
+
+    filteredTools
+      .filter((tool): tool is Tool & { id: string } => Boolean(tool.id))
+      .forEach((tool) => {
+        callbacks.set(tool.id, {
+          onToggleExpanded: () => handleToggleExpanded(tool.id),
+          onVersionSelect: (versionIdx: number) =>
+            handleVersionSelect(tool.id, versionIdx),
+          onEdit: () => handleEditTool(tool),
+          onDelete: () => handleDelete(tool),
+        });
+      });
+
+    return callbacks;
+  }, [
+    filteredTools,
+    handleToggleExpanded,
+    handleVersionSelect,
+    handleEditTool,
+    handleDelete,
+  ]);
+
   // Check if we're on the edit route - if so, render outlet (let edit route handle it)
   const isEditRoute = pathname.endsWith('/edit');
   if (isEditRoute) {
@@ -486,21 +521,26 @@ export const ToolList = memo(function ToolList() {
           <div>
             {filteredTools
               .filter((tool): tool is Tool & { id: string } => Boolean(tool.id)) // Type guard to ensure tool.id is defined
-              .map((tool) => (
-                <ToolRow
-                  key={tool.id}
-                  tool={tool}
-                  isExpanded={expandedToolId === tool.id}
-                  selectedVersionIdx={expandedToolId === tool.id ? selectedVersionIdx : 0}
-                  isNavigatedTo={expandedToolId === tool.id && urlKey !== null}
-                  onToggleExpanded={() => handleToggleExpanded(tool.id)}
-                  onVersionSelect={(versionIdx) =>
-                    handleVersionSelect(tool.id, versionIdx)
-                  }
-                  onEdit={() => handleEditTool(tool)}
-                  onDelete={() => handleDelete(tool)}
-                />
-              ))}
+              .map((tool) => {
+                const callbacks = toolCallbacks.get(tool.id);
+                if (!callbacks) return null;
+
+                return (
+                  <ToolRow
+                    key={tool.id}
+                    tool={tool}
+                    isExpanded={expandedToolId === tool.id}
+                    selectedVersionIdx={
+                      expandedToolId === tool.id ? selectedVersionIdx : 0
+                    }
+                    isNavigatedTo={expandedToolId === tool.id && urlKey !== null}
+                    onToggleExpanded={callbacks.onToggleExpanded}
+                    onVersionSelect={callbacks.onVersionSelect}
+                    onEdit={callbacks.onEdit}
+                    onDelete={callbacks.onDelete}
+                  />
+                );
+              })}
           </div>
         )}
       </div>

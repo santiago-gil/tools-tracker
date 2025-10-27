@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import type { ToolVersion } from '../../types';
 import { sanitizeUrl } from '../../utils/urlValidation';
 import { createHtmlId } from '../../utils/htmlId';
@@ -51,7 +52,7 @@ interface ToolRowExpandedProps {
   versionIdx: number;
 }
 
-export function ToolRowExpanded({
+function ToolRowExpandedComponent({
   currentVersion,
   toolId,
   versionIdx,
@@ -130,3 +131,6 @@ export function ToolRowExpanded({
     </div>
   );
 }
+
+export const ToolRowExpanded = memo(ToolRowExpandedComponent);
+ToolRowExpanded.displayName = 'ToolRowExpanded';

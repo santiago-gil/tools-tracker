@@ -1,8 +1,8 @@
+import { memo, useRef } from 'react';
 import { Badge } from '../common/Badge';
 import { SKRecommendedBadge } from '../common/SKRecommendedBadge';
 import type { Tool, ToolVersion } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
-import { useRef } from 'react';
 import { getButtonClasses } from '../../utils/buttonVariants';
 
 /**
@@ -37,7 +37,7 @@ interface ToolRowHeaderProps {
   onDelete: () => void;
 }
 
-export function ToolRowHeader({
+function ToolRowHeaderComponent({
   tool,
   currentVersion,
   selectedVersionIdx,
@@ -250,3 +250,5 @@ export function ToolRowHeader({
     </div>
   );
 }
+
+export const ToolRowHeader = memo(ToolRowHeaderComponent);

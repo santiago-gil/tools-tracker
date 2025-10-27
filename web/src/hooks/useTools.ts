@@ -19,6 +19,10 @@ export function useCreateTool() {
   return useMutation({
     mutationFn: (tool: Omit<Tool, 'id' | 'createdAt' | 'updatedAt' | 'updatedBy'>) =>
       toolsApi.create(tool),
+    onMutate: () => {
+      // Cancel any outgoing refetches
+      queryClient.cancelQueries({ queryKey: ['tools'] });
+    },
     onSuccess: (response) => {
       // Update cache immediately with the new tool from server
       if (response.success && response.tool) {
@@ -32,11 +36,6 @@ export function useCreateTool() {
 
           return updatedTools;
         });
-
-        // Invalidate the query to ensure all components using it re-render with fresh data
-        // This is important because staleTime might prevent re-renders even after cache updates
-        // Set refetch: false to prevent background refetch since we already have fresh data
-        queryClient.invalidateQueries({ queryKey: ['tools'], refetchType: 'none' });
       }
 
       toast.success(response.message || 'Tool created successfully');
@@ -53,6 +52,10 @@ export function useUpdateTool() {
   return useMutation({
     mutationFn: ({ id, tool, expectedVersion }: { id: string; tool: Partial<Omit<Tool, 'id' | 'createdAt' | 'updatedAt' | 'updatedBy' | '_optimisticVersion'>>; expectedVersion?: number }) => {
       return toolsApi.update(id, tool, expectedVersion);
+    },
+    onMutate: () => {
+      // Cancel any outgoing refetches
+      queryClient.cancelQueries({ queryKey: ['tools'] });
     },
     onSuccess: (response) => {
       // Update cache immediately with the updated tool from server
@@ -73,11 +76,6 @@ export function useUpdateTool() {
             return [...oldTools, response.tool];
           }
         });
-
-        // Invalidate the query to ensure all components using it re-render with fresh data
-        // This is important because staleTime might prevent re-renders even after cache updates
-        // Set refetch: false to prevent background refetch since we already have fresh data
-        queryClient.invalidateQueries({ queryKey: ['tools'], refetchType: 'none' });
       }
 
       toast.success(response.message || 'Tool updated successfully');
@@ -93,6 +91,10 @@ export function useDeleteTool() {
 
   return useMutation({
     mutationFn: (id: string) => toolsApi.delete(id),
+    onMutate: () => {
+      // Cancel any outgoing refetches
+      queryClient.cancelQueries({ queryKey: ['tools'] });
+    },
     onSuccess: (response, deletedId) => {
       // Update cache immediately by removing the deleted tool
       if (response.success) {
@@ -101,11 +103,6 @@ export function useDeleteTool() {
           // Remove the deleted tool from the list
           return oldTools.filter((t) => t.id !== deletedId);
         });
-
-        // Invalidate the query to ensure all components using it re-render with fresh data
-        // This is important because staleTime might prevent re-renders even after cache updates
-        // Set refetch: false to prevent background refetch since we already have fresh data
-        queryClient.invalidateQueries({ queryKey: ['tools'], refetchType: 'none' });
       }
 
       toast.success(response.message || 'Tool deleted successfully');
