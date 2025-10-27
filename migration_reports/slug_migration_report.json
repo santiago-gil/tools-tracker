@@ -1,0 +1,10 @@
+{
+  "timestamp": "2025-10-26T05:49:44.615Z",
+  "totalTools": 139,
+  "processed": 129,
+  "skipped": 10,
+  "errors": [],
+  "migrationProgress": 100,
+  "lookupSuccessRate": 100,
+  "success": true
+}

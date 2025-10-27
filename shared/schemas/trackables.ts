@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { TrackableStatusSchema } from './core';
-import { createUrlSchema } from './validationUtils';
+import { TrackableStatusSchema } from './core.js';
+import { createUrlSchema } from './validationUtils.js';
 
 /**
  * =========================
@@ -14,8 +14,8 @@ import { createUrlSchema } from './validationUtils';
 export const TrackableFieldSchema = z.object({
     status: TrackableStatusSchema,
     notes: z.string().max(1000).optional(),
-    example_site: createUrlSchema('example site URL').optional(),
-    documentation: createUrlSchema('documentation URL').optional(),
+    example_site: createUrlSchema().optional(),
+    documentation: createUrlSchema().optional(),
 });
 
 export const TrackablesSchema = z.object({

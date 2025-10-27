@@ -5,13 +5,13 @@ import { refreshRateLimit } from "../middleware/security.js";
 import { checkOptimisticLock } from "../middleware/optimisticLocking.js";
 import { asyncHandler } from "../middleware/asyncHandler.js";
 import { CreateToolSchema, UpdateToolSchema, idParamSchema, type CreateTool, type UpdateTool } from "../utils/validate.js";
-import { type Tool } from "../types/Tool.js";
+import type { Tool } from '../../../shared/schemas/index.js';
 import {
   getAllTools,
-  addTool,
-  updateTool,
   deleteTool,
+  getToolById,
 } from "../services/index.js";
+import { updateToolWithSlugs, addToolWithSlugs, findToolBySlugDB } from "../services/toolSlugService.js";
 import logger from "../utils/logger/index.js";
 import { AuthedRequest } from "../types/http.js";
 
@@ -57,6 +57,84 @@ router.get("/refresh", refreshRateLimit, asyncHandler(async (req: AuthedRequest,
 }));
 
 /**
+ * GET /tools/slug/:slug
+ * Find tool by slug using database lookup (O(n*m) scan)
+ * Note: Normal app flow uses O(1) client-side lookup via cached tools.
+ * This endpoint is primarily for direct URL access or fallback scenarios.
+ */
+router.get("/slug/:slug", asyncHandler(async (req: AuthedRequest, res) => {
+  const { slug } = req.params;
+
+  logger.info(
+    { uid: req.user?.uid, slug },
+    "GET /tools/slug/:slug called"
+  );
+
+  if (!slug || typeof slug !== 'string') {
+    return res.status(400).json({
+      success: false,
+      error: "Invalid slug parameter",
+      code: 'INVALID_SLUG'
+    });
+  }
+
+  try {
+    const result = await findToolBySlugDB(slug);
+
+    if (!result) {
+      logger.info({ slug }, "Tool not found by slug");
+      return res.status(404).json({
+        success: false,
+        error: "Tool not found",
+        code: 'TOOL_NOT_FOUND'
+      });
+    }
+
+    logger.info({ slug, toolId: result.tool.id }, "GET /tools/slug/:slug success");
+
+    res.json({
+      success: true,
+      tool: result.tool,
+      version: result.version
+    });
+  } catch (error) {
+    logger.error({ slug, error }, "Error in slug lookup");
+    res.status(500).json({
+      success: false,
+      error: "Internal server error",
+      code: 'INTERNAL_ERROR'
+    });
+  }
+}));
+
+/**
+ * GET /tools/:id
+ * Get a single tool by ID (always fresh, bypasses cache for individual tool)
+ */
+router.get("/:id", validateParams(idParamSchema), asyncHandler(async (req: AuthedRequest, res) => {
+  const { id } = req.params;
+
+  logger.info(
+    { uid: req.user?.uid, role: req.user?.role, id },
+    "GET /tools/:id called"
+  );
+
+  const tool = await getToolById(id);
+
+  if (!tool) {
+    logger.warn({ id }, "Tool not found");
+    return res.status(404).json({
+      success: false,
+      error: "Tool not found",
+      code: 'TOOL_NOT_FOUND'
+    });
+  }
+
+  logger.info({ id }, "GET /tools/:id success");
+  res.json({ success: true, tool });
+}));
+
+/**
  * POST /tools
  * Create a new tool
  */
@@ -73,7 +151,7 @@ router.post(
       "POST /tools called"
     );
 
-    const createdTool = await addTool(toolData);
+    const createdTool = await addToolWithSlugs(toolData);
     const toolWithId = createdTool as Tool & { id: string };
     logger.info({ id: toolWithId.id }, "POST /tools success");
 
@@ -120,7 +198,7 @@ router.put(
       }
     }
 
-    const result = await updateTool(
+    const result = await updateToolWithSlugs(
       id,
       updateData,
       req,

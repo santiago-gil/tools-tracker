@@ -1,10 +1,11 @@
 import { useState, useMemo, useEffect, memo, useCallback } from 'react';
+import { useRouter, useLocation } from '@tanstack/react-router';
 import { ToolRow } from './ToolRow';
 import { ToolFormModal } from './ToolFormModal';
 import { ToolFilters } from './ToolFilters';
 import { LoadingSpinner } from '../common/LoadingSpinner';
-import { DynamicVirtualizedList } from '../common/DynamicVirtualizedList';
 import { SKRecommendedBadge } from '../common/SKRecommendedBadge';
+import { X, RefreshCw, ListPlus } from 'lucide-react';
 import {
   useTools,
   useCreateTool,
@@ -15,6 +16,7 @@ import {
 import { useAuth } from '../../hooks/useAuth';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useToolFiltering } from '../../hooks/useToolFiltering';
+import { useSlugLookup, findToolBySlug, createSlug } from '../../utils/slugUtils';
 import type { Tool } from '../../types';
 import type { ToolFormData } from '@shared/schemas';
 
@@ -25,6 +27,42 @@ export const ToolList = memo(function ToolList() {
   const updateTool = useUpdateTool();
   const deleteTool = useDeleteTool();
   const refreshTools = useRefreshTools();
+
+  const router = useRouter();
+  const pathname = useLocation({ select: (l) => l.pathname });
+
+  // Create O(1) slug lookup map with automatic cache invalidation
+  const slugLookupMap = useSlugLookup(tools || []);
+
+  // Extract toolSlug from URL for optimized lookup
+  const toolSlug =
+    pathname.startsWith('/tools/') && pathname !== '/tools'
+      ? pathname.split('/')[2]
+      : null;
+
+  // Get expanded tool ID from URL params using O(1) client-side lookup
+  const expandedToolId = useMemo(() => {
+    if (toolSlug && tools) {
+      const result = findToolBySlug(slugLookupMap, toolSlug);
+      return result?.tool.id || null;
+    }
+    return null;
+  }, [toolSlug, tools, slugLookupMap]);
+
+  // Get selected version index for the expanded tool
+  const selectedVersionIdx = useMemo(() => {
+    if (toolSlug && tools) {
+      const result = findToolBySlug(slugLookupMap, toolSlug);
+      if (result) {
+        // Find the version index that matches the slug
+        const versionIdx = result.tool.versions.findIndex(
+          (v) => v.versionName === result.version.versionName,
+        );
+        return versionIdx >= 0 ? versionIdx : 0;
+      }
+    }
+    return 0; // Default to first version
+  }, [toolSlug, tools, slugLookupMap]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -59,6 +97,19 @@ export const ToolList = memo(function ToolList() {
 
   // Debounce search query to improve performance
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
+  // Handle invalid slugs - redirect to /tools if slug doesn't match any tool
+  useEffect(() => {
+    if (
+      pathname.startsWith('/tools/') &&
+      pathname !== '/tools' &&
+      tools &&
+      expandedToolId === null
+    ) {
+      // Invalid slug - redirect to /tools
+      router.navigate({ to: '/tools' });
+    }
+  }, [expandedToolId, tools, router, pathname]);
 
   // Extract filtering logic into custom hook
   const { categories, filteredTools } = useToolFiltering({
@@ -112,9 +163,13 @@ export const ToolList = memo(function ToolList() {
       }
       if (tool.id) {
         await deleteTool.mutateAsync(tool.id);
+        // Collapse the expanded card if the deleted tool was expanded
+        if (expandedToolId === tool.id) {
+          router.navigate({ to: '/tools' });
+        }
       }
     },
-    [deleteTool],
+    [deleteTool, expandedToolId, router],
   );
 
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,6 +204,67 @@ export const ToolList = memo(function ToolList() {
     setEditingTool(null);
   }, []);
 
+  const handleToggleExpanded = useCallback(
+    (toolId: string) => {
+      if (expandedToolId === toolId) {
+        // Collapse - navigate to /tools
+        router.navigate({ to: '/tools' });
+      } else {
+        // Expand - navigate to /tools/{toolSlug}
+        const tool = tools?.find((t) => t.id === toolId);
+        if (tool) {
+          // Use stored slug from versions array (inline structure matching production)
+          if (tool.versions.length > 0) {
+            const firstVersion = tool.versions[0];
+
+            // Use inline slug from version if available
+            if (firstVersion.slug) {
+              router.navigate({
+                to: '/tools/$toolSlug',
+                params: { toolSlug: firstVersion.slug },
+              });
+              return;
+            }
+          }
+
+          // Fallback: create slug if not available in stored data
+          try {
+            if (tool.versions.length > 0) {
+              const toolSlug = createSlug(tool.name, tool.versions[0].versionName);
+              router.navigate({ to: '/tools/$toolSlug', params: { toolSlug } });
+            } else {
+              const toolSlug = createSlug(tool.name, 'default');
+              router.navigate({ to: '/tools/$toolSlug', params: { toolSlug } });
+            }
+          } catch (error) {
+            console.error('Failed to create slug:', error);
+            router.navigate({ to: '/tools' });
+          }
+        }
+      }
+    },
+    [expandedToolId, router, tools],
+  );
+
+  // Handle version selection - update URL immediately for tools with versions
+  const handleVersionSelect = useCallback(
+    (toolId: string, versionIdx: number) => {
+      const tool = tools?.find((t) => t.id === toolId);
+      if (tool && tool.versions.length > versionIdx) {
+        try {
+          const version = tool.versions[versionIdx];
+          const toolSlug = createSlug(tool.name, version.versionName);
+
+          // Update URL immediately, even if tool is not expanded
+          router.navigate({ to: '/tools/$toolSlug', params: { toolSlug } });
+        } catch (error) {
+          console.error('Failed to create slug for version selection:', error);
+        }
+      }
+    },
+    [router, tools],
+  );
+
   const handleClearSearch = useCallback(() => {
     setSearchQuery('');
   }, []);
@@ -159,142 +275,122 @@ export const ToolList = memo(function ToolList() {
         <div className="text-red-600 dark:text-red-400 text-lg font-semibold mb-2">
           Failed to load tools
         </div>
-        <p style={{ color: 'var(--text-secondary)' }}>{(error as Error).message}</p>
+        <p className="text-secondary content-text">{(error as Error).message}</p>
       </div>
     );
   }
 
   return (
     <div className="h-full flex flex-col space-y-6">
-      {/* Controls */}
-      <div className="flex flex-col lg:flex-row gap-4">
-        <div className="flex-1 relative">
-          <label htmlFor="search-tools" className="sr-only">
-            Search tools
-          </label>
-          <input
-            id="search-tools"
-            type="search"
-            placeholder="Search tools..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            className="input-base pr-28 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
-          />
-          {/* Clear button - only show when there's text */}
-          {searchQuery && (
-            <button
-              onClick={handleClearSearch}
-              className="absolute right-16 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 z-20 transition-colors duration-200 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
-              title="Clear search"
-              aria-label="Clear search"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          )}
-          {/* Keyboard shortcut indicator - only show when search is empty */}
-          {!searchQuery && (
-            <div className="absolute right-20 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none z-10">
-              <kbd className="px-1.5 py-0.5 text-xs font-mono bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded border border-gray-300 dark:border-gray-600">
-                {modifierKey}
-              </kbd>
-              <span className="text-gray-400 dark:text-gray-500 text-xs">+</span>
-              <kbd className="px-1.5 py-0.5 text-xs font-mono bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded border border-gray-300 dark:border-gray-600">
-                K
-              </kbd>
-            </div>
-          )}
-          <button
-            onClick={handleRefresh}
-            disabled={refreshTools.isPending}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed z-20 transition-colors duration-200 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
-            title="Refresh tools data"
-          >
-            {refreshTools.isPending ? (
-              <div className="w-4 h-4 border-2 border-gray-400 dark:border-gray-500 border-t-transparent rounded-full animate-spin"></div>
-            ) : (
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                />
-              </svg>
-            )}
-          </button>
-        </div>
-        <div className="flex gap-3">
-          <SKRecommendedBadge
-            isRecommended={showSKRecommendedOnly}
-            className="active:scale-95 h-10 flex items-center"
-          >
+      {/* Search Controls - Elevated container for hierarchy */}
+      <div className="search-controls">
+        <div className="layout-controls">
+          <div className="flex-1 relative">
+            <label htmlFor="search-tools" className="sr-only">
+              Search tools
+            </label>
             <input
-              id="sk-recommended-filter"
-              type="checkbox"
-              checked={showSKRecommendedOnly}
-              onChange={handleSKRecommendedChange}
-              className="custom-checkbox"
+              id="search-tools"
+              type="search"
+              placeholder="Search tools..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className="input-base pr-24 sm:pr-32 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
             />
-            <span className="ml-3 text-sm font-medium whitespace-nowrap">
-              SK Recommended
-            </span>
-          </SKRecommendedBadge>
-
-          {user?.permissions?.add && (
+            {/* Clear button - only show when there's text */}
+            {searchQuery && (
+              <button
+                onClick={handleClearSearch}
+                className="absolute right-18 sm:right-24 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 z-20 transition-colors duration-200 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 icon-crisp"
+                title="Clear search"
+                aria-label="Clear search"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+            {/* Keyboard shortcut indicator - only show when search is empty */}
+            {!searchQuery && (
+              <div className="absolute right-18 sm:right-24 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none z-10">
+                <kbd className="px-1.5 py-0.5 text-xs font-mono bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded border border-gray-300 dark:border-gray-600">
+                  {modifierKey}
+                </kbd>
+                <span className="text-gray-400 dark:text-gray-500 text-xs">+</span>
+                <kbd className="px-1.5 py-0.5 text-xs font-mono bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded border border-gray-300 dark:border-gray-600">
+                  K
+                </kbd>
+              </div>
+            )}
             <button
-              onClick={handleAddTool}
-              className="btn-primary text-sm px-3 py-2 h-10 flex items-center"
+              onClick={handleRefresh}
+              disabled={refreshTools.isPending}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed z-20 transition-colors duration-200 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 icon-crisp"
+              title="Refresh tools data"
             >
-              + Add Tool
+              {refreshTools.isPending ? (
+                <div className="w-4 h-4 border-2 border-gray-400 dark:border-gray-500 border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <RefreshCw className="w-5 h-5" />
+              )}
             </button>
-          )}
+          </div>
+          <div className="flex gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
+            <SKRecommendedBadge
+              isRecommended={showSKRecommendedOnly}
+              className="active:scale-95 h-10 flex items-center"
+            >
+              <input
+                id="sk-recommended-filter"
+                type="checkbox"
+                checked={showSKRecommendedOnly}
+                onChange={handleSKRecommendedChange}
+                className="custom-checkbox"
+              />
+              <span className="ml-2 sm:ml-3 text-xs sm:text-sm font-medium whitespace-nowrap">
+                <span className="hidden sm:inline">SK Recommended</span>
+                <span className="sm:hidden">SK</span>
+              </span>
+            </SKRecommendedBadge>
+
+            {user?.permissions?.add && (
+              <button
+                onClick={handleAddTool}
+                className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed p-2 rounded-lg icon-crisp"
+                title="Add Tool"
+              >
+                <ListPlus className="h-5 w-5" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Filters - De-emphasized secondary controls */}
+        <div className="mt-3">
+          <ToolFilters
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onCategoryChange={handleCategoryChange}
+          />
         </div>
       </div>
-
-      {/* Filters */}
-      <ToolFilters
-        categories={categories}
-        selectedCategory={selectedCategory}
-        onCategoryChange={handleCategoryChange}
-      />
 
       {/* Loading and status indicators */}
       {isLoading && (
         <div className="flex items-center justify-center py-8">
           <LoadingSpinner />
-          <span className="ml-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+          <span className="ml-2 text-sm text-secondary content-text">
             Loading tools...
           </span>
         </div>
       )}
 
       {!isLoading && (
-        <div className="flex items-center justify-between">
-          <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+        <div className="flex items-center justify-between mb-4">
+          <div className="text-sm text-secondary">
             Showing {filteredTools.length} of {tools?.length ?? 0} tools
             {showSKRecommendedOnly && ' (SK Recommended)'}
           </div>
           {refreshTools.isPending && (
-            <div className="text-sm" style={{ color: 'var(--text-tertiary)' }}>
-              Refreshing...
-            </div>
+            <div className="text-sm text-tertiary">Refreshing...</div>
           )}
         </div>
       )}
@@ -303,30 +399,25 @@ export const ToolList = memo(function ToolList() {
         {isLoading ? (
           <LoadingSpinner className="py-12" />
         ) : filteredTools.length === 0 ? (
-          <p className="text-center py-12" style={{ color: 'var(--text-tertiary)' }}>
-            No tools found.
-          </p>
+          <p className="text-center py-12 text-tertiary content-text">No tools found.</p>
         ) : (
-          <div className="relative flex-1 min-h-0">
-            <DynamicVirtualizedList
-              items={filteredTools}
-              defaultItemHeight={120} // Approximate height of each ToolRow when collapsed
-              containerHeight="100%" // Use full available height
-              renderItem={({ item: tool, index }) => (
-                <div
+          <div>
+            {filteredTools
+              .filter((tool): tool is Tool & { id: string } => Boolean(tool.id)) // Type guard to ensure tool.id is defined
+              .map((tool) => (
+                <ToolRow
                   key={tool.id}
-                  className={`${index === 0 ? 'virtual-first-item' : ''} mb-3`}
-                >
-                  <ToolRow
-                    tool={tool}
-                    onEdit={() => handleEditTool(tool)}
-                    onDelete={() => handleDelete(tool)}
-                  />
-                </div>
-              )}
-              className="custom-scrollbar"
-              overscan={5} // Render 5 extra items above/below for smooth scrolling
-            />
+                  tool={tool}
+                  isExpanded={expandedToolId === tool.id}
+                  selectedVersionIdx={expandedToolId === tool.id ? selectedVersionIdx : 0}
+                  onToggleExpanded={() => handleToggleExpanded(tool.id)}
+                  onVersionSelect={(versionIdx) =>
+                    handleVersionSelect(tool.id, versionIdx)
+                  }
+                  onEdit={() => handleEditTool(tool)}
+                  onDelete={() => handleDelete(tool)}
+                />
+              ))}
           </div>
         )}
       </div>

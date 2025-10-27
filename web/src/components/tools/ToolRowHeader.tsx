@@ -150,7 +150,7 @@ export function ToolRowHeader({
               </div>
             )}
           </div>
-          <p className="text-xs mt-0.5 text-secondary">{tool.category}</p>
+          <p className="text-xs mt-0.5 text-secondary card-text">{tool.category}</p>
 
           {/* Version tabs - moved here for better organization */}
           {tool.versions.length > 1 && (

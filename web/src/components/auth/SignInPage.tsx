@@ -5,9 +5,12 @@ import { DarkModeToggle } from '../common/DarkModeToggle';
 export function SignInPage() {
   const { signInWithGoogle, loading } = useAuth();
 
+  // Note: The router's beforeLoad hook handles redirecting authenticated users to /tools
+  // This component only renders if user is not authenticated
+
   return (
     <div className="min-h-screen bg-[var(--badge-unknown-bg)] dark:bg-gray-900 flex items-center justify-center px-4">
-      <div className="max-w-md w-full">
+      <div className="form-width">
         <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow-xl p-10 relative">
           {/* Dark mode toggle in top right */}
           <div className="absolute top-5 right-5">
@@ -17,10 +20,10 @@ export function SignInPage() {
           {/* Header */}
           <div className="text-center mb-8 flex flex-col items-center">
             <CrownLogo className="w-28 h-28 text-[var(--sk-gold)] mb-4" />
-            <h1 className="text-3xl font-bold text-[var(--sk-black)] dark:text-white mb-3">
+            <h1 className="text-3xl font-semibold text-primary mb-3">
               <span className="text-[var(--sk-red)]">SearchKings</span> Tool Tracker
             </h1>
-            <p className="text-sm text-[var(--sk-grey)] dark:text-gray-300 leading-relaxed">
+            <p className="text-sm text-secondary leading-relaxed">
               Sign in to manage integrations and tools
             </p>
           </div>
@@ -29,7 +32,7 @@ export function SignInPage() {
           <button
             onClick={signInWithGoogle}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 btn-google-glass disabled:opacity-50 disabled:cursor-not-allowed py-4"
+            className="btn-google-glass w-full flex items-center justify-center gap-3 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -49,7 +52,7 @@ export function SignInPage() {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
               />
             </svg>
-            Sign in with Google
+            {loading ? 'Signing in...' : 'Sign in with Google'}
           </button>
         </div>
       </div>

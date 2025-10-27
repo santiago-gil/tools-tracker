@@ -1,9 +1,9 @@
+/* Font loading optimization - Satoshi from CDN (CORS-friendly) */
+@import url('https://fonts.cdnfonts.com/css/satoshi');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Font loading optimization - Satoshi from CDN (CORS-friendly) */
-@import url('https://fonts.cdnfonts.com/css/satoshi');
 
 @layer base {
   :root {
@@ -170,8 +170,195 @@
 }
 
 @layer components {
+  /* ===== CRISP ICON RENDERING ===== */
+  /* Simple approach - let browser handle rendering optimally */
+  svg {
+    shape-rendering: auto;
+    image-rendering: auto;
+  }
+
+  /* Ensure icons are properly sized */
+  .icon-crisp {
+    /* No special transforms that could cause sub-pixel issues */
+  }
+
+  /* Ensure buttons with icons are properly aligned */
+  button svg {
+    display: block;
+    flex-shrink: 0;
+  }
+
+  /* ===== CONTENT-FIRST LAYOUT SYSTEM ===== */
+  .container-main {
+    width: 100%;
+    max-width: 80rem; /* 1280px - reasonable max for content */
+    margin: 0 auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .container-main {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container-main {
+      padding-left: 2.5rem;
+      padding-right: 2.5rem;
+    }
+  }
+
+  /* ===== COMPONENT SIZING ===== */
+  .content-width {
+    width: 100%;
+    max-width: 60rem; /* 960px - optimal reading width */
+  }
+
+  .form-width {
+    width: 100%;
+    max-width: 32rem; /* 512px - optimal form width */
+  }
+
+  .card-width {
+    width: 100%;
+    max-width: 24rem; /* 384px - good card width */
+  }
+
+  /* Tool cards - let them be their natural width */
+  .tool-card {
+    width: 100%;
+    max-width: none; /* Let them use available space */
+  }
+
+  /* ===== VISUAL HIERARCHY SYSTEM ===== */
+  /* Three-tier color system for hierarchy */
+  .text-primary {
+    color: var(--text-primary); /* Dark color for primary content */
+    font-weight: 500;
+  }
+
+  .text-secondary {
+    color: var(--text-secondary); /* Grey for secondary content */
+    font-weight: 400;
+  }
+
+  .text-tertiary {
+    color: var(--text-tertiary); /* Lighter grey for tertiary content */
+    font-weight: 400;
+  }
+
+  /* Two-tier font weight system */
+  .font-normal {
+    font-weight: 400; /* Normal weight for most text */
+  }
+
+  .font-medium {
+    font-weight: 500; /* Medium weight for emphasis */
+  }
+
+  .font-semibold {
+    font-weight: 600; /* Semibold for important elements */
+  }
+
+  /* ===== COMPONENT HIERARCHY ===== */
+  .search-controls {
+    width: 100%;
+    max-width: none; /* Let it use full available space */
+    padding: 0; /* Remove padding - let content breathe naturally */
+    margin-bottom: 1.5rem;
+  }
+
+  .search-input {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-weight: 400; /* Normal weight - don't compete with content */
+    background: var(--surface-0);
+    border: 1px solid var(--border-light);
+    border-radius: 0.75rem;
+  }
+
+  @media (min-width: 640px) {
+    .search-input {
+      padding: 0.875rem 1.25rem;
+      font-size: 1rem; /* Keep same size - hierarchy through other means */
+    }
+  }
+
+  /* ===== INDEPENDENT SPACING SYSTEM ===== */
+  /* Don't scale proportionally - each size optimized for its context */
+  .space-section { 
+    margin-bottom: 2rem; /* 32px - good section separation */
+  }
+  
+  .space-component { 
+    margin-bottom: 1.5rem; /* 24px - component separation */
+  }
+  
+  .space-element { 
+    margin-bottom: 1rem; /* 16px - element separation */
+  }
+  
+  .space-small { 
+    margin-bottom: 0.5rem; /* 8px - tight spacing */
+  }
+
+  /* Mobile: tighter spacing for smaller screens */
+  @media (max-width: 640px) {
+    .space-section { 
+      margin-bottom: 1.5rem; /* 24px - less space on mobile */
+    }
+    
+    .space-component { 
+      margin-bottom: 1rem; /* 16px - tighter on mobile */
+    }
+    
+    .space-element { 
+      margin-bottom: 0.75rem; /* 12px - tighter on mobile */
+    }
+  }
+
+  /* ===== INDEPENDENT COMPONENT SIZING ===== */
+  /* Each component sized for its optimal context */
+
+
+  .tool-card {
+    padding: 1rem; /* 16px - comfortable card padding */
+    border-radius: 0.75rem; /* 12px - modern card corners */
+  }
+
+  @media (min-width: 640px) {
+    .tool-card {
+      padding: 1.25rem; /* 20px - more generous on larger screens */
+      border-radius: 1rem; /* 16px - more rounded on desktop */
+    }
+  }
+
+  /* ===== LAYOUT UTILITIES ===== */
+  .layout-main {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .layout-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .layout-controls {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+  }
+
   .input-base {
-    @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg transition-colors;
+    @apply w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg transition-colors;
+    @apply search-input;
   }
 
   .input-base:focus {
@@ -300,29 +487,44 @@
   }
 
   /* ===== COMPONENT STYLES ===== */
-  /* Button System */
+  /* Button System - Independent sizing */
   .btn-primary {
-    background: linear-gradient(135deg, var(--sk-red) 0%, var(--sk-red-dark) 100%);
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.9) 0%, rgba(185, 28, 28, 0.9) 100%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(220, 38, 38, 0.3);
     color: white;
     font-weight: 500;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.75rem;
-    border: none;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 
-      0 2px 4px -1px rgba(220, 38, 38, 0.15),
-      0 1px 2px -1px rgba(220, 38, 38, 0.1);
-  }
-
-  .btn-primary:hover {
-    transform: translateY(-1px);
     box-shadow: 
       0 4px 6px -1px rgba(220, 38, 38, 0.2),
       0 2px 4px -1px rgba(220, 38, 38, 0.15);
+    /* Independent sizing - optimized for each context */
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    border-radius: 0.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .btn-primary {
+      padding: 0.875rem 2rem;
+      font-size: 0.875rem;
+      border-radius: 0.75rem;
+    }
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%);
+    transform: translateY(-1px);
+    box-shadow: 
+      0 6px 8px -1px rgba(220, 38, 38, 0.25),
+      0 4px 6px -1px rgba(220, 38, 38, 0.2);
+    border-color: rgba(220, 38, 38, 0.4);
   }
 
   .btn-primary:active {
     transform: translateY(0);
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.85) 0%, rgba(185, 28, 28, 0.85) 100%);
   }
 
   /* Google Login Button - Glass Effect */
@@ -377,19 +579,53 @@
   }
 
   .btn-secondary {
-    background-color: var(--surface-1);
+    background: rgba(248, 250, 252, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     color: var(--text-secondary);
-    border: 1px solid var(--border-light);
+    border: 1px solid rgba(203, 213, 225, 0.3);
     font-weight: 500;
     padding: 0.75rem 1.5rem;
     border-radius: 0.75rem;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
   .btn-secondary:hover {
-    background-color: var(--surface-2);
-    border-color: var(--border-medium);
+    background: rgba(248, 250, 252, 0.9);
+    border-color: rgba(203, 213, 225, 0.5);
     transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Dark mode glass buttons */
+  .dark .btn-primary {
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.8) 0%, rgba(185, 28, 28, 0.8) 100%);
+    border-color: rgba(220, 38, 38, 0.4);
+    box-shadow: 
+      0 4px 6px -1px rgba(0, 0, 0, 0.3),
+      0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  }
+
+  .dark .btn-primary:hover {
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.9) 0%, rgba(185, 28, 28, 0.9) 100%);
+    border-color: rgba(220, 38, 38, 0.5);
+    box-shadow: 
+      0 6px 8px -1px rgba(0, 0, 0, 0.4),
+      0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  }
+
+  .dark .btn-secondary {
+    background: rgba(31, 41, 55, 0.6);
+    border-color: rgba(75, 85, 99, 0.3);
+    color: var(--text-secondary);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  .dark .btn-secondary:hover {
+    background: rgba(31, 41, 55, 0.8);
+    border-color: rgba(75, 85, 99, 0.5);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
   }
 
   /* Card System */
@@ -431,6 +667,81 @@
     border-radius: 1rem;
     margin-bottom: 0;
     transition: all 0.2s ease-in-out;
+  }
+
+  /* Expanded card spacing and focus effects */
+  .card.expanded {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 
+      0 8px 25px -5px rgba(0, 0, 0, 0.15),
+      0 4px 10px -2px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-medium);
+    transform: scale(1.01);
+  }
+
+  .dark .card.expanded {
+    box-shadow: 
+      0 8px 25px -5px rgba(0, 0, 0, 0.4),
+      0 4px 10px -2px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-medium);
+  }
+
+  /* Adjacent cards get pushed away when one is expanded */
+  .card.expanded + .card {
+    margin-top: 2rem;
+  }
+
+  .card:has(+ .card.expanded) {
+    margin-bottom: 2rem;
+  }
+
+  /* Typography improvements - line-height based on font size and content width */
+  .text-xs {
+    line-height: 1.6; /* Taller for small text */
+  }
+
+  .text-sm {
+    line-height: 1.5; /* Standard for medium text */
+  }
+
+  .text-base {
+    line-height: 1.4; /* Slightly shorter for larger text */
+  }
+
+  .text-lg {
+    line-height: 1.3; /* Shorter for large text */
+  }
+
+  .text-xl {
+    line-height: 1.2; /* Even shorter for extra large text */
+  }
+
+  .text-2xl {
+    line-height: 1.1; /* Minimal for headlines */
+  }
+
+  /* Content-specific line-height adjustments */
+  .content-text {
+    line-height: 1.6; /* Generous for reading content */
+  }
+
+  .form-text {
+    line-height: 1.5; /* Standard for form content */
+  }
+
+  .card-text {
+    line-height: 1.5; /* Good for card content */
+  }
+
+  /* Wide content gets taller line-height */
+  .wide-content {
+    line-height: 1.7;
+  }
+
+  /* Narrow content can use shorter line-height */
+  .narrow-content {
+    line-height: 1.4;
   }
 
   /* Input System */
@@ -721,6 +1032,15 @@
 
   .text-muted {
     color: var(--text-quaternary);
+  }
+
+  /* Background utility classes */
+  .bg-surface-0 {
+    background-color: var(--surface-0);
+  }
+
+  .bg-surface-1 {
+    background-color: var(--surface-1);
   }
 }
 

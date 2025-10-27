@@ -3,48 +3,44 @@
  * BACKEND VALIDATION - USING SHARED SCHEMAS
  * =========================
  * 
- * BREAKING CHANGE: Export names have changed from PascalCase to camelCase.
- * 
- * Schema identifiers have been renamed:
- * - ToolSchema -> toolSchema
- * - ToolVersionSchema -> toolVersionSchema
- * - TrackableFieldSchema -> trackableSchema
- * - TrackablesSchema -> trackablesSchema
- * - UserInfoSchema -> updatedBySchema
- * - UserSchema -> userSchema
- * - UserPermissionsSchema -> userPermissionsSchema
- * - UserUpdateSchema -> userUpdateSchema
- * 
- * MIGRATION REQUIRED: Consumers must update their imports to use the new
- * camelCase export names. This is a breaking change that requires a version
- * bump for downstream users.
+ * All schemas and types are re-exported from shared/schemas for consistency.
  */
 
 import { z } from 'zod';
-
-// Re-export shared schemas for backward compatibility
-export {
-  // Tool schemas
-  ToolSchema as toolSchema,
+import {
+  ToolSchema as SharedToolSchema,
   CreateToolSchema,
   UpdateToolSchema,
-  ToolVersionSchema as toolVersionSchema,
-  TrackableFieldSchema as trackableSchema,
-  TrackablesSchema as trackablesSchema,
-  UserInfoSchema as updatedBySchema,
-
-  // User schemas
-  UserSchema as userSchema,
-  UserPermissionsSchema as userPermissionsSchema,
-  UserUpdateSchema as userUpdateSchema,
-
-  // Types
-  type Tool as ToolInput,
+  ToolVersionSchema,
+  type Tool,
   type CreateTool,
   type UpdateTool,
-  type User as UserInput,
-  type UserUpdate as UserUpdateInput,
+  UserSchema as SharedUserSchema,
+  UserPermissionsSchema,
+  UserUpdateSchema as SharedUserUpdateSchema,
+  UserInfoSchema,
+  type User,
+  type UserUpdate as SharedUserUpdate,
+  TrackableFieldSchema,
+  TrackablesSchema
 } from '../../../shared/schemas/index.js';
+
+// Re-export with backward-compatible names
+export const toolSchema = SharedToolSchema;
+export { CreateToolSchema, UpdateToolSchema };
+export const toolVersionSchema = ToolVersionSchema;
+export const trackableSchema = TrackableFieldSchema;
+export const trackablesSchema = TrackablesSchema;
+export const updatedBySchema = UserInfoSchema;
+
+export const userSchema = SharedUserSchema;
+export { UserPermissionsSchema };
+export const UserUpdateSchema = SharedUserUpdateSchema;
+
+export type ToolInput = Tool;
+export type { CreateTool, UpdateTool };
+export type UserInput = User;
+export type { SharedUserUpdate as UserUpdate };
 
 // Backend-specific parameter schemas
 export const idParamSchema = z.object({
@@ -63,7 +59,6 @@ export const uidParamSchema = z.object({
 
 import { getUserByUid } from '../services/users.js';
 import logger from './logger/index.js';
-import type { User } from '../types/Users.js';
 
 // Role permissions mapping for validation
 const ROLE_DEFAULT_PERMISSIONS: Record<User["role"], User["permissions"]> = {
@@ -96,21 +91,13 @@ function validatePermissionsAgainstRole(
   uid: string
 ): void {
   const expectedPermissions = ROLE_DEFAULT_PERMISSIONS[role];
+  const permissionKeys: Array<keyof User["permissions"]> = ['add', 'edit', 'delete', 'manageUsers'];
 
-  for (const [permission, value] of Object.entries(permissions)) {
-    // First check if the permission key exists on expectedPermissions
-    if (!Object.prototype.hasOwnProperty.call(expectedPermissions, permission)) {
-      logger.warn(
-        { uid, role, permission, value, expectedPermissions },
-        "Invalid permission key provided"
-      );
-      throw new Error(
-        `Invalid permission key '${permission}' - not recognized for role '${role}'`
-      );
-    }
+  for (const permission of permissionKeys) {
+    if (!(permission in permissions)) continue;
 
-    // Now safely access the permission after confirming it exists
-    if (value && !expectedPermissions[permission as keyof typeof expectedPermissions]) {
+    const value = permissions[permission];
+    if (value && !expectedPermissions[permission]) {
       logger.warn(
         { uid, role, permission, value, expectedPermissions },
         "Permission exceeds role capabilities"

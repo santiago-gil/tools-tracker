@@ -20,7 +20,21 @@ export function useCreateTool() {
     mutationFn: (tool: Omit<Tool, 'id' | 'createdAt' | 'updatedAt' | 'updatedBy'>) =>
       toolsApi.create(tool),
     onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ['tools'] });
+      // Update cache immediately with the new tool from server
+      if (response.success && response.tool) {
+        queryClient.setQueryData<Tool[]>(['tools'], (oldTools) => {
+          // If cache is empty, keep it empty to avoid showing incomplete state
+          // (there may be other tools in the database not yet in cache)
+          if (!oldTools) return undefined;
+          // Append the new tool to the list
+          return [...oldTools, response.tool];
+        });
+      }
+
+      // Note: No immediate invalidateQueries to avoid race condition
+      // where background refetch might overwrite the fresh response.tool.
+      // React Query will refetch on window focus or other triggers.
+
       toast.success(response.message || 'Tool created successfully');
     },
     onError: (error: Error) => {
@@ -36,7 +50,30 @@ export function useUpdateTool() {
     mutationFn: ({ id, tool, expectedVersion }: { id: string; tool: Partial<Omit<Tool, 'id' | 'createdAt' | 'updatedAt' | 'updatedBy' | '_optimisticVersion'>>; expectedVersion?: number }) =>
       toolsApi.update(id, tool, expectedVersion),
     onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ['tools'] });
+      // Update cache immediately with the updated tool from server
+      if (response.success && response.tool) {
+        queryClient.setQueryData<Tool[]>(['tools'], (oldTools) => {
+          // If cache is empty, keep it empty to avoid showing incomplete state
+          // (there may be other tools in the database not yet in cache)
+          if (!oldTools) return undefined;
+
+          // Check if the tool exists in the array
+          const hasExistingTool = oldTools.some((t) => t.id === response.tool.id);
+
+          if (hasExistingTool) {
+            // Replace the existing tool
+            return oldTools.map((t) => (t.id === response.tool.id ? response.tool : t));
+          } else {
+            // Tool not in cache (e.g., created in another tab), add it to the list
+            return [...oldTools, response.tool];
+          }
+        });
+      }
+
+      // Note: No immediate invalidateQueries to avoid race condition
+      // where background refetch might overwrite the fresh response.tool.
+      // React Query will refetch on window focus or other triggers.
+
       toast.success(response.message || 'Tool updated successfully');
     },
     onError: (error: Error) => {
@@ -50,8 +87,20 @@ export function useDeleteTool() {
 
   return useMutation({
     mutationFn: (id: string) => toolsApi.delete(id),
-    onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ['tools'] });
+    onSuccess: (response, deletedId) => {
+      // Update cache immediately by removing the deleted tool
+      if (response.success) {
+        queryClient.setQueryData<Tool[]>(['tools'], (oldTools) => {
+          if (!oldTools) return undefined;
+          // Remove the deleted tool from the list
+          return oldTools.filter((t) => t.id !== deletedId);
+        });
+      }
+
+      // Note: No immediate invalidateQueries to avoid race condition
+      // where background refetch might overwrite the fresh tools list.
+      // React Query will refetch on window focus or other triggers.
+
       toast.success(response.message || 'Tool deleted successfully');
     },
     onError: (error: Error) => {

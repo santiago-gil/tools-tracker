@@ -1,10 +1,2 @@
-import type { User } from './index';
-import type { User as FirebaseUser } from 'firebase/auth';
-
-export interface AuthContextValue {
-    firebaseUser: FirebaseUser | null;
-    user: User | null;
-    loading: boolean;
-    signInWithGoogle: () => Promise<void>;
-    signOut: () => Promise<void>;
-}
+// Re-export AuthContextValue from the context file to avoid duplication
+export type { AuthContextValue } from '../contexts/AuthContext';

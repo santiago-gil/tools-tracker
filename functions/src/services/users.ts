@@ -1,5 +1,5 @@
 import { getAuth } from "firebase-admin/auth";
-import type { User } from "../types/Users.js";
+import type { User } from '../../../shared/schemas/index.js';
 import { db } from "../utils/firebase.js";
 import type { QueryDocumentSnapshot } from "firebase-admin/firestore";
 import logger from "../utils/logger/index.js";
@@ -55,8 +55,8 @@ export async function createUserDoc(
     email,
     role,
     permissions,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
     ...(photoURL && { photoURL }),
     ...(displayName && { displayName }),
   };

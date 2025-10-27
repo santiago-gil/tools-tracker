@@ -22,7 +22,7 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
       <div ref={ref} className={className}>
         <label
           htmlFor={id}
-          className="block text-sm font-medium text-gray-900 dark:text-white mb-1"
+          className="block text-sm font-medium text-primary mb-1"
         >
           {label} {required && <span className="text-red-600">*</span>}
         </label>

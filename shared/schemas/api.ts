@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { ToolSchema } from './tools';
-import { UserSchema } from './users';
+import { ToolSchema } from './tools.js';
+import { UserSchema } from './users.js';
 
 /**
  * =========================

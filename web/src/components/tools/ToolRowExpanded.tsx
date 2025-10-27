@@ -14,13 +14,8 @@ function ExternalLink({ label, url }: ExternalLinkProps) {
   if (!safeUrl) {
     return (
       <div>
-        <h5
-          className="text-xs font-medium mb-1"
-          style={{ color: 'var(--text-tertiary)' }}
-        >
-          {label}
-        </h5>
-        <span className="text-sm text-gray-500 dark:text-gray-400 break-words">
+        <h5 className="text-xs font-medium mb-1 text-tertiary">{label}</h5>
+        <span className="text-sm text-tertiary break-words content-text">
           {url} (unsafe URL)
         </span>
       </div>
@@ -29,14 +24,12 @@ function ExternalLink({ label, url }: ExternalLinkProps) {
 
   return (
     <div>
-      <h5 className="text-xs font-medium mb-1" style={{ color: 'var(--text-tertiary)' }}>
-        {label}
-      </h5>
+      <h5 className="text-xs font-medium mb-1 text-tertiary">{label}</h5>
       <a
         href={safeUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline break-words"
+        className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline break-words content-text"
       >
         {url}
         <span className="sr-only"> (opens in new tab)</span>
@@ -74,7 +67,7 @@ export function ToolRowExpanded({
   if (!hasTeamConsiderations && !hasTrackableContent) {
     return (
       <div className="px-4 pb-4 pt-2 text-center">
-        <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>
+        <p className="text-sm text-tertiary content-text">
           No additional details available for this tool
         </p>
       </div>
@@ -97,7 +90,7 @@ export function ToolRowExpanded({
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
             Web Team Considerations
           </h3>
-          <p className="text-sm text-gray-700 dark:text-gray-300">
+          <p className="text-sm text-gray-700 dark:text-gray-300 content-text">
             {currentVersion.team_considerations}
           </p>
         </div>
@@ -117,13 +110,8 @@ export function ToolRowExpanded({
 
               {trackable?.notes && (
                 <div>
-                  <h5
-                    className="text-xs font-medium mb-1"
-                    style={{ color: 'var(--text-tertiary)' }}
-                  >
-                    Notes
-                  </h5>
-                  <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <h5 className="text-xs font-medium mb-1 text-tertiary">Notes</h5>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 content-text">
                     {trackable.notes}
                   </p>
                 </div>

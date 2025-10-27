@@ -61,7 +61,7 @@ export function BasicInfoSection({
               <button
                 type="button"
                 onClick={onBackToCategoryList}
-                className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+                className="text-sm text-secondary hover:text-primary transition-colors form-text"
               >
                 ← Back to category list
               </button>
@@ -70,7 +70,7 @@ export function BasicInfoSection({
         </FormField>
       </div>
 
-      <div className="border-t pt-4" />
+      <div className="border-t border-[var(--border-light)] pt-4" />
     </>
   );
 }

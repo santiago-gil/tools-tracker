@@ -2,8 +2,9 @@
  * Smart caching service with real-time invalidation
  */
 
-import type { Tool } from "../types/Tool.js";
-import type { User } from "../types/Users.js";
+import logger from '../utils/logger/index.js';
+import type { Tool } from '../../../shared/schemas/index.js';
+import type { User } from '../../../shared/schemas/index.js';
 
 interface CacheEntry<T> {
     data: T;
@@ -44,13 +45,19 @@ class SmartCache<T> {
 
         // Return cached data if fresh
         if (cached && this.isFresh(cached, now)) {
+            const ageSeconds = ((now - cached.timestamp) / 1000).toFixed(1);
+            logger.info({ key, ageSeconds, cacheHit: true }, `Cache HIT: ${key}`);
             return cached.data;
         }
 
         // Return stale data if not too old (background refresh)
         if (cached && this.isAcceptable(cached, now)) {
+            const ageSeconds = ((now - cached.timestamp) / 1000).toFixed(1);
+            logger.info({ key, ageSeconds, cacheHit: 'stale' }, `Cache STALE: ${key} (background refresh)`);
             // Trigger background refresh
-            this.fetchAndCache(key, fetcher).catch(console.error);
+            this.fetchAndCache(key, fetcher).catch((error: unknown) => {
+                logger.error({ error, key }, 'Background cache refresh failed');
+            });
             return cached.data;
         }
 
@@ -142,10 +149,14 @@ class SmartCache<T> {
 
 // Cache configurations for different data types
 export const CACHE_CONFIGS = {
-    // Tools cache: 2 minutes fresh, 10 minutes acceptable
+    // Tools cache: 10 minutes fresh, 30 minutes acceptable (stale-while-revalidate)
+    // Phase 1 (0-10 min): Return cached, 0 reads
+    // Phase 2 (10-30 min): Return stale immediately, 250 reads in background (non-blocking)
+    // Phase 3 (30+ min): Must fetch fresh, 250 reads (blocking wait)
+    // Tools are edited infrequently, safe to cache longer
     tools: {
-        ttl: 2 * 60 * 1000, // 2 minutes
-        maxAge: 10 * 60 * 1000 // 10 minutes
+        ttl: 10 * 60 * 1000, // 10 minutes (fresh period)
+        maxAge: 30 * 60 * 1000 // 30 minutes (expiration)
     },
 
     // Users cache: 5 minutes fresh, 30 minutes acceptable  

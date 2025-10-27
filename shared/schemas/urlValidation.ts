@@ -52,7 +52,7 @@ export function createUrlSchema(fieldName: string = 'URL') {
             const sanitized = sanitizeUrl(val as string);
             return sanitized === null ? undefined : sanitized;
         },
-        z.string({ invalid_type_error: `Invalid or unsafe ${fieldName} format` })
+        z.string('Invalid or unsafe URL format')
     );
 }
 
@@ -70,9 +70,13 @@ export function createUrlSchema(fieldName: string = 'URL') {
  * @returns Zod string schema with validation
  */
 export function createRequiredStringField(minLength: number = 1, maxLength: number, fieldName: string) {
+    let innerSchema = z.string().min(minLength, `${fieldName} is required`);
+    if (typeof maxLength === 'number') {
+        innerSchema = innerSchema.max(maxLength, `${fieldName} too long`);
+    }
     return z.string()
         .transform(val => val.trim())
-        .pipe(z.string().min(minLength, `${fieldName} is required`).max(maxLength, `${fieldName} too long`));
+        .pipe(innerSchema);
 }
 
 /**
@@ -82,9 +86,13 @@ export function createRequiredStringField(minLength: number = 1, maxLength: numb
  * @returns Zod string schema with validation
  */
 export function createOptionalStringField(maxLength: number, fieldName: string) {
+    let stringSchema = z.string();
+    if (typeof maxLength === 'number') {
+        stringSchema = stringSchema.max(maxLength, `${fieldName} too long`);
+    }
     return z.preprocess(
         (v) => typeof v === 'string' ? v.trim() : v,
-        z.string().max(maxLength, `${fieldName} too long`).optional()
+        stringSchema.optional()
     ).transform(val => val === '' ? undefined : val);
 }
 
@@ -96,9 +104,12 @@ export function createOptionalStringField(maxLength: number, fieldName: string) 
  * @returns Zod string schema with validation
  */
 export function createRequiredStringFieldNoTrim(minLength: number = 1, maxLength: number, fieldName: string) {
-    return z.string()
-        .min(minLength, `${fieldName} is required`)
-        .max(maxLength, `${fieldName} too long`);
+    let schema = z.string()
+        .min(minLength, `${fieldName} is required`);
+    if (typeof maxLength === 'number') {
+        schema = schema.max(maxLength, `${fieldName} too long`);
+    }
+    return schema;
 }
 
 /**
@@ -108,7 +119,9 @@ export function createRequiredStringFieldNoTrim(minLength: number = 1, maxLength
  * @returns Zod string schema with validation
  */
 export function createOptionalStringFieldNoTrim(maxLength: number, fieldName: string) {
-    return z.string()
-        .max(maxLength, `${fieldName} too long`)
-        .optional();
+    let schema = z.string();
+    if (typeof maxLength === 'number') {
+        schema = schema.max(maxLength, `${fieldName} too long`);
+    }
+    return schema.optional();
 }

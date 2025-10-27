@@ -40,57 +40,37 @@ export const UsersPage = memo(function UsersPage() {
         <div className="text-red-600 text-lg font-semibold mb-2">
           Failed to load users
         </div>
-        <p className="text-gray-600 dark:text-gray-300">{(error as Error).message}</p>
+        <p className="text-secondary">{(error as Error).message}</p>
       </div>
     );
   }
 
   if (!users?.length) {
-    return (
-      <div className="text-center py-12 text-gray-600 dark:text-gray-300">
-        No users found.
-      </div>
-    );
+    return <div className="text-center py-12 text-tertiary">No users found.</div>;
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
-          User Management
-        </h2>
-        <p className="mt-1" style={{ color: 'var(--text-secondary)' }}>
-          Manage user roles and permissions.
-        </p>
+    <div className="layout-main">
+      <div className="space-component">
+        <h2 className="text-2xl font-semibold text-primary">User Management</h2>
+        <p className="mt-1 text-secondary">Manage user roles and permissions.</p>
       </div>
 
       <div className="elevation-2 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full">
             <thead>
-              <tr style={{ backgroundColor: 'var(--surface-1)' }}>
-                <th
-                  className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-                  style={{ color: 'var(--text-secondary)' }}
-                >
+              <tr className="bg-surface-1">
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-secondary">
                   User
                 </th>
-                <th
-                  className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-                  style={{ color: 'var(--text-secondary)' }}
-                >
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-secondary">
                   Role
                 </th>
-                <th
-                  className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-                  style={{ color: 'var(--text-secondary)' }}
-                >
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-secondary">
                   Permissions
                 </th>
-                <th
-                  className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider"
-                  style={{ color: 'var(--text-secondary)' }}
-                >
+                <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-secondary">
                   Actions
                 </th>
               </tr>
@@ -99,27 +79,11 @@ export const UsersPage = memo(function UsersPage() {
               {users.map((user) => (
                 <tr
                   key={user.uid}
-                  className="transition-colors duration-200"
-                  style={{
-                    backgroundColor: 'var(--surface-0)',
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor = 'var(--surface-1)')
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundColor = 'var(--surface-0)')
-                  }
+                  className="transition-colors duration-200 bg-surface-0 hover:bg-surface-1"
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div
-                      className="text-sm font-medium"
-                      style={{ color: 'var(--text-primary)' }}
-                    >
-                      {user.email}
-                    </div>
-                    <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
-                      {user.uid}
-                    </div>
+                    <div className="text-sm font-medium text-primary">{user.email}</div>
+                    <div className="text-xs text-tertiary">{user.uid}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <select
@@ -128,12 +92,7 @@ export const UsersPage = memo(function UsersPage() {
                         handleRoleChange(user.uid, e.target.value as UserRole)
                       }
                       disabled={updateUser.isPending || user.role === 'admin'} // prevent demotion of self
-                      className="text-sm rounded-lg transition-all duration-200 focus:ring-2 focus:ring-[var(--sk-red)] focus:ring-offset-2"
-                      style={{
-                        backgroundColor: 'var(--surface-1)',
-                        borderColor: 'var(--border-light)',
-                        color: 'var(--text-primary)',
-                      }}
+                      className="text-sm rounded-lg transition-all duration-200 focus:ring-2 focus:ring-[var(--sk-red)] focus:ring-offset-2 bg-surface-1 border-[var(--border-light)] text-primary"
                     >
                       <option value="viewer">Viewer</option>
                       <option value="ops">Ops</option>
@@ -147,12 +106,7 @@ export const UsersPage = memo(function UsersPage() {
                         .map(([key]) => (
                           <span
                             key={key}
-                            className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium capitalize border"
-                            style={{
-                              backgroundColor: 'var(--surface-1)',
-                              color: 'var(--text-secondary)',
-                              borderColor: 'var(--border-light)',
-                            }}
+                            className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium capitalize border bg-surface-1 text-secondary border-[var(--border-light)]"
                           >
                             {key}
                           </span>

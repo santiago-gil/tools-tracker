@@ -1,7 +1,7 @@
 import { getAuth } from "firebase-admin/auth";
 import type { Response, NextFunction } from "express";
 import type { AuthedRequest } from "../types/http.js";
-import { createUserDoc, getUserByUid } from "../services/users.js";
+import { getUserByUid, createUserDoc } from "../services/users.js";
 import logger from "../utils/logger/index.js";
 
 /**
@@ -13,10 +13,17 @@ export async function authMiddleware(
   _res: Response,
   next: NextFunction
 ) {
+  logger.info({
+    path: req.path,
+    method: req.method,
+    url: req.url
+  }, "Auth middleware called");
+
   const header = req.headers.authorization ?? "";
   const match = header.match(/^Bearer (.+)$/);
 
   if (!match) {
+    logger.warn("Missing token in request");
     return next({ status: 401, message: "Missing token" });
   }
 
@@ -37,32 +44,29 @@ export async function authMiddleware(
     );
 
     // Restrict to company emails
-    if (!decoded.email?.endsWith("@searchkings.ca")) {
-      logger.warn({ email: decoded.email }, "Invalid email domain");
+    if (typeof decoded.email !== 'string' || !decoded.email.endsWith("@searchkings.ca")) {
+      logger.warn({ email: decoded.email }, "Invalid email domain or type");
       return next({ status: 403, message: "Invalid domain" });
     }
 
-    // Try to get existing user
+    // Get existing user - create if missing (only for authenticated user's own document)
     let userDoc = await getUserByUid(decoded.uid);
 
     if (!userDoc) {
-      logger.warn({ uid: decoded.uid }, "User document not found");
+      logger.warn({ uid: decoded.uid }, "User document not found - auto-creating");
 
-      if (decoded.email) {
-        // Create user document with atomic operation
+      // Only auto-create for the authenticated user's own document
+      // This handles cases where trigger didn't fire (e.g., emulator)
+      if (typeof decoded.email === 'string') {
         try {
           logger.info({ uid: decoded.uid }, "Creating user document");
-
-          // Use atomic operation to prevent race conditions
-          const newUser = await createUserDoc(
+          userDoc = await createUserDoc(
             decoded.uid,
             decoded.email,
-            typeof decoded.picture === 'string' ? decoded.picture : undefined,
-            typeof decoded.name === 'string' ? decoded.name : undefined
+            decoded.picture as string | undefined,
+            decoded.name as string | undefined
           );
-          userDoc = newUser;
-
-          logger.info({ uid: decoded.uid, role: userDoc.role }, "User document successfully created");
+          logger.info({ uid: decoded.uid, role: userDoc.role }, "User document auto-created");
         } catch (createError) {
           // Check if user was created by another request (race condition)
           userDoc = await getUserByUid(decoded.uid);

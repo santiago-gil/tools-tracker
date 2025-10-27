@@ -17,8 +17,8 @@ import { z } from 'zod';
 /**
  * Sanitizes URLs to prevent XSS attacks
  * Only allows http: and https: protocols
- * @param url - The URL to sanitize
- * @returns A safe URL or null if the URL is dangerous
+ * @param url - string | null | undefined - The URL to sanitize. Nullish inputs are treated as empty strings.
+ * @returns A sanitized string or null when input is nullish or whitespace-only
  */
 export function sanitizeUrl(url: string | null | undefined): string | null {
     const trimmed = (url ?? '').trim();
@@ -45,10 +45,9 @@ export function sanitizeUrl(url: string | null | undefined): string | null {
 
 /**
  * Creates a Zod schema for safe URL validation
- * @param fieldName - The name of the field for error messages
  * @returns A Zod string schema with URL validation
  */
-export function createUrlSchema(fieldName: string = 'URL') {
+export function createUrlSchema() {
     return z.string()
         .optional()
         .transform(val => {
@@ -72,9 +71,13 @@ export function createUrlSchema(fieldName: string = 'URL') {
  * @returns Zod string schema with validation
  */
 export function createRequiredStringField(minLength: number = 1, maxLength: number, fieldName: string) {
+    let innerSchema = z.string().min(minLength, `${fieldName} is required`);
+    if (typeof maxLength === 'number') {
+        innerSchema = innerSchema.max(maxLength, `${fieldName} too long`);
+    }
     return z.string()
         .transform(val => val.trim())
-        .pipe(z.string().min(minLength, `${fieldName} is required`).max(maxLength, `${fieldName} too long`));
+        .pipe(innerSchema);
 }
 
 /**
@@ -84,6 +87,10 @@ export function createRequiredStringField(minLength: number = 1, maxLength: numb
  * @returns Zod string schema with validation
  */
 export function createOptionalStringField(maxLength: number, fieldName: string) {
+    let stringSchema = z.string();
+    if (typeof maxLength === 'number') {
+        stringSchema = stringSchema.max(maxLength, `${fieldName} too long`);
+    }
     return z.preprocess(
         (v) => {
             if (typeof v === 'string') {
@@ -92,7 +99,7 @@ export function createOptionalStringField(maxLength: number, fieldName: string) 
             }
             return v;
         },
-        z.string().max(maxLength, `${fieldName} too long`).optional()
+        stringSchema.optional()
     );
 }
 
@@ -104,9 +111,12 @@ export function createOptionalStringField(maxLength: number, fieldName: string) 
  * @returns Zod string schema with validation
  */
 export function createRequiredStringFieldNoTrim(minLength: number = 1, maxLength: number, fieldName: string) {
-    return z.string()
-        .min(minLength, `${fieldName} is required`)
-        .max(maxLength, `${fieldName} too long`);
+    let schema = z.string()
+        .min(minLength, `${fieldName} is required`);
+    if (typeof maxLength === 'number') {
+        schema = schema.max(maxLength, `${fieldName} too long`);
+    }
+    return schema;
 }
 
 /**
@@ -116,10 +126,71 @@ export function createRequiredStringFieldNoTrim(minLength: number = 1, maxLength
  * @returns Zod string schema with validation
  */
 export function createOptionalStringFieldNoTrim(maxLength: number, fieldName: string) {
-    return z.string()
-        .max(maxLength, `${fieldName} too long`)
-        .optional();
+    let schema = z.string();
+    if (typeof maxLength === 'number') {
+        schema = schema.max(maxLength, `${fieldName} too long`);
+    }
+    return schema.optional();
 }
+
+/**
+ * =========================
+ * SLUG VALIDATION HELPERS
+ * =========================
+ */
+
+/**
+ * Creates a reusable slug validator factory
+ * Enforces the same validation rules as SLUG_SCHEMA with configurable length constraints.
+ * This is intended for full slugs with double-hyphen separators (e.g., "tool-name--version-name").
+ * @param min - Minimum length (default: 3)
+ * @param max - Maximum length (default: 200)
+ * @returns Zod schema for slug validation
+ */
+export function createSlugField(min: number = 3, max: number = 200) {
+    return z.string()
+        .min(min, 'Slug too short')
+        .max(max, 'Slug too long')
+        .regex(/^[a-z0-9-]+$/, 'Slug contains invalid characters')
+        .refine((val: string) => !val.startsWith('-') && !val.endsWith('-'), 'Slug cannot start or end with hyphen')
+        .refine((val: string) => {
+            // Allow exactly one double hyphen separator (--), but no other consecutive hyphens
+            const doubleHyphenCount = (val.match(/--/g) || []).length;
+            if (doubleHyphenCount > 1) return false; // More than one double hyphen
+            if (doubleHyphenCount === 1) {
+                // If there's exactly one double hyphen, ensure neither part starts or ends with a single hyphen
+                const parts = val.split('--');
+                return !parts[0].startsWith('-') && !parts[0].endsWith('-') &&
+                    !parts[1].startsWith('-') && !parts[1].endsWith('-');
+            }
+            // No double hyphens - valid
+            return true;
+        }, 'Slug may contain at most one double hyphen (--) used as a separator; no other consecutive hyphens allowed and no leading/trailing hyphens on either side');
+}
+
+/**
+ * Shared Zod schema for slug validation
+ * Used for URL-friendly slugs with consistent validation rules
+ * Includes validation for double-hyphen separator pattern (tool-name--version-name)
+ */
+export const SLUG_SCHEMA = z.string()
+    .min(3, 'Slug too short')
+    .max(200, 'Slug too long')
+    .regex(/^[a-z0-9-]+$/, 'Slug contains invalid characters')
+    .refine((val: string) => !val.startsWith('-') && !val.endsWith('-'), 'Slug cannot start or end with hyphen')
+    .refine((val: string) => {
+        // Allow exactly one double hyphen separator (--), but no other consecutive hyphens
+        const doubleHyphenCount = (val.match(/--/g) || []).length;
+        if (doubleHyphenCount > 1) return false; // More than one double hyphen
+        if (doubleHyphenCount === 1) {
+            // If there's exactly one double hyphen, ensure neither part starts or ends with a single hyphen
+            const parts = val.split('--');
+            return !parts[0].startsWith('-') && !parts[0].endsWith('-') &&
+                !parts[1].startsWith('-') && !parts[1].endsWith('-');
+        }
+        // No double hyphens - valid
+        return true;
+    }, 'Slug may contain at most one double hyphen (--) used as a separator; no other consecutive hyphens allowed and no leading/trailing hyphens on either side');
 
 /**
  * =========================
@@ -129,18 +200,24 @@ export function createOptionalStringFieldNoTrim(maxLength: number, fieldName: st
 
 /**
  * Helper function for required datetime fields
- * @param fieldName - Field name for error messages
+ * @param _fieldName - Field name for documentation (currently unused but kept for API consistency)
  * @returns Zod string schema with datetime validation
+ * 
+ * Validates ISO 8601 datetime strings with timezone offsets.
+ * Accepts formats like: "2024-01-01T12:00:00.000Z", "2024-01-01T12:00:00+02:00"
  */
-export function createRequiredDateTimeField(fieldName: string) {
-    return z.string().datetime(`${fieldName} must be a valid ISO 8601 datetime string`);
+export function createRequiredDateTimeField(_fieldName: string) {
+    return z.iso.datetime({ offset: true });
 }
 
 /**
  * Helper function for optional datetime fields
- * @param fieldName - Field name for error messages
+ * @param _fieldName - Field name for documentation (currently unused but kept for API consistency)
  * @returns Zod string schema with datetime validation
+ * 
+ * Validates ISO 8601 datetime strings with timezone offsets, or undefined.
+ * Accepts formats like: "2024-01-01T12:00:00.000Z", "2024-01-01T12:00:00+02:00"
  */
-export function createOptionalDateTimeField(fieldName: string) {
-    return z.string().datetime(`${fieldName} must be a valid ISO 8601 datetime string`).optional();
+export function createOptionalDateTimeField(_fieldName: string) {
+    return z.iso.datetime({ offset: true }).optional();
 }

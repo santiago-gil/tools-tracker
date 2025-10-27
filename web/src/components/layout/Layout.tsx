@@ -1,16 +1,16 @@
 import { Header } from './Header';
-import type { ReactNode } from 'react';
+import { Outlet } from '@tanstack/react-router';
 
-interface LayoutProps {
-  children: ReactNode;
-}
+export type Page = 'tools' | 'users';
 
-export function Layout({ children }: LayoutProps) {
+export function Layout() {
   return (
-    <div className="h-screen bg-gradient-to-br from-gray-50 via-gray-100/30 to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col overflow-hidden">
+    <div className="h-screen bg-gradient-to-br from-gray-50 via-gray-100/30 to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col overflow-hidden min-w-[320px]">
       <Header />
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 overflow-auto">
-        {children}
+      <main className="flex-1 py-8 overflow-auto">
+        <div className="container-main">
+          <Outlet />
+        </div>
       </main>
     </div>
   );

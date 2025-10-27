@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { TrackablesSchema } from './trackables';
-import { createRequiredStringFieldNoTrim, createOptionalStringFieldNoTrim } from './validationUtils';
+import { TrackablesSchema } from './trackables.js';
+import { createRequiredStringFieldNoTrim } from './validationUtils.js';
 
 /**
  * =========================
@@ -15,7 +15,11 @@ import { createRequiredStringFieldNoTrim, createOptionalStringFieldNoTrim } from
 export const VersionFormSchema = z.object({
     versionName: createRequiredStringFieldNoTrim(1, 100, 'Version name'),
     trackables: TrackablesSchema,
-    team_considerations: createOptionalStringFieldNoTrim(2000, 'Team considerations'),
+    // Allow null so we can distinguish "empty" from "don't update" in partial updates
+    team_considerations: z.string()
+        .max(2000, 'Team considerations too long')
+        .nullable()
+        .optional(),
     sk_recommended: z.boolean(),
 });
 

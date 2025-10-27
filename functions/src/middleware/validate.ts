@@ -24,8 +24,9 @@ export function validateBody<T extends z.ZodSchema>(schema: T) {
   return (req: Request, _res: Response, next: NextFunction) => {
     const result = schema.safeParse(req.body);
     if (!result.success) {
-      return next({ status: 400, message: "Validation failed", errors: result.error.errors });
+      return next({ status: 400, message: "Validation failed", errors: result.error.issues });
     }
+
     (req as TypedRequest<z.infer<T>>).body = result.data as z.infer<T>;
     next();
   };
@@ -38,7 +39,7 @@ export function validateParams<T extends z.ZodSchema>(schema: T) {
   return (req: Request, _res: Response, next: NextFunction) => {
     const result = schema.safeParse(req.params);
     if (!result.success) {
-      return next({ status: 400, message: "Invalid parameters", errors: result.error.errors });
+      return next({ status: 400, message: "Invalid parameters", errors: result.error.issues });
     }
     (req as TypedRequestParams<z.infer<T>>).validatedParams = result.data as z.infer<T>;
     next();

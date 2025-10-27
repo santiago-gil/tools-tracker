@@ -8,33 +8,36 @@
  */
 
 import { z } from 'zod';
-import { ToolSchema, CreateToolSchema, UpdateToolSchema } from './tools';
-import { UserSchema, UserUpdateSchema } from './users';
-import { ToolFormSchema, VersionFormSchema } from './forms';
-import { ToolsResponseSchema, SingleToolResponseSchema, UsersResponseSchema, SingleUserResponseSchema, CreateToolResponseSchema, UpdateToolResponseSchema, DeleteToolResponseSchema } from './api';
+import { ToolSchema, CreateToolSchema, UpdateToolSchema } from './tools.js';
+import { UserSchema, UserUpdateSchema } from './users.js';
+import { ToolFormSchema, VersionFormSchema } from './forms.js';
+import { ToolsResponseSchema, SingleToolResponseSchema, UsersResponseSchema, SingleUserResponseSchema, CreateToolResponseSchema, UpdateToolResponseSchema, DeleteToolResponseSchema } from './api.js';
 
 // Core types and enums
-export * from './core';
+export * from './core.js';
 
 // URL validation utilities (now in validationUtils)
 
 // Trackable schemas
-export * from './trackables';
+export * from './trackables.js';
 
 // User schemas
-export * from './users';
+export * from './users.js';
 
 // Tool schemas
-export * from './tools';
+export * from './tools.js';
 
 // Form schemas
-export * from './forms';
+export * from './forms.js';
 
 // API response schemas
-export * from './api';
+export * from './api.js';
 
 // Validation utilities
-export * from './validationUtils';
+export * from './validationUtils.js';
+
+// Slug utilities
+export * from './slugUtils.js';
 
 /**
  * =========================

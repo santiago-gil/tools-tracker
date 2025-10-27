@@ -2,7 +2,7 @@ import { Router } from "express";
 import { authMiddleware, requirePerm } from "../middleware/index.js";
 import { validateParams, validateBody } from "../middleware/validate.js";
 import { asyncHandler } from "../middleware/asyncHandler.js";
-import { uidParamSchema, userUpdateSchema, type UserUpdateInput } from "../utils/validate.js";
+import { uidParamSchema, UserUpdateSchema, type UserUpdate } from "../utils/validate.js";
 import {
   listUsers,
   getUserByUid,
@@ -10,7 +10,7 @@ import {
   deleteUser,
 } from "../services/users.js";
 import type { AuthedRequest } from "../types/http.js";
-import type { User } from "../types/Users.js";
+import type { User } from '../../../shared/schemas/index.js';
 import logger from "../utils/logger/index.js";
 
 const router = Router();
@@ -41,11 +41,20 @@ router.get(
   "/:uid",
   validateParams(uidParamSchema),
   asyncHandler(async (req: AuthedRequest, res) => {
+    logger.info({
+      uid: req.user?.uid,
+      path: req.path,
+      params: req.params,
+      route: '/users/:uid'
+    }, "GET /users/:uid called");
+
     if (!req.user) {
+      logger.warn("GET /users/:uid - No user in request");
       return res.status(401).json({ error: "Unauthorized" });
     }
 
     const { uid } = req.params;
+    logger.info({ requestedUid: uid, requesterUid: req.user.uid, role: req.user.role }, "Processing user fetch request");
 
     // req.user.role is now populated by authMiddleware
     if (req.user.role !== "admin" && req.user.uid !== uid) {
@@ -78,7 +87,7 @@ router.put(
   "/:uid",
   requirePerm("manageUsers"),
   validateParams(uidParamSchema),
-  validateBody(userUpdateSchema),
+  validateBody(UserUpdateSchema),
   asyncHandler(async (req: AuthedRequest, res) => {
     if (!req.user?.uid) {
       logger.error("Missing user context in authenticated request");
@@ -87,7 +96,7 @@ router.put(
 
     const { uid } = req.params;
     // req.body is now validated and typed by validateBody middleware
-    const updateData = req.body as unknown as UserUpdateInput;
+    const updateData = req.body as unknown as UserUpdate;
 
     logger.info(
       { uid, update: updateData, by: req.user.uid },

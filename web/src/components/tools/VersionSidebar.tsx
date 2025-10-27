@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { FilePlus2, X } from 'lucide-react';
 import { Badge } from '../common/Badge';
 import type { ToolVersion, TrackableStatus } from '../../types';
 
@@ -79,18 +80,18 @@ export function VersionSidebar({
   }, [versions]);
 
   return (
-    <div className="w-full md:w-64 bg-gray-50 dark:bg-gray-800 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700 p-4">
+    <div className="w-full md:w-64 bg-gray-50 dark:bg-gray-800 border-b md:border-b-0 md:border-r border-[var(--border-light)] p-4">
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-            Versions
-          </h3>
+          <h3 className="text-sm font-semibold text-primary">Versions</h3>
           <button
             type="button"
             onClick={onAddVersion}
-            className="filter-btn filter-btn-inactive text-xs px-2 py-1"
+            className="filter-btn filter-btn-inactive text-xs px-2 py-1 flex items-center gap-1"
+            title="Add Version"
+            aria-label="Add Version"
           >
-            + Add
+            <FilePlus2 className="w-4 h-4" />
           </button>
         </div>
 
@@ -112,7 +113,7 @@ export function VersionSidebar({
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate mb-1">
+                  <p className="text-sm font-medium text-primary truncate mb-1">
                     {version.versionName}
                   </p>
                   <div className="grid grid-cols-2 gap-1 min-h-[16px]">
@@ -122,13 +123,13 @@ export function VersionSidebar({
                       if (analysis.meaningful.length === 0) {
                         if (analysis.unknown.length > 0) {
                           return (
-                            <div className="col-span-2 text-xs text-gray-500 dark:text-gray-400 italic">
+                            <div className="col-span-2 text-xs text-tertiary italic">
                               Service status unknown
                             </div>
                           );
                         } else {
                           return (
-                            <div className="col-span-2 text-xs text-gray-500 dark:text-gray-400 italic">
+                            <div className="col-span-2 text-xs text-tertiary italic">
                               No service status configured
                             </div>
                           );
@@ -137,7 +138,7 @@ export function VersionSidebar({
 
                       return analysis.meaningful.map((trackable) => (
                         <div key={trackable.key} className="flex items-center gap-1">
-                          <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                          <span className="text-xs font-medium text-secondary">
                             {trackable.label}:
                           </span>
                           <Badge status={trackable.status} compact />
@@ -163,7 +164,7 @@ export function VersionSidebar({
                       }
                     }}
                   >
-                    ✕
+                    <X className="w-3 h-3" />
                   </span>
                 )}
               </div>

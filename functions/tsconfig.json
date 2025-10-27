@@ -1,14 +1,15 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
     "outDir": "lib",
+    "allowImportingTsExtensions": false,
     "paths": {
-      "*": ["*", "*.ts"],
       "@shared/schemas": ["../shared/schemas"],
       "@shared/schemas/*": ["../shared/schemas/*"]
     }
   },
-  "include": ["src", "migrate.js", "../shared/schemas"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "lib"]
 }

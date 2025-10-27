@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useToolForm } from '../../hooks/useToolForm';
 import { FormHeader } from './form/FormHeader';
-import { FormFooter } from './form/FormFooter';
 import { BasicInfoSection } from './form/BasicInfoSection';
 import { VersionFormSection } from './form/VersionFormSection';
 import { TrackableFieldsSection } from './form/TrackableFieldsSection';
@@ -88,7 +87,12 @@ export function ToolFormModal({
         className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-5xl my-8 max-h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <FormHeader isEditing={isEditing} onClose={onClose} />
+        <FormHeader
+          isEditing={isEditing}
+          onClose={onClose}
+          isSubmitting={isSubmitting}
+          onSubmit={() => handleSubmit(onFormSubmit, onFormError)()}
+        />
 
         {/* Form Content */}
         <div className="flex-1 overflow-hidden flex flex-col md:flex-row">
@@ -140,12 +144,6 @@ export function ToolFormModal({
                 </>
               )}
             </div>
-
-            <FormFooter
-              isEditing={isEditing}
-              isSubmitting={isSubmitting}
-              onClose={onClose}
-            />
           </form>
         </div>
       </div>

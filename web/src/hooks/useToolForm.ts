@@ -9,6 +9,7 @@ const DEFAULT_VERSION: ToolVersion = {
     versionName: 'v1',
     trackables: createEmptyTrackables(),
     sk_recommended: false,
+    team_considerations: '',
 };
 
 const createEmptyVersion = (): ToolVersion => ({
@@ -32,6 +33,7 @@ export function useToolForm(tool?: Tool | null, categories: string[] = []) {
         setValue,
         clearErrors,
         setError,
+        getValues,
     } = useForm<ToolFormData>({
         resolver: zodResolver(ToolFormSchema),
         defaultValues: tool
@@ -47,28 +49,37 @@ export function useToolForm(tool?: Tool | null, categories: string[] = []) {
             },
     });
 
+    // Use watch() for reactive render-time reads so components re-render on form changes.
+    // Handlers use getValues() for immediate synchronous access to the freshest state.
+    // This pattern ensures UI stays in sync while handlers always read current form state.
     const versions = watch('versions') as ToolFormData['versions'];
     const currentVersion = versions[selectedVersionIdx] as ToolFormData['versions'][0];
 
     const handleAddVersion = () => {
+        // Get the current versions from the form state using getValues to avoid unnecessary re-renders
+        const currentVersions = getValues('versions');
+
         // Create a completely clean version with all fields reset to default values
         const newVersion = createEmptyVersion();
 
-        // Add the new version to the form
-        setValue('versions', [...versions, newVersion]);
-        setSelectedVersionIdx(versions.length);
+        // Add the new version to the form using the current versions
+        setValue('versions', [...currentVersions, newVersion]);
+        setSelectedVersionIdx(currentVersions.length);
 
         // Clear any form errors to start fresh with the new version
         clearErrors();
     };
 
     const handleRemoveVersion = (idx: number) => {
-        if (versions.length > 1) {
-            const versionToDelete = versions[idx];
+        // Get current versions from form state to avoid stale closure
+        const currentVersions = getValues('versions');
+
+        if (currentVersions.length > 1) {
+            const versionToDelete = currentVersions[idx];
             const confirmMessage = `Are you sure you want to delete version "${versionToDelete.versionName}"? This action cannot be undone.`;
 
             if (confirm(confirmMessage)) {
-                const updated = versions.filter((_: ToolFormData['versions'][0], i: number) => i !== idx);
+                const updated = currentVersions.filter((_: ToolFormData['versions'][0], i: number) => i !== idx);
                 setValue('versions', updated);
                 if (selectedVersionIdx >= updated.length) {
                     setSelectedVersionIdx(updated.length - 1);

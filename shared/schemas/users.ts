@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { UserRoleSchema } from './core';
-import { createOptionalStringField, createRequiredDateTimeField, createOptionalDateTimeField } from './validationUtils';
+import { UserRoleSchema } from './core.js';
+import { createOptionalStringField, createRequiredDateTimeField, createOptionalDateTimeField } from './validationUtils.js';
 
 /**
  * =========================
@@ -31,7 +31,12 @@ export const UserSchema = z.object({
         z.string().min(1, "Email is required").email('Must be a valid email')
     ),
     role: UserRoleSchema.default('viewer'),
-    permissions: UserPermissionsSchema.default({}),
+    permissions: UserPermissionsSchema.default({
+        add: false,
+        edit: false,
+        delete: false,
+        manageUsers: false
+    }),
     createdAt: createRequiredDateTimeField('Created at'),
     updatedAt: createOptionalDateTimeField('Updated at'),
     photoURL: z.string().url().optional(),

@@ -1,11 +1,4 @@
-import type { TrackableField } from '../types';
-
-export type Trackables = {
-    gtm: TrackableField;
-    ga4: TrackableField;
-    google_ads: TrackableField;
-    msa: TrackableField;
-};
+import type { TrackableField, Trackables } from '@shared/schemas';
 
 /**
  * Creates an empty trackable field with default values

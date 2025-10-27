@@ -1,5 +1,5 @@
-import type { Tool } from "../types/Tool.js";
-import type { CreateTool, UpdateTool } from "../utils/validate.js";
+import type { Tool, CreateTool, UpdateTool } from '../../../shared/schemas/index.js';
+import { normalizeName } from '../../../shared/schemas/slugUtils.js';
 
 // Type for tools returned from service functions (with required ID)
 type ToolWithId = Tool & { id: string };
@@ -78,19 +78,17 @@ export async function getAllTools(forceRefresh = false): Promise<Tool[]> {
   return await toolsCache.get(
     'all-tools',
     async () => {
-      logger.info("Cache miss - fetching from Firestore");
+      logger.info("Cache MISS - fetching all docs from Firestore");
       const snap = await toolsCol.get();
       logger.info({ count: snap.size }, "Fetched tools collection");
       return snap.docs.map((d: QueryDocumentSnapshot) => {
         const data = d.data() as Omit<Tool, "id">;
 
-        // Auto-initialize _optimisticVersion if missing
+        // Note: If _optimisticVersion is missing, it will be initialized
+        // properly by verifyOptimisticLock() when updates happen.
+        // For read operations, we just set it to 0 in memory to prevent errors.
         if (data._optimisticVersion === undefined) {
-          logger.info({ toolId: d.id }, 'Tool missing _optimisticVersion, initializing to 0');
-          // Update the document in the background (don't wait for it)
-          d.ref.update({ _optimisticVersion: 0 }).catch((error: unknown) => {
-            logger.error({ error, toolId: d.id }, 'Failed to initialize _optimisticVersion');
-          });
+          logger.warn({ toolId: d.id }, 'Tool missing _optimisticVersion, defaulting to 0 in response');
           data._optimisticVersion = 0;
         }
 
@@ -193,8 +191,28 @@ export async function getToolById(id: string): Promise<Tool | null> {
 export async function addTool(data: CreateTool): Promise<ToolWithId> {
   logger.info({ data }, "Adding new tool");
 
+  // Check for duplicate tool names
+  const normalizedName = normalizeName(data.name);
+  const existingTools = await toolsCol
+    .where('normalizedName', '==', normalizedName)
+    .get();
+
+  if (!existingTools.empty) {
+    const existingTool = existingTools.docs[0].data();
+    throw new Error(`Tool with name "${existingTool.name}" already exists. Please use a different name.`);
+  }
+
+  // Check for duplicate version names within tool
+  // Intentionally normalize version names to lowercase (map(v => v.versionName.toLowerCase()))
+  // to perform a case-insensitive uniqueness check. This means "V1" and "v1" are treated as duplicates.
+  const versionNames = new Set(data.versions.map(v => v.versionName.toLowerCase()));
+  if (versionNames.size !== data.versions.length) {
+    throw new Error('Duplicate version names are not allowed within the same tool');
+  }
+
   const toolData = {
     ...data,
+    normalizedName, // Store normalized name for efficient queries
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     _optimisticVersion: 0, // Initialize version for new tools

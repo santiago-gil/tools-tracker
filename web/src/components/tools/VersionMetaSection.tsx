@@ -12,9 +12,9 @@ export function VersionMetaSection({ version, onChange }: VersionMetaSectionProp
   };
 
   return (
-    <div className="space-y-4 border-t pt-4">
+    <div className="space-y-4 border-t border-[var(--border-light)] pt-4">
       <div>
-        <label className="block text-sm font-medium text-gray-900 mb-1">
+        <label className="block text-sm font-medium text-primary mb-1">
           Team Considerations
         </label>
         <textarea

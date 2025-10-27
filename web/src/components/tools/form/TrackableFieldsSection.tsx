@@ -22,8 +22,8 @@ export function TrackableFieldsSection({
   versionIndex,
 }: TrackableFieldsSectionProps) {
   return (
-    <div className="space-y-4 border-t pt-4">
-      <h4 className="text-base font-semibold text-gray-900 dark:text-white">
+    <div className="space-y-4 border-t border-[var(--border-light)] pt-4">
+      <h4 className="text-base font-semibold text-primary">
         Tracking Capabilities
       </h4>
 

@@ -4,6 +4,7 @@ import { createUserDoc } from "../services/users.js";
 import { db } from "../utils/firebase.js";
 import { getAuth } from "firebase-admin/auth";
 import { COLLECTIONS } from "../config/collections.js";
+import { ALLOWED_EMAIL_DOMAINS } from "../config/auth.js";
 
 export const onUserCreated = auth.user().onCreate(async (user) => {
   const { uid, email, photoURL, displayName } = user;
@@ -15,18 +16,20 @@ export const onUserCreated = auth.user().onCreate(async (user) => {
     return;
   }
 
-  const allowedDomains = ["@searchkings.ca"];
+  const allowedDomains = ALLOWED_EMAIL_DOMAINS;
 
-  // relax auth in emulator
-  if (
-    process.env.FUNCTIONS_EMULATOR !== "true" &&
-    !allowedDomains.some((d) => email.endsWith(d))
-  ) {
+  // Check domain - always enforce, even in emulator
+  if (!allowedDomains.some((d) => email.endsWith(d))) {
     logger.warn(
       { uid, email, allowedDomains },
       "Unauthorized domain detected, disabling account"
     );
-    await getAuth().updateUser(uid, { disabled: true });
+    try {
+      await getAuth().updateUser(uid, { disabled: true });
+    } catch (err) {
+      logger.error({ uid, email, err }, "Error disabling user account");
+      throw err;
+    }
     return;
   }
 
