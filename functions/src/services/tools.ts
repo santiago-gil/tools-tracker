@@ -233,9 +233,11 @@ export async function addTool(data: CreateTool, req?: AuthedRequest): Promise<To
   // Normalize team_considerations before writing to ensure consistency
   const normalizedVersions = normalizeVersions(data.versions);
 
+  // Explicitly construct toolData to avoid client-provided normalizedName
+  const { normalizedName: _, ...dataWithoutNormalizedName } = data as CreateTool & { normalizedName?: string };
   const toolData = {
-    ...data,
-    normalizedName, // Store normalized name for efficient queries
+    ...dataWithoutNormalizedName,
+    normalizedName, // Store normalized name for efficient queries (computed, not from client)
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     _optimisticVersion: 0, // Initialize version for new tools
