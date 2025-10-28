@@ -8,6 +8,7 @@ import {
   getUserByUid,
   updateUser,
   deleteUser,
+  createUserDoc,
 } from "../services/users.js";
 import type { AuthedRequest } from "../types/http.js";
 import type { User } from '../../../shared/schemas/index.js';
@@ -68,7 +69,17 @@ router.get(
     const userDoc = await getUserByUid(uid);
 
     if (!userDoc) {
-      logger.warn({ uid }, "User document not found");
+      logger.warn({ uid }, "User document not found - attempting auto-creation");
+      // Only auto-create if requested for current user (not admin looking at someone else)
+      if (uid === req.user.uid && req.user.email) {
+        try {
+          const newUserDoc = await createUserDoc(uid, req.user.email, req.user.photoURL, req.user.displayName);
+          logger.info({ uid }, "User document auto-created in route");
+          return res.json({ user: newUserDoc });
+        } catch (err) {
+          logger.error({ uid, error: err }, "Failed to auto-create user in route");
+        }
+      }
       return res.status(404).json({ error: "User not found" });
     }
 

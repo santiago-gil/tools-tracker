@@ -149,14 +149,14 @@ class SmartCache<T> {
 
 // Cache configurations for different data types
 export const CACHE_CONFIGS = {
-    // Tools cache: 10 minutes fresh, 30 minutes acceptable (stale-while-revalidate)
-    // Phase 1 (0-10 min): Return cached, 0 reads
-    // Phase 2 (10-30 min): Return stale immediately, 250 reads in background (non-blocking)
-    // Phase 3 (30+ min): Must fetch fresh, 250 reads (blocking wait)
-    // Tools are edited infrequently, safe to cache longer
+    // Tools cache: 2 minutes fresh, 10 minutes acceptable (stale-while-revalidate)
+    // Phase 1 (0-2 min): Return cached, 0 reads
+    // Phase 2 (2-10 min): Return stale immediately, 250 reads in background (non-blocking)
+    // Phase 3 (10+ min): Must fetch fresh, 250 reads (blocking wait)
+    // Tools are edited infrequently, safe to cache but keep fresh for real-time feel
     tools: {
-        ttl: 10 * 60 * 1000, // 10 minutes (fresh period)
-        maxAge: 30 * 60 * 1000 // 30 minutes (expiration)
+        ttl: 2 * 60 * 1000, // 2 minutes (fresh period)
+        maxAge: 10 * 60 * 1000 // 10 minutes (expiration)
     },
 
     // Users cache: 5 minutes fresh, 30 minutes acceptable  
