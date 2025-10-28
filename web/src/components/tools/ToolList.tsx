@@ -1,16 +1,26 @@
-import { useState, useMemo, useEffect, memo, useCallback } from 'react';
 import {
-  useRouter,
-  useLocation,
-  useParams,
-  useSearch,
-  Outlet,
-} from '@tanstack/react-router';
+  useState,
+  useMemo,
+  useEffect,
+  memo,
+  useCallback,
+  lazy,
+  Suspense,
+  useRef,
+} from 'react';
+import { useRouter, useLocation, useParams, useSearch } from '@tanstack/react-router';
 import { ToolRow } from './ToolRow';
-import { ToolFormModal } from './ToolFormModal';
 import { ToolFilters } from './ToolFilters';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { SKRecommendedBadge } from '../common/SKRecommendedBadge';
+import { DynamicVirtualizedList } from '../common/DynamicVirtualizedList';
+
+// Lazy load the form modal to reduce initial bundle size
+const ToolFormModal = lazy(() =>
+  import('./ToolFormModal').then((module) => ({
+    default: module.ToolFormModal,
+  })),
+);
 import { X, RefreshCw, ListPlus } from 'lucide-react';
 import {
   useTools,
@@ -47,13 +57,25 @@ export const ToolList = memo(function ToolList() {
 
   const router = useRouter();
   const pathname = useLocation({ select: (l) => l.pathname });
-  const params = useParams({ strict: false }); // Use params from router
-  const searchParams = useSearch({ strict: false }); // Use search params from router
+  const params = useParams({ strict: false });
+  const searchParams = useSearch({ strict: false });
 
   // Get category and tool from route params (only present in /tools/$category/$tool route)
   const category = params.category;
   const toolName = params.tool;
   const versionName = searchParams.v;
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [showSKRecommendedOnly, setShowSKRecommendedOnly] = useState(false);
+  const [editingTool, setEditingTool] = useState<Tool | null>(null);
+  const [editingToolVersionIdx, setEditingToolVersionIdx] = useState<number>(0);
+  const [isAddingTool, setIsAddingTool] = useState(false);
+  const [localVersionIdx, setLocalVersionIdx] = useState<number | null>(null);
+  const virtualizerRef = useRef<{
+    scrollToIndex: (index: number) => void;
+    measure: () => void;
+  } | null>(null);
 
   // Create O(1) tool lookup map for large datasets (250-500+ tools)
   const toolLookupMap = useToolLookup(tools || []);
@@ -75,8 +97,14 @@ export const ToolList = memo(function ToolList() {
     return null;
   }, [urlKey, tools, toolLookupMap]);
 
-  // Get selected version index for the expanded tool from search params
+  // Get selected version index for the expanded tool from search params or local state
   const selectedVersionIdx = useMemo(() => {
+    // Use local version if it's been set (for quick version switches)
+    if (localVersionIdx !== null && expandedToolId) {
+      return localVersionIdx;
+    }
+
+    // Otherwise use URL params
     if (expandedToolId && tools && versionName) {
       const tool = tools.find((t) => t.id === expandedToolId);
       if (tool) {
@@ -87,13 +115,7 @@ export const ToolList = memo(function ToolList() {
       }
     }
     return 0; // Default to first version
-  }, [expandedToolId, tools, versionName]);
-
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [showSKRecommendedOnly, setShowSKRecommendedOnly] = useState(false);
-  const [editingTool, setEditingTool] = useState<Tool | null>(null);
-  const [showAddModal, setShowAddModal] = useState(false);
+  }, [expandedToolId, tools, versionName, localVersionIdx]);
 
   // Detect platform for keyboard shortcut display (memoized)
   const isMac = useMemo(
@@ -157,6 +179,7 @@ export const ToolList = memo(function ToolList() {
 
   // Handle invalid URLs - redirect to /tools if category/tool doesn't match any tool
   useEffect(() => {
+    // Only run this effect on specific route paths, not on every render
     if (
       pathname.startsWith('/tools/') &&
       pathname !== '/tools' &&
@@ -172,12 +195,11 @@ export const ToolList = memo(function ToolList() {
   }, [
     expandedToolId,
     tools,
-    router,
     pathname,
     isLoading,
     category,
     toolName,
-    toolLookupMap,
+    router, // router is stable, it's safe to include
   ]);
 
   // Extract filtering logic into custom hook
@@ -188,11 +210,107 @@ export const ToolList = memo(function ToolList() {
     showSKRecommendedOnly,
   });
 
+  // Track if we need to scroll after expansion completes
+  const pendingScrollIndexRef = useRef<number | null>(null);
+
+  // Scroll callback triggered after expansion animation completes
+  const handleExpansionComplete = useCallback(() => {
+    // Always clear the pending scroll state when expansion completes
+    // For direct navigation, the useEffect handles scrolling to avoid double-scroll
+    // For user-initiated expansions, we prevent the ref from staying stale
+    pendingScrollIndexRef.current = null;
+  }, []);
+
+  // Set up pending scroll when expanded tool changes (including direct navigation)
+  useEffect(() => {
+    if (
+      !expandedToolId ||
+      !filteredTools ||
+      filteredTools.length === 0 ||
+      !virtualizerRef.current
+    )
+      return;
+    if (isLoading) return; // Don't scroll while still loading
+
+    const index = filteredTools
+      .filter((tool): tool is Tool & { id: string } => Boolean(tool.id))
+      .findIndex((tool) => tool.id === expandedToolId);
+
+    if (index >= 0) {
+      // Store the index to scroll to after expansion completes
+      pendingScrollIndexRef.current = index;
+
+      // Check if this is direct navigation (have category/toolName in URL)
+      const isDirectNavigation = category && toolName;
+
+      if (isDirectNavigation) {
+        // Extract scroll logic to avoid closure issues
+        const performScroll = () => {
+          const toolCard = document.querySelector(`[data-tool-id="${expandedToolId}"]`);
+          const mainElement = document.querySelector('main');
+
+          if (!toolCard || !mainElement) return;
+
+          // Batch ALL layout reads at once to prevent layout thrashing
+          const cardRect = toolCard.getBoundingClientRect();
+          const mainRect = mainElement.getBoundingClientRect();
+          const scrollTop = mainElement.scrollTop;
+
+          // Check if card is fully visible with comfortable padding
+          const padding = 40;
+          const isCardFullyVisible =
+            cardRect.top >= mainRect.top + padding &&
+            cardRect.bottom <= mainRect.bottom - padding;
+
+          if (!isCardFullyVisible) {
+            // Single layout write
+            const scrollToPosition = cardRect.top - mainRect.top + scrollTop - padding;
+
+            mainElement.scrollTo({
+              top: Math.max(0, scrollToPosition),
+              behavior: 'auto',
+            });
+          }
+        };
+
+        // Optimal scroll using RAF - wait for paint cycle before reading layout
+        const rafScroll = () => {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(performScroll);
+          });
+        };
+
+        // Wait for DOM to be ready and animations to start settling
+        const initialDelay = setTimeout(rafScroll, 150);
+
+        // Also listen for transitionend to catch when animations complete
+        const toolCard = document.querySelector(`[data-tool-id="${expandedToolId}"]`);
+        const cleanup = () => {
+          clearTimeout(initialDelay);
+          if (toolCard) {
+            toolCard.removeEventListener('transitionend', performScroll);
+          }
+        };
+
+        if (toolCard) {
+          toolCard.addEventListener('transitionend', performScroll, { once: true });
+        }
+
+        return cleanup;
+      }
+    }
+  }, [expandedToolId, filteredTools, isLoading, category, toolName]);
+
   const handleSubmit = useCallback(
     async (toolData: ToolFormData, versionIdx?: number) => {
       // Backend will handle sanitization and validation
       try {
-        if (editingTool?.id) {
+        if (isAddingTool) {
+          // Creating new tool
+          await createTool.mutateAsync(toolData);
+          setIsAddingTool(false);
+        } else if (editingTool?.id) {
+          // Updating existing tool
           await updateTool.mutateAsync({
             id: editingTool.id,
             tool: toolData as Partial<
@@ -218,11 +336,6 @@ export const ToolList = memo(function ToolList() {
             ...(selectedVersion && { version: selectedVersion }),
           });
           setEditingTool(null); // Close modal immediately
-        } else {
-          await createTool.mutateAsync(
-            toolData as Omit<Tool, 'id' | 'createdAt' | 'updatedAt' | 'updatedBy'>,
-          );
-          setShowAddModal(false);
         }
       } catch (error) {
         // Error handling is done by the mutation hooks (toast notifications)
@@ -232,7 +345,7 @@ export const ToolList = memo(function ToolList() {
         }
       }
     },
-    [editingTool, updateTool, createTool],
+    [editingTool, updateTool, createTool, isAddingTool],
   );
 
   const handleDelete = useCallback(
@@ -275,38 +388,30 @@ export const ToolList = memo(function ToolList() {
   }, [refreshTools]);
 
   const handleAddTool = useCallback(() => {
-    setShowAddModal(true);
+    setIsAddingTool(true);
   }, []);
 
-  const handleEditTool = useCallback(
-    (tool: Tool) => {
-      // Navigate to edit route instead of opening modal
-      if (tool.id) {
-        const categorySlug = normalizeName(tool.category);
-        const toolSlug = normalizeName(tool.name);
-
-        router.navigate({
-          to: '/tools/$category/$tool/edit',
-          params: { category: categorySlug, tool: toolSlug },
-          search: versionName ? { v: versionName } : undefined,
-        });
-      }
-    },
-    [router, versionName],
-  );
+  const handleEditTool = useCallback((tool: Tool, versionIdx: number = 0) => {
+    // Open modal for editing (no route navigation for faster UX)
+    setEditingTool(tool);
+    setEditingToolVersionIdx(versionIdx);
+  }, []);
 
   const handleCloseModal = useCallback(() => {
-    setShowAddModal(false);
     setEditingTool(null);
+    setEditingToolVersionIdx(0);
+    setIsAddingTool(false);
   }, []);
 
   const handleToggleExpanded = useCallback(
     (toolId: string) => {
       if (expandedToolId === toolId) {
-        // Collapse - navigate to /tools
+        // Collapse - navigate to /tools and clear local version
+        setLocalVersionIdx(null);
         router.navigate({ to: '/tools' });
       } else {
         // Expand - navigate to /tools/{category}/{tool}
+        setLocalVersionIdx(null); // Reset local version when expanding new tool
         const tool = tools?.find((t) => t.id === toolId);
         if (tool) {
           const categorySlug = normalizeName(tool.category);
@@ -322,23 +427,29 @@ export const ToolList = memo(function ToolList() {
     [expandedToolId, router, tools],
   );
 
-  // Handle version selection - update URL immediately for tools with versions
+  // Handle version selection - use local state for fast switching (no navigation for expanded tool)
   const handleVersionSelect = useCallback(
     (toolId: string, versionIdx: number) => {
-      const tool = tools?.find((t) => t.id === toolId);
-      if (tool && tool.versions.length > versionIdx) {
-        const categorySlug = normalizeName(tool.category);
-        const toolSlug = normalizeName(tool.name);
+      // Only update URL if navigating to a different tool
+      if (toolId !== expandedToolId) {
+        const tool = tools?.find((t) => t.id === toolId);
+        if (tool && tool.versions.length > versionIdx) {
+          const categorySlug = normalizeName(tool.category);
+          const toolSlug = normalizeName(tool.name);
 
-        // Update URL immediately, even if tool is not expanded
-        router.navigate({
-          to: '/tools/$category/$tool',
-          params: { category: categorySlug, tool: toolSlug },
-          search: { v: tool.versions[versionIdx].versionName },
-        });
+          // Navigate to the tool with the selected version
+          router.navigate({
+            to: '/tools/$category/$tool',
+            params: { category: categorySlug, tool: toolSlug },
+            search: { v: tool.versions[versionIdx].versionName },
+          });
+        }
+      } else {
+        // Same tool, different version - just update local state (fast, no navigation)
+        setLocalVersionIdx(versionIdx);
       }
     },
-    [router, tools],
+    [router, tools, expandedToolId],
   );
 
   const handleClearSearch = useCallback(() => {
@@ -346,6 +457,7 @@ export const ToolList = memo(function ToolList() {
   }, []);
 
   // Create stable callback references for each tool to support memoization
+  // Only recompute when the list of tools changes, not when version state changes
   const toolCallbacks = useMemo(() => {
     if (!filteredTools) return new Map();
 
@@ -354,7 +466,7 @@ export const ToolList = memo(function ToolList() {
       {
         onToggleExpanded: () => void;
         onVersionSelect: (versionIdx: number) => void;
-        onEdit: () => void;
+        onEdit: (versionIdx: number) => void;
         onDelete: () => void;
       }
     >();
@@ -366,7 +478,7 @@ export const ToolList = memo(function ToolList() {
           onToggleExpanded: () => handleToggleExpanded(tool.id),
           onVersionSelect: (versionIdx: number) =>
             handleVersionSelect(tool.id, versionIdx),
-          onEdit: () => handleEditTool(tool),
+          onEdit: (versionIdx: number) => handleEditTool(tool, versionIdx),
           onDelete: () => handleDelete(tool),
         });
       });
@@ -374,17 +486,11 @@ export const ToolList = memo(function ToolList() {
     return callbacks;
   }, [
     filteredTools,
+    handleDelete,
+    handleEditTool,
     handleToggleExpanded,
     handleVersionSelect,
-    handleEditTool,
-    handleDelete,
   ]);
-
-  // Check if we're on the edit route - if so, render outlet (let edit route handle it)
-  const isEditRoute = pathname.endsWith('/edit');
-  if (isEditRoute) {
-    return <Outlet />;
-  }
 
   if (error) {
     return (
@@ -518,47 +624,77 @@ export const ToolList = memo(function ToolList() {
         ) : filteredTools.length === 0 ? (
           <p className="text-center py-12 text-tertiary content-text">No tools found.</p>
         ) : (
-          <div>
-            {filteredTools
-              .filter((tool): tool is Tool & { id: string } => Boolean(tool.id)) // Type guard to ensure tool.id is defined
-              .map((tool) => {
-                const callbacks = toolCallbacks.get(tool.id);
-                if (!callbacks) return null;
+          <DynamicVirtualizedList
+            ref={virtualizerRef}
+            items={filteredTools.filter((tool): tool is Tool & { id: string } =>
+              Boolean(tool.id),
+            )}
+            defaultItemHeight={200}
+            containerHeight="100%"
+            overscan={3}
+            renderItem={({ item: tool }) => {
+              const typedTool = tool as Tool;
+              const callbacks = toolCallbacks.get(typedTool.id);
+              if (!callbacks) return null;
 
-                return (
-                  <ToolRow
-                    key={tool.id}
-                    tool={tool}
-                    isExpanded={expandedToolId === tool.id}
-                    selectedVersionIdx={
-                      expandedToolId === tool.id ? selectedVersionIdx : 0
-                    }
-                    isNavigatedTo={expandedToolId === tool.id && urlKey !== null}
-                    onToggleExpanded={callbacks.onToggleExpanded}
-                    onVersionSelect={callbacks.onVersionSelect}
-                    onEdit={callbacks.onEdit}
-                    onDelete={callbacks.onDelete}
-                  />
-                );
-              })}
-          </div>
+              const isThisExpanded = expandedToolId === typedTool.id;
+              return (
+                <ToolRow
+                  key={typedTool.id}
+                  tool={typedTool}
+                  isExpanded={isThisExpanded}
+                  selectedVersionIdx={isThisExpanded ? selectedVersionIdx : 0}
+                  isNavigatedTo={isThisExpanded && urlKey !== null}
+                  onToggleExpanded={callbacks.onToggleExpanded}
+                  onVersionSelect={callbacks.onVersionSelect}
+                  onEdit={callbacks.onEdit}
+                  onDelete={callbacks.onDelete}
+                  onExpansionComplete={
+                    isThisExpanded
+                      ? () => {
+                          handleExpansionComplete();
+                        }
+                      : undefined
+                  }
+                />
+              );
+            }}
+          />
         )}
       </div>
 
-      {/* Show modal for add or edit */}
-      {(showAddModal || editingTool) && (
-        <ToolFormModal
-          key={
-            editingTool
-              ? `${editingTool.id}-${editingTool._optimisticVersion ?? 'no-version'}`
-              : 'new-tool'
+      {/* Show modal for edit or add - lazy loaded */}
+      {(editingTool || isAddingTool) && (
+        <Suspense
+          fallback={
+            <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
+                <LoadingSpinner />
+              </div>
+            </div>
           }
-          tool={editingTool}
-          categories={categories}
-          onClose={handleCloseModal}
-          onSubmit={handleSubmit}
-          isSubmitting={createTool.isPending || updateTool.isPending}
-        />
+        >
+          <ToolFormModal
+            key={
+              editingTool
+                ? `${editingTool.id}-${editingTool._optimisticVersion ?? 'no-version'}-v${editingToolVersionIdx}`
+                : 'new-tool'
+            }
+            tool={editingTool}
+            categories={categories}
+            onClose={handleCloseModal}
+            onSubmit={handleSubmit}
+            isSubmitting={Boolean(
+              (isAddingTool && createTool.isPending) ||
+                (editingTool && updateTool.isPending),
+            )}
+            initialVersionName={
+              editingTool && editingTool.versions.length > editingToolVersionIdx
+                ? editingTool.versions[editingToolVersionIdx].versionName
+                : undefined
+            }
+          />
+        </Suspense>
       )}
     </div>
   );

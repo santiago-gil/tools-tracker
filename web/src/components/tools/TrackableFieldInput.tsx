@@ -29,7 +29,10 @@ export function TrackableFieldInput({
     <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg space-y-3">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField label={label} required id={`${trackableKey}-status-${versionIndex}`}>
-          <select {...register(statusKey)} className="input-base">
+          <select
+            {...register(statusKey)}
+            className="input-base"
+          >
             {TRACKABLE_STATUSES.map((status) => (
               <option key={status} value={status}>
                 {status}

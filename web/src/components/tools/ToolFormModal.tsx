@@ -132,7 +132,7 @@ export function ToolFormModal({
           {/* Sidebar (versions) - only show in edit mode */}
           {isEditing && (
             <VersionSidebar
-              key={`sidebar-${selectedVersionIdx}-${versions.length}`}
+              key={`sidebar-${tool?.id || 'new'}`}
               versions={versions as ToolVersion[]}
               selectedIndex={selectedVersionIdx}
               onSelectVersion={handleVersionChange}
@@ -161,6 +161,7 @@ export function ToolFormModal({
               {currentVersion && (
                 <>
                   <VersionFormSection
+                    key={`version-form-${selectedVersionIdx}`}
                     version={currentVersion}
                     register={register}
                     errors={errors}
@@ -171,6 +172,7 @@ export function ToolFormModal({
                   />
 
                   <TrackableFieldsSection
+                    key={`trackables-${selectedVersionIdx}`}
                     register={register}
                     errors={errors}
                     versionIndex={selectedVersionIdx}

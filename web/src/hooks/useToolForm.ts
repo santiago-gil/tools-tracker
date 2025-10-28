@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useForm, type FieldErrors } from 'react-hook-form';
+import { useForm, type FieldErrors, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ToolFormSchema, type ToolFormData } from '@shared/schemas';
 import type { Tool, ToolVersion } from '../types';
@@ -24,8 +24,7 @@ const createEmptyVersion = (): ToolVersion => ({
 export function useToolForm(tool?: Tool | null, categories: string[] = []) {
     const [selectedVersionIdx, setSelectedVersionIdx] = useState(0);
     const [showCustomCategory, setShowCustomCategory] = useState(false);
-    // Store the original tool data as source of truth for each version
-    const [originalToolVersions, setOriginalToolVersions] = useState<ToolFormData['versions']>([]);
+    const [formVersion, setFormVersion] = useState(0);
 
     const {
         register,
@@ -37,6 +36,7 @@ export function useToolForm(tool?: Tool | null, categories: string[] = []) {
         setError,
         getValues,
         reset,
+        control,
     } = useForm<ToolFormData>({
         resolver: zodResolver(ToolFormSchema),
         defaultValues: tool
@@ -55,19 +55,18 @@ export function useToolForm(tool?: Tool | null, categories: string[] = []) {
             },
     });
 
-    const versions = watch('versions') as ToolFormData['versions'];
+    // Use useWatch to ensure re-renders when nested fields change
+    const versions = useWatch({ control, name: 'versions' }) as ToolFormData['versions'];
     const currentVersion = versions[selectedVersionIdx] as ToolFormData['versions'][0];
 
-    // Initialize form and store original tool versions
+    // Increment form version when selected version index changes
+    useEffect(() => {
+        setFormVersion(v => v + 1);
+    }, [selectedVersionIdx]);
+
+    // Initialize form when tool changes
     useEffect(() => {
         if (tool && tool.id !== undefined) {
-            // Store original versions as source of truth with team_considerations normalized
-            const cloned = structuredClone(tool.versions).map((v: ToolVersion) => ({
-                ...v,
-                team_considerations: v.team_considerations ?? '',
-            }));
-            setOriginalToolVersions(cloned);
-
             // Only reset form if this is a different tool or versions changed
             const currentVersions = getValues('versions');
             const versionsChanged =
@@ -88,41 +87,16 @@ export function useToolForm(tool?: Tool | null, categories: string[] = []) {
         }
     }, [tool, reset, getValues]); // Include tool to properly track all changes
 
-    // Handle version switching - always restore from original tool data
+    // Handle version switching - just update index, form handles the rest
     const handleVersionSwitch = useCallback((newIdx: number) => {
         // If switching to the same version, do nothing
         if (selectedVersionIdx === newIdx) {
             return;
         }
 
-        // Get current form values
-        const name = getValues('name');
-        const category = getValues('category');
-        const currentVersions = getValues('versions');
-
-        // Create updated versions array - restore target from original, keep others
-        const updatedVersions = currentVersions.map((v, idx) => {
-            if (idx === newIdx && originalToolVersions[idx]) {
-                // Restore this version from original data
-                return structuredClone(originalToolVersions[idx]);
-            } else {
-                // Keep current data for other versions
-                return v;
-            }
-        });
-
-        // Reset the entire form to ensure all fields update properly
-        reset({
-            name,
-            category,
-            versions: updatedVersions,
-        }, {
-            keepDefaultValues: false,
-            keepDirty: false,
-        });
-
+        // Just update the selected index - watch() will update currentVersion automatically
         setSelectedVersionIdx(newIdx);
-    }, [selectedVersionIdx, originalToolVersions, getValues, reset, setSelectedVersionIdx]);
+    }, [selectedVersionIdx, setSelectedVersionIdx]);
 
     const handleAddVersion = useCallback(() => {
         // Get the current versions from the form state using getValues to avoid unnecessary re-renders
@@ -135,15 +109,11 @@ export function useToolForm(tool?: Tool | null, categories: string[] = []) {
         // Add the new version to the form using the current versions
         setValue('versions', [...currentVersions, newVersion], { shouldDirty: true });
 
-        // Add to original versions too
-        const cloned = structuredClone(newVersion);
-        setOriginalToolVersions(prev => [...prev, cloned]);
-
         setSelectedVersionIdx(newIdx);
 
         // Clear any form errors to start fresh with the new version
         clearErrors();
-    }, [getValues, setValue, setOriginalToolVersions, setSelectedVersionIdx, clearErrors]);
+    }, [getValues, setValue, setSelectedVersionIdx, clearErrors]);
 
     const handleRemoveVersion = useCallback((idx: number) => {
         // Get current versions from form state to avoid stale closure
@@ -156,16 +126,13 @@ export function useToolForm(tool?: Tool | null, categories: string[] = []) {
             if (confirm(confirmMessage)) {
                 const updated = currentVersions.filter((_: ToolFormData['versions'][0], i: number) => i !== idx);
 
-                // Update original versions
-                setOriginalToolVersions(prev => prev.filter((_, i) => i !== idx));
-
                 setValue('versions', updated, { shouldDirty: true });
                 if (selectedVersionIdx >= updated.length) {
                     setSelectedVersionIdx(updated.length - 1);
                 }
             }
         }
-    }, [getValues, selectedVersionIdx, setValue, setOriginalToolVersions, setSelectedVersionIdx]);
+    }, [getValues, selectedVersionIdx, setValue, setSelectedVersionIdx]);
 
     const handleCategoryChange = useCallback((value: string) => {
         if (value === '__custom__') {
@@ -220,5 +187,8 @@ export function useToolForm(tool?: Tool | null, categories: string[] = []) {
 
         // Form handlers
         onFormError,
+
+        // Reactive version counter for forcing re-renders
+        formVersion,
     };
 }

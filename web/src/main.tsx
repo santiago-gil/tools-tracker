@@ -11,11 +11,11 @@ import './index.css';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 2, // 2 minutes - reduced for better concurrent editing
-      gcTime: 1000 * 60 * 10, // 10 minutes - keep data in cache longer (v5: gcTime replaces cacheTime)
+      staleTime: 1000 * 60 * 5, // 5 minutes - data stays fresh for 5 minutes
+      gcTime: 1000 * 60 * 10, // 10 minutes - keep data in cache longer
       retry: 1,
-      refetchOnWindowFocus: true, // Refetch when user returns to tab to see concurrent changes
-      refetchOnMount: true, // Refetch stale data on mount to surface concurrent edits from other users
+      refetchOnWindowFocus: false, // Disabled to prevent constant re-renders
+      refetchOnMount: false, // Disabled - only refetch manually or when needed
     },
   },
 });
@@ -37,7 +37,7 @@ createRoot(document.getElementById('root')!).render(
             }}
           />
         </AuthProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
+        {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
       </QueryClientProvider>
     </ErrorBoundary>
   </StrictMode>,

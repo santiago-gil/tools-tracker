@@ -1,6 +1,16 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { useRef, memo, useCallback, useEffect, useState } from 'react';
+import {
+  useRef,
+  memo,
+  useCallback,
+  useEffect,
+  useState,
+  forwardRef,
+  useImperativeHandle,
+} from 'react';
 import type { ReactNode } from 'react';
+
+const LAST_ITEMS_THRESHOLD = 3;
 
 interface DynamicVirtualizedListProps<T> {
   items: T[];
@@ -12,15 +22,23 @@ interface DynamicVirtualizedListProps<T> {
   onItemHeightChange?: (index: number, height: number) => void;
 }
 
-export const DynamicVirtualizedList = memo(function DynamicVirtualizedList<T>({
-  items,
-  defaultItemHeight,
-  containerHeight,
-  renderItem,
-  className = '',
-  overscan = 5,
-  onItemHeightChange,
-}: DynamicVirtualizedListProps<T>) {
+export interface DynamicVirtualizedListHandle {
+  scrollToIndex: (index: number) => void;
+  measure: () => void;
+}
+
+function DynamicVirtualizedListInner<T>(
+  {
+    items,
+    defaultItemHeight,
+    containerHeight,
+    renderItem,
+    className = '',
+    overscan = 5,
+    onItemHeightChange,
+  }: DynamicVirtualizedListProps<T>,
+  ref: React.ForwardedRef<DynamicVirtualizedListHandle>,
+) {
   const parentRef = useRef<HTMLDivElement>(null);
   const [itemHeights, setItemHeights] = useState<Map<number, number>>(new Map());
 
@@ -37,6 +55,40 @@ export const DynamicVirtualizedList = memo(function DynamicVirtualizedList<T>({
     estimateSize: getItemHeight,
     overscan,
   });
+
+  // Expose scroll method via ref
+  useImperativeHandle(
+    ref,
+    () => ({
+      scrollToIndex: (index: number) => {
+        // Check if item is near the bottom of the list
+        const totalItems = items.length;
+        const isLastItems = index >= totalItems - LAST_ITEMS_THRESHOLD; // Last 3 items
+
+        try {
+          if (isLastItems) {
+            // Align to end so expanded content is fully visible
+            virtualizer.scrollToIndex(index, {
+              align: 'end',
+              behavior: 'auto',
+            });
+          } else {
+            // For other items, use center alignment for better visibility
+            virtualizer.scrollToIndex(index, {
+              align: 'center',
+              behavior: 'auto',
+            });
+          }
+        } catch (error) {
+          console.error('virtualizer.scrollToIndex error:', error);
+        }
+      },
+      measure: () => {
+        virtualizer.measure();
+      },
+    }),
+    [virtualizer, items.length],
+  );
 
   // Update item height when it changes
   const handleItemHeightChange = useCallback(
@@ -59,7 +111,7 @@ export const DynamicVirtualizedList = memo(function DynamicVirtualizedList<T>({
   return (
     <div
       ref={parentRef}
-      className={`overflow-auto ${className}`}
+      className={`overflow-y-auto ${className}`}
       style={{
         height: typeof containerHeight === 'string' ? containerHeight : containerHeight,
         minHeight: typeof containerHeight === 'number' ? containerHeight : undefined,
@@ -98,7 +150,25 @@ export const DynamicVirtualizedList = memo(function DynamicVirtualizedList<T>({
       </div>
     </div>
   );
-}) as <T>(props: DynamicVirtualizedListProps<T>) => JSX.Element;
+}
+
+const DynamicVirtualizedListInnerWithRef = forwardRef(DynamicVirtualizedListInner) as <T>(
+  props: DynamicVirtualizedListProps<T> & {
+    ref?: React.Ref<DynamicVirtualizedListHandle>;
+  },
+) => JSX.Element;
+
+export const DynamicVirtualizedList = memo(
+  DynamicVirtualizedListInnerWithRef,
+  (prevProps, nextProps) => {
+    return (
+      prevProps.items === nextProps.items &&
+      prevProps.defaultItemHeight === nextProps.defaultItemHeight &&
+      prevProps.containerHeight === nextProps.containerHeight &&
+      prevProps.overscan === nextProps.overscan
+    );
+  },
+) as typeof DynamicVirtualizedListInnerWithRef;
 
 // Component to measure and report height changes
 interface DynamicItemWrapperProps {

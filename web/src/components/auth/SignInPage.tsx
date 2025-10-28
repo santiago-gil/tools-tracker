@@ -1,19 +1,31 @@
 import { useEffect } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { useRouter, useSearch } from '@tanstack/react-router';
 import { useAuth } from '../../hooks/useAuth';
 import { CrownLogo } from '../layout/CrownLogo';
 import { DarkModeToggle } from '../common/DarkModeToggle';
+import { validateRedirectPath } from '../../utils/urlValidation';
 
 export function SignInPage() {
   const { signInWithGoogle, loading, user } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
+  const { redirectTo } = useSearch({ from: '/sign-in' });
 
-  // Redirect to tools after successful sign-in
+  // Redirect to intended destination after successful sign-in
   useEffect(() => {
     if (!loading && user) {
-      navigate({ to: '/tools', replace: true });
+      // Only redirect if we have a meaningful redirect destination
+      if (redirectTo) {
+        const destination = validateRedirectPath(redirectTo);
+        // Only navigate if we have a valid destination (not empty and not sign-in)
+        if (destination && destination !== '/sign-in') {
+          router.navigate({ to: destination, replace: true });
+          return;
+        }
+      }
+      // If no redirectTo parameter or invalid destination, redirect to tools
+      router.navigate({ to: '/tools', replace: true });
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, router, redirectTo]);
 
   // Note: The router's beforeLoad hook handles redirecting authenticated users to /tools
   // This component only renders if user is not authenticated

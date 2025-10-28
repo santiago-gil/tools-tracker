@@ -1,4 +1,4 @@
-import { memo, useRef, useEffect } from 'react';
+import { memo, useRef, useEffect, useCallback } from 'react';
 import type { Tool } from '../../types';
 import { ToolRowHeader } from './ToolRowHeader';
 import { ToolRowExpanded } from './ToolRowExpanded';
@@ -9,9 +9,10 @@ interface ToolRowProps {
   selectedVersionIdx: number;
   onToggleExpanded: () => void;
   onVersionSelect: (versionIdx: number) => void;
-  onEdit: () => void;
+  onEdit: (versionIdx: number) => void;
   onDelete: () => void;
   isNavigatedTo?: boolean; // Whether this tool was navigated to via URL
+  onExpansionComplete?: () => void; // Called when expansion animation completes
 }
 
 function ToolRowComponent({
@@ -22,10 +23,11 @@ function ToolRowComponent({
   onVersionSelect,
   onEdit,
   onDelete,
-  isNavigatedTo = false,
+  isNavigatedTo,
+  onExpansionComplete,
 }: ToolRowProps) {
+  void isNavigatedTo; // Keep for prop signature
   const toolRowRef = useRef<HTMLDivElement>(null);
-  const hasScrolledRef = useRef(false);
 
   // Validate propSelectedVersionIdx and compute currentVersion safely
   const isValidIndex =
@@ -39,53 +41,31 @@ function ToolRowComponent({
   // regardless of whether they have expandable content or not. The URL navigation will
   // select the correct version and scroll to the tool, even if it's not expandable.
 
-  // Scroll to tool if it was navigated to via URL (regardless of expandability)
+  // Note: Scrolling is handled by parent ToolList component to ensure
+  // proper coordination with expansion animations and prevent multiple competing scrolls
+
+  // Listen for expansion animation completion
   useEffect(() => {
-    if (isNavigatedTo && toolRowRef.current && !hasScrolledRef.current) {
-      const element = toolRowRef.current;
-      hasScrolledRef.current = true;
+    const cardElement = toolRowRef.current;
+    if (!cardElement || !isExpanded || !onExpansionComplete) return;
 
-      // Wait for next animation frame to avoid blocking initial render
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          if (element) {
-            element.scrollIntoView({
-              behavior: 'auto',
-              block: 'center',
-              inline: 'nearest',
-            });
-          }
-        });
-      });
-    }
-  }, [isNavigatedTo]);
+    const handleTransitionEnd = (event: TransitionEvent) => {
+      // Only trigger on the card element's own transition, not child transitions
+      if (event.target === cardElement) {
+        onExpansionComplete();
+      }
+    };
 
-  // Scroll to expanded tool if it's not in viewport (for click-based expansion)
-  useEffect(() => {
-    if (isExpanded && !isNavigatedTo && toolRowRef.current) {
-      const element = toolRowRef.current;
+    cardElement.addEventListener('transitionend', handleTransitionEnd);
+    return () => {
+      cardElement.removeEventListener('transitionend', handleTransitionEnd);
+    };
+  }, [isExpanded, onExpansionComplete]);
 
-      // Use minimal timeout to avoid blocking render
-      const timeoutId = window.setTimeout(() => {
-        if (!element) return;
-
-        // Use getBoundingClientRect only when necessary
-        const rect = element.getBoundingClientRect();
-        const viewportHeight = window.innerHeight;
-
-        // Only scroll if element is truly out of view
-        if (rect.bottom > viewportHeight || rect.top < 0) {
-          element.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-            inline: 'nearest',
-          });
-        }
-      }, 0); // Defer until after current call stack clears
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [isExpanded, isNavigatedTo]);
+  const handleEdit = useCallback(
+    () => onEdit(propSelectedVersionIdx),
+    [onEdit, propSelectedVersionIdx],
+  );
 
   // Safety check for versions array
   if (!tool.versions || tool.versions.length === 0) {
@@ -97,38 +77,66 @@ function ToolRowComponent({
   }
 
   return (
-    <div
-      ref={toolRowRef}
-      className={`card elevation-2 elevation-interactive transition-colors duration-200 ${
-        isExpanded ? 'expanded' : 'overflow-hidden'
-      }`}
-      role="article"
-      aria-label={`Tool: ${tool.name}`}
-    >
-      <ToolRowHeader
-        tool={tool}
-        currentVersion={currentVersion}
-        selectedVersionIdx={propSelectedVersionIdx}
-        expanded={isExpanded}
-        onToggleExpanded={onToggleExpanded}
-        onVersionSelect={onVersionSelect}
-        onEdit={onEdit}
-        onDelete={onDelete}
-      />
-
-      {/* Expanded Details */}
-      {isExpanded && currentVersion && (
-        <ToolRowExpanded
+    <div className="mb-4">
+      <div
+        ref={toolRowRef}
+        data-tool-id={tool.id}
+        className={`card elevation-2 elevation-interactive transition-colors duration-200 ${
+          isExpanded ? 'expanded toolRowExpanded' : 'overflow-hidden'
+        }`}
+        role="article"
+        aria-label={`Tool: ${tool.name}`}
+      >
+        <ToolRowHeader
+          tool={tool}
           currentVersion={currentVersion}
-          toolId={tool.id || ''}
-          versionIdx={propSelectedVersionIdx}
+          selectedVersionIdx={propSelectedVersionIdx}
+          expanded={isExpanded}
+          onToggleExpanded={onToggleExpanded}
+          onVersionSelect={onVersionSelect}
+          onEdit={handleEdit}
+          onDelete={onDelete}
         />
-      )}
+
+        {/* Expanded Details */}
+        {isExpanded && currentVersion && (
+          <div className="toolRowExpandedContent">
+            <ToolRowExpanded
+              currentVersion={currentVersion}
+              toolId={tool.id || ''}
+              versionIdx={propSelectedVersionIdx}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-export const ToolRow = memo(ToolRowComponent);
+export const ToolRow = memo(ToolRowComponent, (prevProps, nextProps) => {
+  // Re-render only if key props change
+  if (prevProps.tool.id !== nextProps.tool.id) return false;
+  if (prevProps.isExpanded !== nextProps.isExpanded) return false;
+  if (prevProps.selectedVersionIdx !== nextProps.selectedVersionIdx) return false;
+  if (prevProps.isNavigatedTo !== nextProps.isNavigatedTo) return false;
+
+  // Re-render if tool versions changed
+  if (prevProps.tool.versions.length !== nextProps.tool.versions.length) return false;
+
+  // Re-render if current version data changed
+  const prevVersion = prevProps.tool.versions[prevProps.selectedVersionIdx];
+  const nextVersion = nextProps.tool.versions[nextProps.selectedVersionIdx];
+
+  // Check for mismatched existence (one defined, other undefined)
+  if (!!prevVersion !== !!nextVersion) return false;
+
+  if (prevVersion && nextVersion) {
+    if (prevVersion.versionName !== nextVersion.versionName) return false;
+    if (prevVersion.sk_recommended !== nextVersion.sk_recommended) return false;
+  }
+
+  return true; // Props are equal, skip re-render
+});
 
 // Set display name for better React DevTools debugging
 ToolRow.displayName = 'ToolRow';

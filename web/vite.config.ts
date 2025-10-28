@@ -13,7 +13,13 @@ export default defineConfig({
   plugins: [
     tanstackRouter({
       target: 'react',
-      autoCodeSplitting: true, // Enable automatic code splitting
+      autoCodeSplitting: true,
+      codeSplittingOptions: {
+        // Default: keep loaders with components for most routes
+        defaultBehavior: [
+          ['loader', 'component'], // Keep loader and component together
+        ],
+      },
     }),
     react(),
     svgr({
@@ -48,6 +54,10 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    // Note: Vite automatically handles SPA routing - no historyApiFallback option needed
+    watch: {
+      ignored: ['**/.tanstack/tmp/**', '**/node_modules/**', '**/dist/**'],
+    },
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:5001/tool-tracker-c8180/us-central1/api',

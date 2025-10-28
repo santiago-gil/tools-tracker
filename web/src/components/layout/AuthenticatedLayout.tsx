@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Header } from './Header';
-import { Outlet, useRouter } from '@tanstack/react-router';
+import { Outlet, useRouter, useLocation } from '@tanstack/react-router';
 import { useAuth } from '../../hooks/useAuth';
+import { buildRedirectTo } from '../../utils/urlValidation';
 
 export function AuthenticatedLayout() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const location = useLocation();
   const [redirectError, setRedirectError] = useState<string | null>(null);
   const [isRedirecting, setIsRedirecting] = useState(false);
 
@@ -15,12 +17,26 @@ export function AuthenticatedLayout() {
   // Actually redirect to sign-in if no user after loading completes
   useEffect(() => {
     if (!loading && !user) {
+      // Don't redirect if we're already on the sign-in page to prevent infinite loops
+      if (location.pathname === '/sign-in') {
+        return;
+      }
+
       const performRedirect = async () => {
         setIsRedirecting(true);
         setRedirectError(null);
 
         try {
-          await router.navigate({ to: '/sign-in' });
+          console.log(
+            'AuthenticatedLayout: Redirecting to sign-in with location:',
+            location,
+          );
+          const redirectTo = buildRedirectTo(location);
+          console.log('AuthenticatedLayout: redirectTo =', redirectTo);
+          await router.navigate({
+            to: '/sign-in',
+            search: redirectTo ? { redirectTo } : undefined,
+          });
           // If navigation succeeds, component will unmount
         } catch (error) {
           const errorMessage =
@@ -33,7 +49,7 @@ export function AuthenticatedLayout() {
 
       performRedirect();
     }
-  }, [loading, user, router]);
+  }, [loading, user, router, location]);
 
   // Show loading state while authentication is in progress
   if (loading) {
@@ -78,7 +94,11 @@ export function AuthenticatedLayout() {
                   setRedirectError(null);
                   setIsRedirecting(true);
                   try {
-                    await router.navigate({ to: '/sign-in' });
+                    const redirectTo = buildRedirectTo(location);
+                    await router.navigate({
+                      to: '/sign-in',
+                      search: { redirectTo },
+                    });
                     // If navigation succeeds, component will unmount
                   } catch (error) {
                     const errorMessage =
@@ -94,7 +114,10 @@ export function AuthenticatedLayout() {
               </button>
               <p className="text-sm text-secondary mt-4">
                 Or{' '}
-                <a href="/sign-in" className="text-primary underline">
+                <a
+                  href={`/sign-in?redirectTo=${buildRedirectTo(location)}`}
+                  className="text-primary underline"
+                >
                   click here
                 </a>{' '}
                 to go to sign-in

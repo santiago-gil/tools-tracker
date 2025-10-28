@@ -15,7 +15,6 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated.
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated.users'
 import { Route as AuthenticatedToolsRouteImport } from './routes/_authenticated.tools'
 import { Route as AuthenticatedToolsCategoryToolRouteImport } from './routes/_authenticated.tools.$category.$tool'
-import { Route as AuthenticatedToolsCategoryToolEditRouteImport } from './routes/_authenticated.tools.$category.$tool.edit'
 
 const SignInRoute = SignInRouteImport.update({
   id: '/sign-in',
@@ -47,28 +46,20 @@ const AuthenticatedToolsCategoryToolRoute =
     path: '/$category/$tool',
     getParentRoute: () => AuthenticatedToolsRoute,
   } as any)
-const AuthenticatedToolsCategoryToolEditRoute =
-  AuthenticatedToolsCategoryToolEditRouteImport.update({
-    id: '/edit',
-    path: '/edit',
-    getParentRoute: () => AuthenticatedToolsCategoryToolRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/sign-in': typeof SignInRoute
   '/tools': typeof AuthenticatedToolsRouteWithChildren
   '/users': typeof AuthenticatedUsersRoute
   '/': typeof AuthenticatedIndexRoute
-  '/tools/$category/$tool': typeof AuthenticatedToolsCategoryToolRouteWithChildren
-  '/tools/$category/$tool/edit': typeof AuthenticatedToolsCategoryToolEditRoute
+  '/tools/$category/$tool': typeof AuthenticatedToolsCategoryToolRoute
 }
 export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
   '/tools': typeof AuthenticatedToolsRouteWithChildren
   '/users': typeof AuthenticatedUsersRoute
   '/': typeof AuthenticatedIndexRoute
-  '/tools/$category/$tool': typeof AuthenticatedToolsCategoryToolRouteWithChildren
-  '/tools/$category/$tool/edit': typeof AuthenticatedToolsCategoryToolEditRoute
+  '/tools/$category/$tool': typeof AuthenticatedToolsCategoryToolRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,26 +68,13 @@ export interface FileRoutesById {
   '/_authenticated/tools': typeof AuthenticatedToolsRouteWithChildren
   '/_authenticated/users': typeof AuthenticatedUsersRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
-  '/_authenticated/tools/$category/$tool': typeof AuthenticatedToolsCategoryToolRouteWithChildren
-  '/_authenticated/tools/$category/$tool/edit': typeof AuthenticatedToolsCategoryToolEditRoute
+  '/_authenticated/tools/$category/$tool': typeof AuthenticatedToolsCategoryToolRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/sign-in'
-    | '/tools'
-    | '/users'
-    | '/'
-    | '/tools/$category/$tool'
-    | '/tools/$category/$tool/edit'
+  fullPaths: '/sign-in' | '/tools' | '/users' | '/' | '/tools/$category/$tool'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/sign-in'
-    | '/tools'
-    | '/users'
-    | '/'
-    | '/tools/$category/$tool'
-    | '/tools/$category/$tool/edit'
+  to: '/sign-in' | '/tools' | '/users' | '/' | '/tools/$category/$tool'
   id:
     | '__root__'
     | '/_authenticated'
@@ -105,7 +83,6 @@ export interface FileRouteTypes {
     | '/_authenticated/users'
     | '/_authenticated/'
     | '/_authenticated/tools/$category/$tool'
-    | '/_authenticated/tools/$category/$tool/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -157,38 +134,15 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedToolsCategoryToolRouteImport
       parentRoute: typeof AuthenticatedToolsRoute
     }
-    '/_authenticated/tools/$category/$tool/edit': {
-      id: '/_authenticated/tools/$category/$tool/edit'
-      path: '/edit'
-      fullPath: '/tools/$category/$tool/edit'
-      preLoaderRoute: typeof AuthenticatedToolsCategoryToolEditRouteImport
-      parentRoute: typeof AuthenticatedToolsCategoryToolRoute
-    }
   }
 }
-
-interface AuthenticatedToolsCategoryToolRouteChildren {
-  AuthenticatedToolsCategoryToolEditRoute: typeof AuthenticatedToolsCategoryToolEditRoute
-}
-
-const AuthenticatedToolsCategoryToolRouteChildren: AuthenticatedToolsCategoryToolRouteChildren =
-  {
-    AuthenticatedToolsCategoryToolEditRoute:
-      AuthenticatedToolsCategoryToolEditRoute,
-  }
-
-const AuthenticatedToolsCategoryToolRouteWithChildren =
-  AuthenticatedToolsCategoryToolRoute._addFileChildren(
-    AuthenticatedToolsCategoryToolRouteChildren,
-  )
 
 interface AuthenticatedToolsRouteChildren {
-  AuthenticatedToolsCategoryToolRoute: typeof AuthenticatedToolsCategoryToolRouteWithChildren
+  AuthenticatedToolsCategoryToolRoute: typeof AuthenticatedToolsCategoryToolRoute
 }
 
 const AuthenticatedToolsRouteChildren: AuthenticatedToolsRouteChildren = {
-  AuthenticatedToolsCategoryToolRoute:
-    AuthenticatedToolsCategoryToolRouteWithChildren,
+  AuthenticatedToolsCategoryToolRoute: AuthenticatedToolsCategoryToolRoute,
 }
 
 const AuthenticatedToolsRouteWithChildren =
