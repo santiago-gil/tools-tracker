@@ -5,8 +5,13 @@ import { apiDocument } from '../docs/api.js';
 
 export function attachRoutes(app: Express) {
   app.use('/tools', toolsRouter);
+  app.use('/api/tools', toolsRouter);
   app.use('/users', (req, res, next) => {
     console.log('Users router hit:', req.method, req.path);
+    next();
+  }, usersRouter);
+  app.use('/api/users', (req, res, next) => {
+    console.log('API Users router hit:', req.method, req.path);
     next();
   }, usersRouter);
 
