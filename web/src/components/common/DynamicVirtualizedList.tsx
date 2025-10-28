@@ -41,6 +41,7 @@ function DynamicVirtualizedListInner<T>(
 ) {
   const parentRef = useRef<HTMLDivElement>(null);
   const [itemHeights, setItemHeights] = useState<Map<number, number>>(new Map());
+  const measureRafRef = useRef<number | null>(null);
 
   const getItemHeight = useCallback(
     (index: number) => {
@@ -103,9 +104,22 @@ function DynamicVirtualizedListInner<T>(
     [onItemHeightChange],
   );
 
-  // Force virtualizer to recalculate when heights change
+  // Force virtualizer to recalculate when heights change (using RAF to batch updates)
   useEffect(() => {
-    virtualizer.measure();
+    if (measureRafRef.current) {
+      cancelAnimationFrame(measureRafRef.current);
+    }
+
+    measureRafRef.current = requestAnimationFrame(() => {
+      virtualizer.measure();
+      measureRafRef.current = null;
+    });
+
+    return () => {
+      if (measureRafRef.current) {
+        cancelAnimationFrame(measureRafRef.current);
+      }
+    };
   }, [itemHeights, virtualizer]);
 
   return (

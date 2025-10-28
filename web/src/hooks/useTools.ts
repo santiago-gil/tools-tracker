@@ -41,20 +41,14 @@ export function useCreateTool() {
         });
         toast.success(response.message || 'Tool created successfully');
       } else if (response.success && !response.tool) {
-        // Abnormal state: success but missing tool object
-        console.warn('Create tool response missing tool object:', {
-          success: response.success,
-          message: response.message,
-          response,
-        });
+        // Server returned success but no tool object - this happens when the API
+        // returns just an id instead of the full tool. Refresh the list to get the complete data.
+        console.info('Create tool response missing tool object, refreshing list');
 
-        // Treat as a sync issue - invalidate to force refetch
+        // Invalidate to force refetch from server
         await queryClient.invalidateQueries({ queryKey: ['tools'] });
 
-        // Show appropriate message to user
-        toast('Tool created, awaiting sync — refreshing list', {
-          icon: '⏳',
-        });
+        toast.success(response.message || 'Tool created successfully');
       } else {
         // Response was not successful
         console.error('Create tool failed:', response);

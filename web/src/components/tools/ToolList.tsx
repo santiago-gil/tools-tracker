@@ -618,7 +618,7 @@ export const ToolList = memo(function ToolList() {
         </div>
       )}
 
-      <div className="flex-1 flex flex-col min-h-0">
+      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
         {isLoading ? (
           <LoadingSpinner className="py-12" />
         ) : filteredTools.length === 0 ? (
