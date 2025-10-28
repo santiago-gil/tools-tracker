@@ -16,14 +16,16 @@ export async function authMiddleware(
   logger.info({
     path: req.path,
     method: req.method,
-    url: req.url
+    url: req.url,
+    hasAuthHeader: !!req.headers.authorization,
+    userAgent: req.headers['user-agent']
   }, "Auth middleware called");
 
   const header = req.headers.authorization ?? "";
   const match = header.match(/^Bearer (.+)$/);
 
   if (!match) {
-    logger.warn("Missing token in request");
+    logger.warn({ path: req.path, url: req.url }, "Missing token in request");
     return next({ status: 401, message: "Missing token" });
   }
 
@@ -36,6 +38,8 @@ export async function authMiddleware(
     logger.info(
       {
         uid: decoded.uid,
+        email: decoded.email,
+        path: req.path,
         // Don't log sensitive email
         iat: decoded.iat,
         exp: decoded.exp
@@ -45,15 +49,16 @@ export async function authMiddleware(
 
     // Restrict to company emails
     if (typeof decoded.email !== 'string' || !decoded.email.endsWith("@searchkings.ca")) {
-      logger.warn({ email: decoded.email }, "Invalid email domain or type");
+      logger.warn({ email: decoded.email, path: req.path }, "Invalid email domain or type");
       return next({ status: 403, message: "Invalid domain" });
     }
 
     // Get existing user - create if missing (only for authenticated user's own document)
+    logger.info({ uid: decoded.uid, path: req.path }, "Fetching user document in auth middleware");
     let userDoc = await getUserByUid(decoded.uid);
 
     if (!userDoc) {
-      logger.warn({ uid: decoded.uid }, "User document not found - auto-creating");
+      logger.warn({ uid: decoded.uid, path: req.path }, "User document not found - auto-creating");
 
       // Only auto-create for the authenticated user's own document
       // This handles cases where trigger didn't fire (e.g., emulator)
@@ -93,7 +98,7 @@ export async function authMiddleware(
       role: userDoc.role,
     };
 
-    logger.debug({ uid: req.user.uid, role: req.user.role }, "Auth success");
+    logger.info({ uid: req.user.uid, role: req.user.role, path: req.path }, "Auth middleware completed - proceeding to route");
     return next();
   } catch (err) {
     logger.error({ err: err instanceof Error ? err.message : err }, "Auth failed");

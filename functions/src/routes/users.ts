@@ -42,6 +42,7 @@ router.get(
   "/:uid",
   validateParams(uidParamSchema),
   asyncHandler(async (req: AuthedRequest, res) => {
+    logger.info({ path: req.path, method: req.method, uid: req.params.uid }, "GET /users/:uid route handler called");
     logger.info({
       uid: req.user?.uid,
       path: req.path,
