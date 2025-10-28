@@ -126,7 +126,9 @@ export const UsersPage = memo(function UsersPage() {
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-primary">{user.email}</div>
-                      <div className="text-xs text-tertiary">{user.uid}</div>
+                      {user.displayName && (
+                        <div className="text-xs text-tertiary">{user.displayName}</div>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <select
