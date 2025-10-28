@@ -203,18 +203,22 @@ export async function getToolById(id: string): Promise<Tool | null> {
 /**
  * Add a new tool
  */
-export async function addTool(data: CreateTool): Promise<ToolWithId> {
+export async function addTool(data: CreateTool, req?: AuthedRequest): Promise<ToolWithId> {
   logger.info({ data }, "Adding new tool");
 
   // Check for duplicate tool names within the same category (case-insensitive)
   const normalizedName = normalizeName(data.name);
-  const existingTools = await toolsCol
+
+  // First try O(1) lookup using normalizedName index (for migrated tools)
+  const queryByNormalizedName = toolsCol
     .where('category', '==', data.category)
     .where('normalizedName', '==', normalizedName)
-    .get();
+    .limit(1);
 
-  if (!existingTools.empty) {
-    const existingTool = existingTools.docs[0].data();
+  const existingNormalizedNameTool = await queryByNormalizedName.get();
+
+  if (!existingNormalizedNameTool.empty) {
+    const existingTool = existingNormalizedNameTool.docs[0].data();
     throw new Error(`Tool with name "${existingTool.name}" already exists in the "${data.category}" category. Please use a different name.`);
   }
 
@@ -236,19 +240,32 @@ export async function addTool(data: CreateTool): Promise<ToolWithId> {
     updatedAt: new Date().toISOString(),
     _optimisticVersion: 0, // Initialize version for new tools
     versions: normalizedVersions,
+    // Add user info if request context is available
+    ...(req?.user && {
+      updatedBy: {
+        uid: req.user.uid,
+        name: req.user.email ?? 'Unknown',
+        email: req.user.email ?? undefined,
+      },
+    }),
   };
+
+  logger.info({ toolData: { ...toolData, versions: '[...]' }, normalizedName }, "Tool data before saving");
 
   const docRef = await toolsCol.add(toolData);
 
   // Invalidate cache after adding tool
   toolsCache.invalidate('all-tools');
-  logger.info({ id: docRef.id }, "Tool added successfully, cache invalidated");
+  logger.info({ id: docRef.id, normalizedName }, "Tool added successfully, cache invalidated");
 
   // Return the tool object constructed from docRef.id plus the normalized data
-  return {
+  const result = {
     id: docRef.id,
     ...toolData,
   };
+
+  logger.info({ hasNormalizedName: !!result.normalizedName }, "Returning tool with normalizedName");
+  return result;
 }
 
 /**
@@ -278,31 +295,37 @@ export async function updateTool(
     }
     const currentTool = currentToolDoc.data() as Tool;
 
-    // Merge with incoming data for validation
-    const mergedData = {
-      ...currentTool,
-      ...data,
-    };
-
     // Check for duplicate tool names within the same category if name is changing
     const nameChanged = data.name !== undefined && data.name !== currentTool.name;
-    if (nameChanged && data.name !== undefined) {
-      const newNormalizedName = normalizeName(data.name);
-      const category = currentTool.category; // Use existing category from the tool
-      const existingTools = await toolsCol
-        .where('category', '==', category)
-        .where('normalizedName', '==', newNormalizedName)
-        .get();
 
-      // Check if any OTHER tool (not this one) has this name in the same category
-      const conflictingTool = existingTools.docs.find(doc => doc.id !== id);
-      if (conflictingTool) {
-        const conflictingToolData = conflictingTool.data();
-        return {
-          success: false,
-          error: `Tool with name "${conflictingToolData.name}" already exists in the "${category}" category. Please use a different name.`,
-          errorCode: 'FIELD_EXISTS'
-        };
+    // Calculate normalized name - use new name if changed, otherwise use current
+    const normalizedNameForUpdate = nameChanged && data.name !== undefined
+      ? normalizeName(data.name)
+      : (currentTool.normalizedName ?? normalizeName(currentTool.name));
+
+    if (nameChanged && data.name !== undefined) {
+      // Reuse the already-computed normalizedNameForUpdate instead of re-computing
+      const category = currentTool.category; // Use existing category from the tool
+
+      // First try O(1) lookup using normalizedName index (for migrated tools)
+      const queryByNormalizedName = toolsCol
+        .where('category', '==', category)
+        .where('normalizedName', '==', normalizedNameForUpdate)
+        .limit(1);
+
+      const existingNormalizedNameTool = await queryByNormalizedName.get();
+
+      if (!existingNormalizedNameTool.empty) {
+        const conflictingTool = existingNormalizedNameTool.docs[0];
+        // Make sure it's not the same tool we're updating
+        if (conflictingTool.id !== id) {
+          const conflictingToolData = conflictingTool.data();
+          return {
+            success: false,
+            error: `Tool with name "${conflictingToolData.name}" already exists in the "${category}" category. Please use a different name.`,
+            errorCode: 'FIELD_EXISTS'
+          };
+        }
       }
     }
 
@@ -322,9 +345,20 @@ export async function updateTool(
 
     const updateData = {
       ...data,
-      ...(nameChanged && { normalizedName: normalizeName(mergedData.name) }),
+      // Always ensure normalizedName is set (for legacy tools without it)
+      normalizedName: normalizedNameForUpdate,
       updatedAt: new Date().toISOString(),
+      // Add user info if request context available
+      ...(req?.user && {
+        updatedBy: {
+          uid: req.user.uid,
+          name: req.user.email ?? 'Unknown',
+          email: req.user.email ?? undefined,
+        },
+      }),
     };
+
+    logger.info({ id, normalizedName: normalizedNameForUpdate, hasUpdatedBy: !!updateData.updatedBy }, "Updating tool with data");
 
     // Perform the update
     await toolsCol.doc(id).update(updateData);

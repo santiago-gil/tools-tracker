@@ -103,7 +103,7 @@ router.post(
       "POST /tools called"
     );
 
-    const createdTool = await addTool(toolData);
+    const createdTool = await addTool(toolData, req);
     const toolWithId = createdTool as Tool & { id: string };
     logger.info({ id: toolWithId.id }, "POST /tools success");
 
