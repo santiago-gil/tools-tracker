@@ -26,7 +26,7 @@ export function useCreateTool() {
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['tools'] });
     },
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       // Update cache immediately with the new tool from server
       if (response.success && response.tool) {
         queryClient.setQueryData<Tool[]>(['tools'], (oldTools) => {
@@ -39,9 +39,27 @@ export function useCreateTool() {
           const updatedTools = [...oldTools, response.tool];
           return updatedTools;
         });
-      }
+        toast.success(response.message || 'Tool created successfully');
+      } else if (response.success && !response.tool) {
+        // Abnormal state: success but missing tool object
+        console.warn('Create tool response missing tool object:', {
+          success: response.success,
+          message: response.message,
+          response,
+        });
 
-      toast.success(response.message || 'Tool created successfully');
+        // Treat as a sync issue - invalidate to force refetch
+        await queryClient.invalidateQueries({ queryKey: ['tools'] });
+
+        // Show appropriate message to user
+        toast('Tool created, awaiting sync — refreshing list', {
+          icon: '⏳',
+        });
+      } else {
+        // Response was not successful
+        console.error('Create tool failed:', response);
+        toast.error(response.message || 'Failed to create tool');
+      }
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to create tool');

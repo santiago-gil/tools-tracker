@@ -55,6 +55,7 @@ export function BasicInfoSection({
           ) : (
             <div className="space-y-2">
               <input
+                id={showCustomCategory ? 'category-custom' : 'category-select'}
                 {...register('category')}
                 className="input-base"
                 placeholder="Enter new category name..."
