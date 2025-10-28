@@ -252,6 +252,11 @@ export async function addTool(data: CreateTool, req?: AuthedRequest): Promise<To
 
   logger.info({ toolData: { ...toolData, versions: '[...]' }, normalizedName }, "Tool data before saving");
 
+  // Verify normalizedName is set before saving
+  if (!toolData.normalizedName) {
+    throw new Error('normalizedName is missing from toolData before save');
+  }
+
   const docRef = await toolsCol.add(toolData);
 
   // Invalidate cache after adding tool
@@ -298,7 +303,8 @@ export async function updateTool(
     // Check for duplicate tool names within the same category if name is changing
     const nameChanged = data.name !== undefined && data.name !== currentTool.name;
 
-    // Calculate normalized name - use new name if changed, otherwise use current
+    // Calculate normalized name - use new name if changed, otherwise backfill if missing
+    // This ensures legacy tools without normalizedName get it populated
     const normalizedNameForUpdate = nameChanged && data.name !== undefined
       ? normalizeName(data.name)
       : (currentTool.normalizedName ?? normalizeName(currentTool.name));
