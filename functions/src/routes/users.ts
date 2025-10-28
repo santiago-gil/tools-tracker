@@ -66,19 +66,24 @@ router.get(
       return res.status(403).json({ error: "Forbidden" });
     }
 
+    logger.info({ uid, reqUserUid: req.user?.uid, reqUserEmail: req.user?.email }, "About to fetch user document");
     const userDoc = await getUserByUid(uid);
+    logger.info({ uid, userDocExists: !!userDoc }, "User document fetch result");
 
     if (!userDoc) {
-      logger.warn({ uid }, "User document not found - attempting auto-creation");
+      logger.warn({ uid, reqUserUid: req.user?.uid, reqUserEmail: req.user?.email }, "User document not found - attempting auto-creation");
       // Only auto-create if requested for current user (not admin looking at someone else)
-      if (uid === req.user.uid && req.user.email) {
+      if (uid === req.user?.uid && req.user?.email) {
         try {
+          logger.info({ uid, email: req.user.email }, "Auto-creating user document");
           const newUserDoc = await createUserDoc(uid, req.user.email, req.user.photoURL, req.user.displayName);
           logger.info({ uid }, "User document auto-created in route");
           return res.json({ user: newUserDoc });
         } catch (err) {
           logger.error({ uid, error: err }, "Failed to auto-create user in route");
         }
+      } else {
+        logger.warn({ uid, reqUserUid: req.user?.uid, reqUserEmail: req.user?.email }, "Cannot auto-create - not requesting own UID or missing email");
       }
       return res.status(404).json({ error: "User not found" });
     }

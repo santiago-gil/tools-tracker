@@ -74,16 +74,16 @@ export async function createUserDoc(
 }
 
 export async function getUserByUid(uid: string): Promise<User | null> {
-  logger.info({ uid }, "Fetching user document");
+  logger.info({ uid, collectionName: usersCol.path }, "Fetching user document");
   const doc = await usersCol.doc(uid).get();
 
   if (!doc.exists) {
-    logger.warn({ uid }, "User document not found");
+    logger.warn({ uid, collectionName: usersCol.path }, "User document not found");
     return null;
   }
 
   const user = { uid: doc.id, ...(doc.data() as Omit<User, "uid">) };
-  logger.info({ uid, role: user.role }, "Fetched user document");
+  logger.info({ uid, role: user.role, collectionName: usersCol.path }, "Fetched user document");
   return user;
 }
 
