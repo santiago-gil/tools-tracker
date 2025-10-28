@@ -5,7 +5,10 @@ import { apiDocument } from '../docs/api.js';
 
 export function attachRoutes(app: Express) {
   app.use('/tools', toolsRouter);
-  app.use('/users', usersRouter);
+  app.use('/users', (req, res, next) => {
+    console.log('Users router hit:', req.method, req.path);
+    next();
+  }, usersRouter);
 
   // API documentation endpoint
   app.get('/docs', (req, res) => {
