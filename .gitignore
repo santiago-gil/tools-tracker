@@ -51,3 +51,4 @@ migrate_to_v2.js
 *.temp
 
 .eslintcache
+*.md

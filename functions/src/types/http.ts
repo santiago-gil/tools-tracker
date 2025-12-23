@@ -5,6 +5,8 @@ export interface RequestUser {
   uid: string;
   email?: string;
   role?: "admin" | "ops" | "viewer";
+  photoURL?: string;
+  displayName?: string;
 }
 
 export interface AuthedRequest extends Request {

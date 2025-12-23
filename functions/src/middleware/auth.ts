@@ -96,6 +96,8 @@ export async function authMiddleware(
       uid: userDoc.uid,
       email: userDoc.email,
       role: userDoc.role,
+      photoURL: userDoc.photoURL,
+      displayName: userDoc.displayName,
     };
 
     logger.info({ uid: req.user.uid, role: req.user.role, path: req.path }, "Auth middleware completed - proceeding to route");
