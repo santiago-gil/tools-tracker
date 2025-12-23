@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import type { JSX } from 'react';
 import { FilePlus2, X } from 'lucide-react';
 import { Badge } from '../common/Badge';
 import type { ToolVersion, TrackableStatus } from '../../types';

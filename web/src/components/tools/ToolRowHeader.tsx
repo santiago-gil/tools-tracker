@@ -162,7 +162,9 @@ function ToolRowHeaderComponent({
               {tool.versions.map((version, idx) => (
                 <button
                   key={`${tool.id}-version-${idx}`}
-                  ref={(el) => (versionTabRefs.current[idx] = el)}
+                  ref={(el) => {
+                    versionTabRefs.current[idx] = el;
+                  }}
                   onClick={(e) => {
                     e.stopPropagation();
                     onVersionSelect(idx);

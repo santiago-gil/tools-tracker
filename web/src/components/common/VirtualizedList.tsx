@@ -1,6 +1,6 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useRef, memo } from 'react';
-import type { ReactNode } from 'react';
+import type { JSX, ReactNode } from 'react';
 
 interface VirtualizedListProps<T> {
   items: T[];

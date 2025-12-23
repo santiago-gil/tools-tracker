@@ -8,7 +8,7 @@ import {
   forwardRef,
   useImperativeHandle,
 } from 'react';
-import type { ReactNode } from 'react';
+import type { JSX, ReactNode } from 'react';
 
 const LAST_ITEMS_THRESHOLD = 3;
 
